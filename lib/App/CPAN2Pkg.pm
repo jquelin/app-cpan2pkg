@@ -44,9 +44,12 @@ sub spawn {
 #
 
 sub _start {
+    my $k = $_[KERNEL];
+    $k->alias_set('app');
 }
 
 sub _stop {
+    warn "_stop";
 }
 
 __END__
