@@ -106,9 +106,7 @@ sub _build_gui {
 
 sub _build_title {
     my ($self) = @_;
-    my $tb = $self->add(undef, 'Window',
-        -height => 1,
-    );
+    my $tb = $self->add(undef, 'Window', -height => 1);
     $self->{title} = $tb->add(undef, 'Label', -bold=>1);
 }
 
