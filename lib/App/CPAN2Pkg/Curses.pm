@@ -100,6 +100,7 @@ sub _build_gui {
 
     $self->_build_title;
     $self->_build_main_window;
+    $self->_build_queue;
     $self->_set_bindings;
 }
 
@@ -122,6 +123,12 @@ sub _build_main_window {
         -height => $rows - 2,
     );
     $self->{mw} = $mw;
+}
+
+sub _build_queue {
+    my ($self) = @_;
+    my $list = $self->{mw}->add(undef, 'Listbox');
+    $self->{listbox} = $list;
 }
 
 sub _set_bindings {
