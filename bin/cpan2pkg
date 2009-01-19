@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# for testing purposes
+use FindBin qw{ $Bin };
+use lib "$Bin/../lib";
+
+
+#use Getopt::Euclid;
+use App::CPAN2Pkg;
+use POE;
+
+App::CPAN2Pkg->spawn;
+POE::Kernel->run;
+exit;
+
+__END__
