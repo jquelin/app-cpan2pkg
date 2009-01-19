@@ -12,6 +12,8 @@ package App::CPAN2Pkg::Curses;
 use App::CPAN2Pkg;
 use Curses;
 use Curses::UI::POE;
+use POE;
+
 use base qw{ Curses::UI::POE };
 
 #--
@@ -23,6 +25,7 @@ sub spawn {
     my $cui = $class->new(
         -color_support => 1,
         inline_states  => {
+            # inline states
             _start => \&_start,
             _stop  => sub { warn "_stop"; },
         },
@@ -30,14 +33,21 @@ sub spawn {
     return $cui;
 }
 
+
+#--
+# SUBS
+
+#-- poe inline states
+
 sub _start {
-    warn "_start";
-    my ($cui) = @_[HEAP];
-    _build_gui($cui);
-    #$_[HEAP]->dialog("Hello!");
+    my ($k, $self) = @_[KERNEL, HEAP];
+
+    $k->alias_set('ui');
+    $self->_build_gui;
 }
 
 #
+
 
 
 =pod
@@ -67,6 +77,11 @@ Language::Befunge [ok]
 n = new, d = delete, enter = jump to
 
 =cut
+
+#--
+# METHODS
+
+# -- private methods
 
 my $title;
 sub _build_gui {
