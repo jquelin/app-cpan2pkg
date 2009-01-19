@@ -1,0 +1,17 @@
+use strict;
+use warnings;
+use Module::Build;
+
+my $builder = Module::Build->new(
+    module_name         => 'App::CPAN2Pkg',
+    license             => 'perl',
+    dist_author         => 'Jerome Quelin <jquelin@cpan.org>',
+    dist_version_from   => 'lib/App/CPAN2Pkg.pm',
+    build_requires => {
+        'Test::More' => 0,
+    },
+    add_to_cleanup      => [ 'App-CPAN2Pkg-*' ],
+    create_makefile_pl => 'traditional',
+);
+
+$builder->create_build_script();
