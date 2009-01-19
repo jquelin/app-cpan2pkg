@@ -99,11 +99,17 @@ my $title;
 sub _build_gui {
     my ($self) = @_;
 
-
-    $self->set_binding( sub{ die; }, "\cQ" );
-
+    $self->_build_title;
+    $self->_build_main_window;
 }
 
+sub _build_title {
+    my ($self) = @_;
+    my $tb = $self->add(undef, 'Window',
+        -height => 1,
+    );
+    $self->{title} = $tb->add(undef, 'Label', -bold=>1);
+}
 
 
 1;
