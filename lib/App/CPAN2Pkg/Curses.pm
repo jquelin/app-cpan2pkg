@@ -20,7 +20,9 @@ use base qw{ Curses::UI::POE };
 # CONSTRUCTOR
 
 sub spawn {
-    my ($class, %opts) = @_;
+    my ($class, $opts) = @_;
+
+    App::CPAN2Pkg->spawn($opts);
 
     my $cui = $class->new(
         -color_support => 1,

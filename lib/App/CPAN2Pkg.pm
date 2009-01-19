@@ -17,14 +17,14 @@ use POE;
 our $VERSION = '0.0.1';
 
 sub spawn {
-    my ($class, %opts) = @_;
+    my ($class, $opts) = @_;
 
     my $session = POE::Session->create(
         inline_states => {
             _start => \&_start,
             _stop  => sub { warn "stop"; },
         },
-        args => \%opts,
+        args => $opts,
     );
     return $session->ID;
 }
