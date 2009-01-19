@@ -86,7 +86,7 @@ Language::Befunge [ok]
     Math::BaseCalc [ok]
     UNIVERSAL::require [ok]
 
-n = new, d = delete, enter = jump to
+enter = jump to, n = new, d = delete
 
 =cut
 
@@ -98,50 +98,9 @@ n = new, d = delete, enter = jump to
 my $title;
 sub _build_gui {
     my ($self) = @_;
-    my $tb  = $self->add('win_title', 'Window', -height=>1);
-    $title  = $tb->add('title',  'Label', -bold=>1, -width=>40);
-    $title->text("Building package from cpan");
-
-    $self->set_binding( sub { $title->text("foo")->draw; die; }, KEY_ENTER );
-}
 
 
-sub _build_menu {
-    my ($self) = shift;
-
-    my $mnu_module = [
-        { -label => 'Package new...', -callback => sub { warn; } },
-        { -label => 'Exit',           -callback => sub { warn; } },
-    ];
-
-=pod
-
-    my $mnu_config = [];
-    my $mnu_windows = [
-        { -label => 'Packages queue', -callback => sub { warn; } },
-        { -label => 'Window list',    -callback => sub { warn; } },
-    ];
-    my $mnu_help = [
-        { -label => "Help", -callback => sub { warn; } },
-        { -label => "Help", -callback => sub { warn; } },
-        { -label => "Help", -callback => sub { warn; } },
-        { -label => "Help", -callback => sub { warn; } },
-    ];
-    F1 - help
-    F2 - packages queue
-    F3 - window list
-    F4 - config (?)
-
-=cut
-
-    my $menus = [
-        { -label => 'Module', -submenu => $mnu_module },
-
-    ];
-    my $menu = $self->add( 
-        'menu', 'Menubar',
-        -menu => $menus
-    );
+    $self->set_binding( sub{ die; }, "\cQ" );
 
 }
 
