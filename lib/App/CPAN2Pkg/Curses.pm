@@ -22,8 +22,6 @@ use base qw{ Curses::UI::POE };
 sub spawn {
     my ($class, $opts) = @_;
 
-    App::CPAN2Pkg->spawn($opts);
-
     my $cui = $class->new(
         -color_support => 1,
         inline_states  => {
@@ -46,6 +44,8 @@ sub _start {
 
     $k->alias_set('ui');
     $self->_build_gui;
+
+    App::CPAN2Pkg->spawn($opts);
 }
 
 #
