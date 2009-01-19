@@ -7,13 +7,12 @@ use warnings;
 use FindBin qw{ $Bin };
 use lib "$Bin/../lib";
 
-
 #use Getopt::Euclid;
-use App::CPAN2Pkg;
-use POE;
+use App::CPAN2Pkg::Curses;
 
-App::CPAN2Pkg->spawn;
-POE::Kernel->run;
+my $ui = App::CPAN2Pkg::Curses->spawn;
+$ui->mainloop;
+
 exit;
 
 __END__

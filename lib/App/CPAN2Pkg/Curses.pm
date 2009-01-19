@@ -1,24 +1,28 @@
 
 package App::CPAN2Pkg::Curses;
 
+use App::CPAN2Pkg;
+use Curses;
+use Curses::UI::POE;
 use base qw{ Curses::UI::POE };
 
 sub spawn {
     my ($class, %opts) = @_;
 
-    #use Curses::UI::POE;
-    #Curses::UI::POE->new(
-    $class->new(
+    my $cui = $class->new(
         -color_support => 1,
         inline_states  => {
             _start => \&_start,
-            _stop  => \&_stop,
+            _stop  => sub { warn "_stop"; },
         },
     );
+    return $cui;
 }
 
 sub _start {
-    warn $_[HEAP];    
+    warn "_start";
+    my ($cui) = @_[HEAP];
+    _build_gui($cui);
     #$_[HEAP]->dialog("Hello!");
 }
 
@@ -53,17 +57,27 @@ n = new, d = delete, enter = jump to
 
 =cut
 
+my $title;
+sub _build_gui {
+    my ($self) = @_;
+    my $tb  = $self->add('win_title', 'Window', -height=>1);
+    $title  = $tb->add('title',  'Label', -bold=>1, -width=>40);
+    $title->text("Building package from cpan");
+
+    $self->set_binding( sub { $title->text("foo")->draw; die; }, KEY_ENTER );
+}
 
 
 sub _build_menu {
-    my ($cui) = shift;
-
-=pod
+    my ($self) = shift;
 
     my $mnu_module = [
         { -label => 'Package new...', -callback => sub { warn; } },
         { -label => 'Exit',           -callback => sub { warn; } },
     ];
+
+=pod
+
     my $mnu_config = [];
     my $mnu_windows = [
         { -label => 'Packages queue', -callback => sub { warn; } },
@@ -79,16 +93,17 @@ sub _build_menu {
     F2 - packages queue
     F3 - window list
     F4 - config (?)
+
+=cut
+
     my $menus = [
         { -label => 'Module', -submenu => $mnu_module },
 
     ];
-    my $menu = $cui->add( 
+    my $menu = $self->add( 
         'menu', 'Menubar',
         -menu => $menus
     );
-
-=cut
 
 }
 
