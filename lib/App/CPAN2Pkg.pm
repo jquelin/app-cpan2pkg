@@ -3,6 +3,41 @@ package App::CPAN2Pkg;
 use warnings;
 use strict;
 
+use App::CPAN2Pkg::Curses;
+
+our $VERSION = '0.0.1';
+
+sub spawn {
+    my ($class, %opts) = @_;
+
+    App::CPAN2Pkg::Curses->spawn;
+    # FIXME: setup a controller session
+}
+
+
+#
+# status:
+#  - computing dependencies
+#  - installing dependencies
+#  - check cooker availability
+#  - cpan2dist
+#  - install local
+#  - check local availability
+#  - mdvsys import
+#  - mdvsys submit
+#  - wait for kenobi build
+#
+
+sub _start {
+
+}
+
+sub _stop {
+    #$_[HEAP]->dialog("Good bye!");
+}
+
+__END__
+
 =head1 NAME
 
 App::CPAN2Pkg - The great new App::CPAN2Pkg!
