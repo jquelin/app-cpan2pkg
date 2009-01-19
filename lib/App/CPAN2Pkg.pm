@@ -3,15 +3,21 @@ package App::CPAN2Pkg;
 use warnings;
 use strict;
 
-use App::CPAN2Pkg::Curses;
+use POE;
 
 our $VERSION = '0.0.1';
 
 sub spawn {
     my ($class, %opts) = @_;
 
-    App::CPAN2Pkg::Curses->spawn;
-    # FIXME: setup a controller session
+    my $session = POE::Session->create(
+        inline_states => {
+            _start => \&_start,
+            _stop  => sub { warn "stop"; },
+        },
+        args => \%opts,
+    );
+    return $session->ID;
 }
 
 
@@ -29,11 +35,10 @@ sub spawn {
 #
 
 sub _start {
-
+    warn "_start";
 }
 
 sub _stop {
-    #$_[HEAP]->dialog("Good bye!");
 }
 
 __END__
