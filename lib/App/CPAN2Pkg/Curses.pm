@@ -121,6 +121,7 @@ sub _build_main_window {
         '-y'    => 1,
         -height => $rows - 2,
     );
+    $self->{mw} = $mw;
 }
 
 sub _set_bindings {
