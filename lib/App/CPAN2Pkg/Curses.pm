@@ -111,6 +111,22 @@ sub _build_title {
     $self->{title} = $tb->add(undef, 'Label', -bold=>1);
 }
 
+sub _build_main_window {
+    my ($self) = @_;
+
+    my ($rows, $cols);
+    getmaxyx($rows, $cols);
+    my $mw = $self->add('win_queue', 'Window',
+        -border => 1,
+        '-y'    => 1,
+        -height => $rows - 2,
+    );
+
+    $self->set_binding( sub{ die; }, "\cQ" );
+
+}
+
+
 
 1;
 __END__
