@@ -16,6 +16,16 @@ use POE;
 
 use base qw{ Curses::UI::POE };
 
+
+# debugging with curses is not easy
+if ( exists $ENV{CPAN2PKG_DEBUG} ) {
+    $SIG{__DIE__} = $SIG{__WARN__} = sub {
+        open my $fh, '>>', 'stderr';
+        print $fh @_;
+    };
+    warn '-' x 40 . "\n";
+}
+
 #--
 # CONSTRUCTOR
 
