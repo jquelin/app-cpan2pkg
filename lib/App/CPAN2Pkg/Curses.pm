@@ -95,7 +95,6 @@ enter = jump to, n = new, d = delete
 
 # -- private methods
 
-my $title;
 sub _build_gui {
     my ($self) = @_;
 
