@@ -116,7 +116,7 @@ sub _build_main_window {
 
     my ($rows, $cols);
     getmaxyx($rows, $cols);
-    my $mw = $self->add('win_queue', 'Window',
+    my $mw = $self->add(undef, 'Window',
         -border => 1,
         '-y'    => 1,
         -height => $rows - 2,
