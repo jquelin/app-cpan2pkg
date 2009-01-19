@@ -101,6 +101,7 @@ sub _build_gui {
 
     $self->_build_title;
     $self->_build_main_window;
+    $self->_set_bindings;
 }
 
 sub _build_title {
@@ -121,9 +122,11 @@ sub _build_main_window {
         '-y'    => 1,
         -height => $rows - 2,
     );
+}
 
+sub _set_bindings {
+    my ($self) = @_;
     $self->set_binding( sub{ die; }, "\cQ" );
-
 }
 
 
