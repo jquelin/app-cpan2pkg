@@ -20,14 +20,24 @@ use App::CPAN2Pkg::Curses;
 use Hook::Output::File;
 
 my $hook;
-$hook = Hook::Output::File->redirect(
-    stdout => '/tmp/cpan2pkg.stdout',
-    stderr => '/tmp/cpan2pkg.stderr',
-);
+my $dir = _get_development_root();
+if ( defined $dir ) {
+    $hook = Hook::Output::File->redirect(
+        stdout => "$dir/cpan2pkg.stdout",
+        stderr => "$dir/cpan2pkg.stderr",
+    );
+    warn '-' x 40 . "\n";
+}
 
 my $ui = App::CPAN2Pkg::Curses->spawn({modules=>\@ARGV});
 $ui->mainloop;
 
 exit;
+
+sub _get_development_root {
+    my $dir = "$Bin/..";
+    return $dir if -d "$dir/.git";
+    return;
+}
 
 __END__
