@@ -28,6 +28,7 @@ sub spawn {
 
     my $cui = $class->new(
         -color_support => 1,
+        -userdata      => $opts,
         inline_states  => {
             # inline states
             _start => \&_start,
@@ -49,6 +50,7 @@ sub _start {
     $k->alias_set('ui');
     $self->_build_gui;
 
+    my $opts = $self->userdata;
     App::CPAN2Pkg->spawn($opts);
 }
 

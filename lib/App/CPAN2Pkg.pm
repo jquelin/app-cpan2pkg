@@ -44,8 +44,10 @@ sub spawn {
 #
 
 sub _start {
-    my $k = $_[KERNEL];
+    my ($k,$opts) = @_[KERNEL, ARG0];
     $k->alias_set('app');
+    my $modules = $opts->{modules};
+    warn "$_\n" for @$modules;
 }
 
 sub _stop {

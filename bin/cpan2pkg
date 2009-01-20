@@ -25,7 +25,7 @@ $hook = Hook::Output::File->redirect(
     stderr => '/tmp/cpan2pkg.stderr',
 );
 
-my $ui = App::CPAN2Pkg::Curses->spawn;
+my $ui = App::CPAN2Pkg::Curses->spawn({modules=>\@ARGV});
 $ui->mainloop;
 
 exit;
