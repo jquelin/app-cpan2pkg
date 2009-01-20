@@ -1,8 +1,13 @@
+bin/cpan2pkg
 Build.PL
 Changes
-MANIFEST
-README
 lib/App/CPAN2Pkg.pm
+lib/App/CPAN2Pkg/Curses.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
 t/00-load.t
-t/pod-coverage.t
-t/pod.t
+t/9-pod-coverage.t
+t/9-pod.t
