@@ -126,11 +126,8 @@ sub _build_notebook {
 
 sub _build_queue {
     my ($self) = @_;
-    #my $list = $self->{mw}->add(undef, 'Listbox');
-    #$self->{listbox} = $list;
-    #my $nb = $self->{mw}->add(undef, 'Notebook');
-    my $nb = $self->{nb};
-    my $p1 = $nb->add_page('page 1');
+    my $pane = $self->{nb}->add_page('Package queue');
+    my $list = $pane->add(undef, 'Listbox');
 }
 
 sub _set_bindings {
