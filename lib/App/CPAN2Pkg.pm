@@ -12,6 +12,7 @@ package App::CPAN2Pkg;
 use strict;
 use warnings;
 
+use App::CPAN2Pkg::Module;
 use POE;
 
 our $VERSION = '0.0.1';
@@ -33,18 +34,6 @@ sub spawn {
 }
 
 
-#
-# status:
-#  - computing dependencies
-#  - installing dependencies
-#  - check cooker availability
-#  - cpan2dist
-#  - install local
-#  - check local availability
-#  - mdvsys import
-#  - mdvsys submit
-#  - wait for kenobi build
-#
 
 #--
 # SUBS
@@ -53,7 +42,7 @@ sub spawn {
 
 sub package {
     my ($k, $module) = @_[KERNEL, ARG0];
-    warn "packaging: $module\n";
+    App::CPAN2Pkg::Module->spawn($module);
 }
 
 
