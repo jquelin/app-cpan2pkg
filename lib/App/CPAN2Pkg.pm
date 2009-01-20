@@ -21,6 +21,9 @@ sub spawn {
 
     my $session = POE::Session->create(
         inline_states => {
+            # public events
+            package => \&package,
+            # poe inline states
             _start => \&_start,
             _stop  => sub { warn "stop"; },
         },
@@ -43,11 +46,26 @@ sub spawn {
 #  - wait for kenobi build
 #
 
+#--
+# SUBS
+
+# -- public events
+
+sub package {
+    my ($k, $module) = @_[KERNEL, ARG0];
+    warn "packaging: $module\n";
+}
+
+
+# -- poe inline states
+
 sub _start {
-    my ($k,$opts) = @_[KERNEL, ARG0];
+    my ($k, $opts) = @_[KERNEL, ARG0];
     $k->alias_set('app');
+
+    # start packaging some modules
     my $modules = $opts->{modules};
-    warn "$_\n" for @$modules;
+    $k->yield('package', $_) for @$modules;
 }
 
 sub _stop {
