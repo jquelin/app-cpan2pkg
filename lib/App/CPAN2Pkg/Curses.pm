@@ -13,6 +13,11 @@ use strict;
 use warnings;
 
 use App::CPAN2Pkg;
+use Class::XSAccessor
+    accessors => {
+        nb       => 'notebook',
+        notebook => 'notebook',
+    };
 use Curses;
 use Curses::UI::POE;
 use POE;
@@ -112,12 +117,12 @@ sub _build_notebook {
         -height => $rows - 3,
     );
     my $nb = $mw->add(undef, 'Notebook');
-    $self->{nb} = $nb;
+    $self->notebook($nb);
 }
 
 sub _build_queue {
     my ($self) = @_;
-    my $pane = $self->{nb}->add_page('Package queue');
+    my $pane = $self->nb->add_page('Package queue');
     my $list = $pane->add(undef, 'Listbox');
 }
 
