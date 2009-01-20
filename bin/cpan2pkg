@@ -17,6 +17,13 @@ use lib "$Bin/../lib";
 
 #use Getopt::Euclid;
 use App::CPAN2Pkg::Curses;
+use Hook::Output::File;
+
+my $hook;
+$hook = Hook::Output::File->redirect(
+    stdout => '/tmp/cpan2pkg.stdout',
+    stderr => '/tmp/cpan2pkg.stderr',
+);
 
 my $ui = App::CPAN2Pkg::Curses->spawn;
 $ui->mainloop;
