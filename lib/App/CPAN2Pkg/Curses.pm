@@ -9,6 +9,9 @@
 
 package App::CPAN2Pkg::Curses;
 
+use strict;
+use warnings;
+
 use App::CPAN2Pkg;
 use Curses;
 use Curses::UI::POE;

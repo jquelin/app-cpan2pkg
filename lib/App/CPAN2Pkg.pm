@@ -9,8 +9,8 @@
 
 package App::CPAN2Pkg;
 
-use warnings;
 use strict;
+use warnings;
 
 use POE;
 
