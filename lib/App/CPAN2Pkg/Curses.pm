@@ -106,8 +106,9 @@ sub _build_gui {
 
 sub _build_title {
     my ($self) = @_;
+    my $title = 'cpan2pkg - generating native linux packages from cpan';
     my $tb = $self->add(undef, 'Window', -height => 1);
-    $self->{title} = $tb->add(undef, 'Label', -bold=>1);
+    $tb->add(undef, 'Label', -bold=>1, -text=>$title);
 }
 
 sub _build_main_window {
