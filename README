@@ -1,18 +1,28 @@
 App-CPAN2Pkg
+============
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+cpan2pkg is an application that aims at producing native linux packages
+from cpan distributions.
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+Yes, i know of cpan2dist - i've even created the CPANPLUS::Dist::Mdv
+backend for Mandriva. However, cpan2dist is "just" creating the package.
+
+But creating a package is more than that:
+    - checking if package is already provided by your linux distribution
+    - installing the package on the local system
+    - importing newly created package in the distribution build system
+    - building & distributing the new package in the distribution
+    - and this, taking the module prerequisites into account...
+      recursively!
+
+So, cpan2pkg is an application that does all that. It uses cpan2dist at
+its heart to generate the package, but interacts with the distribution
+infrastructure to really provide the new package to the final
+distribution users.
 
 
 INSTALLATION
+============
 
 To install this module, run the following commands:
 
@@ -21,7 +31,9 @@ To install this module, run the following commands:
 	./Build test
 	./Build install
 
+
 SUPPORT AND DOCUMENTATION
+=========================
 
 After installing, you can find documentation for this module with the
 perldoc command.
@@ -43,9 +55,16 @@ You can also look for information at:
         http://search.cpan.org/dist/App-CPAN2Pkg
 
 
-COPYRIGHT AND LICENCE
+AUTHOR
+======
 
-Copyright (C) 2009 Jerome Quelin
+Jerome Quelin, <jquelin@cpan.org>
+
+
+COPYRIGHT
+=========
+
+Copyright (c) 2009 Jerome Quelin, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
