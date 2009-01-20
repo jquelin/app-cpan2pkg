@@ -13,7 +13,11 @@ use strict;
 use warnings;
 
 use Class::XSAccessor
-    constructor => 'new';
+    constructor => 'new',
+    accessors   => {
+        name      => 'name',
+        shortname => 'shortname',
+    };
 use POE;
 
 #
