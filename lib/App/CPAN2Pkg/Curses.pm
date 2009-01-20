@@ -99,7 +99,7 @@ sub _build_gui {
     my ($self) = @_;
 
     $self->_build_title;
-    $self->_build_main_window;
+    $self->_build_notebook;
     $self->_build_queue;
     $self->_set_bindings;
 }
@@ -111,23 +111,26 @@ sub _build_title {
     $tb->add(undef, 'Label', -bold=>1, -text=>$title);
 }
 
-sub _build_main_window {
+sub _build_notebook {
     my ($self) = @_;
 
     my ($rows, $cols);
     getmaxyx($rows, $cols);
     my $mw = $self->add(undef, 'Window',
-        -border => 1,
-        '-y'    => 1,
-        -height => $rows - 2,
+        '-y'    => 2,
+        -height => $rows - 3,
     );
-    $self->{mw} = $mw;
+    my $nb = $mw->add(undef, 'Notebook');
+    $self->{nb} = $nb;
 }
 
 sub _build_queue {
     my ($self) = @_;
-    my $list = $self->{mw}->add(undef, 'Listbox');
-    $self->{listbox} = $list;
+    #my $list = $self->{mw}->add(undef, 'Listbox');
+    #$self->{listbox} = $list;
+    #my $nb = $self->{mw}->add(undef, 'Notebook');
+    my $nb = $self->{nb};
+    my $p1 = $nb->add_page('page 1');
 }
 
 sub _set_bindings {
