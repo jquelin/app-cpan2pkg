@@ -12,6 +12,8 @@ package App::CPAN2Pkg::Module;
 use strict;
 use warnings;
 
+use Class::XSAccessor
+    constructor => 'new';
 use POE;
 
 #
@@ -56,8 +58,27 @@ use POE;
 # CONSTRUCTOR
 
 sub spawn {
-    my ($class, $opts) = @_;
-    warn "spawning =$opts=\n";
+    my ($class, $module) = @_;
+
+    # creating the object
+    my $short = $module;
+    $short =~ s/::/:/g;
+    $short =~ s/[[:lower:]]//g;
+    my $obj = App::CPAN2Pkg::Module->new(
+        name      => $module,
+        shortname => $short,
+    );
+
+    # spawning the session
+    my $session = POE::Session->create(
+        inline_states => {
+            # poe inline states
+            _start => \&_start,
+            _stop  => sub { warn "stop"; },
+        },
+        heap => $obj,
+    );
+    return $session->ID;
 }
 
 
@@ -69,7 +90,7 @@ sub spawn {
 sub _start {
     my ($k, $self) = @_[KERNEL, HEAP];
 
-    $k->alias_set('ui');
+    $k->alias_set($self);
 }
 
 #
@@ -103,47 +124,6 @@ sub _start {
 # METHODS
 
 # -- private methods
-
-sub _build_gui {
-    my ($self) = @_;
-
-    $self->_build_title;
-    $self->_build_notebook;
-    $self->_build_queue;
-    $self->_set_bindings;
-}
-
-sub _build_title {
-    my ($self) = @_;
-    my $title = 'cpan2pkg - generating native linux packages from cpan';
-    my $tb = $self->add(undef, 'Window', -height => 1);
-    $tb->add(undef, 'Label', -bold=>1, -text=>$title);
-}
-
-sub _build_notebook {
-    my ($self) = @_;
-
-    my ($rows, $cols);
-    getmaxyx($rows, $cols);
-    my $mw = $self->add(undef, 'Window',
-        '-y'    => 2,
-        -height => $rows - 3,
-    );
-    my $nb = $mw->add(undef, 'Notebook');
-    $self->{nb} = $nb;
-}
-
-sub _build_queue {
-    my ($self) = @_;
-    my $pane = $self->{nb}->add_page('Package queue');
-    my $list = $pane->add(undef, 'Listbox');
-}
-
-sub _set_bindings {
-    my ($self) = @_;
-    $self->set_binding( sub{ die; }, "\cQ" );
-}
-
 
 
 1;
