@@ -35,6 +35,8 @@ sub spawn {
         -color_support => 1,
         -userdata      => $opts,
         inline_states  => {
+            # public events
+            new_module => \&new_module,
             # inline states
             _start => \&_start,
             _stop  => sub { warn "_stop"; },
@@ -46,6 +48,17 @@ sub spawn {
 
 #--
 # SUBS
+
+# -- public events
+
+sub new_module {
+    my ($k, $self, $module) = @_[KERNEL, HEAP, ARG0];
+
+    # adding a notebook pane
+    my $nb = $self->notebook;
+    my $pane = $nb->add_page($module->shortname);
+    $nb->draw;
+}
 
 #-- poe inline states
 
