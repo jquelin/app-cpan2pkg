@@ -13,6 +13,7 @@ use warnings;
 use Module::Build;
 
 my %requires = (
+    'Class::XSAccessor'  => 0,
     'Curses'             => 0,
     'Curses::UI'         => 0,
     'Curses::UI::POE'    => 0,
