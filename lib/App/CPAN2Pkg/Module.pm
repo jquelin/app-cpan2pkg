@@ -138,40 +138,44 @@ __END__
 
 =head1 NAME
 
-App::CPAN2Pkg::Module - curses user interface for cpan2pkg
+App::CPAN2Pkg::Module - poe session to drive a module packaging
 
 
 
 =head1 DESCRIPTION
 
-C<App::CPAN2Pkg::Curses> implements a POE session driving a curses
-interface for C<cpan2pkg>.
+C<App::CPAN2Pkg::Module> implements a POE session driving the whole
+packaging process of a given module.
 
-It is spawned directly by C<cpan2pkg> (since C<Curses::UI::POE> is a bit
-special regarding the event loop), and is responsible for launching the
-application controller (see C<App::CPAN2Pkg>).
+It is spawned by C<App::CPAN2Pkg> and implements the logic related to
+the module availability in the distribution.
 
 
 
 =head1 PUBLIC PACKAGE METHODS
 
-=head2 my $cui = App::CPAN2Pkg->spawn( \%params )
+=head2 my $id = App::CPAN2Pkg::Module->spawn( $module )
 
-This method will create a POE session responsible for creating the
-curses UI and reacting to it.
+This method will create a POE session responsible for packaging &
+installing the wanted C<$module>.
 
-It will return a C<App::CPAN2Pkg::Curses> object, which inherits from
-C<Curses::UI::POE>.
+It will return the POE id of the session newly created.
 
-You can tune the session by passing some arguments as a hash
-reference, where the hash keys are:
+
+
+=head1 METHODS
+
+This package is also a class, used B<internally> to store private data
+needed for the packaging stuff. The following methods are therefore
+available, but should not be used directly:
 
 =over 4
 
-=item * modules => \@list_of_modules
+=item new()
 
-A list of modules to start packaging.
+=item name()
 
+=item shortname()
 
 =back
 
