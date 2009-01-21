@@ -8,6 +8,11 @@ High-level changelog
 Low-level changelog
 ===================
 
+0.0.2 Wed Jan 21 16:43:28 CET 2009
+ - fix to support latest curses::ui::poe version
+ - starting logic to package modules supplied on command-line
+ - first curses interface update
+
 0.0.1 Tue Jan 20 14:19:19 CET 2009
  - original version
 
