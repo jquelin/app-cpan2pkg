@@ -15,6 +15,8 @@ use warnings;
 use App::CPAN2Pkg;
 use Class::XSAccessor
     accessors => {
+        lb       => 'listbox',
+        listbox  => 'listbox',
         nb       => 'notebook',
         notebook => 'notebook',
     };
@@ -58,6 +60,16 @@ sub new_module {
     my $nb = $self->notebook;
     my $pane = $nb->add_page($module->shortname);
     $nb->draw;
+    
+    #
+    my $lb = $self->listbox;
+    my $values = $lb->values;
+    my $pos = scalar @$values;
+    warn "$pos => $module";
+    $lb->add_labels( { $module => $module->name } );
+    $lb->insert_at($pos, $module);
+    $lb->draw;
+    $lb->focus;
 }
 
 #-- poe inline states
@@ -137,6 +149,7 @@ sub _build_queue {
     my ($self) = @_;
     my $pane = $self->nb->add_page('Package queue');
     my $list = $pane->add(undef, 'Listbox');
+    $self->lb($list);
 }
 
 sub _set_bindings {
