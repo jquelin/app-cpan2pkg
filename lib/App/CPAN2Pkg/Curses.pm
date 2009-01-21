@@ -14,17 +14,17 @@ use warnings;
 
 use App::CPAN2Pkg;
 use Class::XSAccessor
-    accessors => {
+    constructor => 'new',
+    accessors   => {
         lb       => 'listbox',
         listbox  => 'listbox',
         nb       => 'notebook',
         notebook => 'notebook',
+        opts     => 'opts',
     };
 use Curses;
 use Curses::UI::POE;
 use POE;
-
-use base qw{ Curses::UI::POE };
 
 
 #--
@@ -33,9 +33,13 @@ use base qw{ Curses::UI::POE };
 sub spawn {
     my ($class, $opts) = @_;
 
-    my $cui = $class->new(
+    # the userdata object
+    my $self = $class->new( opts => $opts );
+
+    # the curses::ui object
+    my $cui  = Curses::UI::POE->new(
         -color_support => 1,
-        -userdata      => $opts,
+        -userdata      => $self,
         inline_states  => {
             # public events
             new_module => \&new_module,
@@ -54,7 +58,8 @@ sub spawn {
 # -- public events
 
 sub new_module {
-    my ($k, $self, $module) = @_[KERNEL, HEAP, ARG0];
+    my ($k, $cui, $module) = @_[KERNEL, HEAP, ARG0];
+    my $self = $cui->userdata;
 
     # adding a notebook pane
     my $nb = $self->notebook;
@@ -75,12 +80,13 @@ sub new_module {
 #-- poe inline states
 
 sub _start {
-    my ($k, $self) = @_[KERNEL, HEAP];
+    my ($k, $cui) = @_[KERNEL, HEAP];
+    my $self = $cui->userdata;
 
     $k->alias_set('ui');
-    $self->_build_gui;
+    $self->_build_gui($cui);
 
-    my $opts = $self->userdata;
+    my $opts = $self->opts;
     App::CPAN2Pkg->spawn($opts);
 }
 
@@ -117,27 +123,27 @@ sub _start {
 # -- private methods
 
 sub _build_gui {
-    my ($self) = @_;
+    my ($self, $cui) = @_;
 
-    $self->_build_title;
-    $self->_build_notebook;
-    $self->_build_queue;
-    $self->_set_bindings;
+    $self->_build_title($cui);
+    $self->_build_notebook($cui);
+    $self->_build_queue($cui);
+    $self->_set_bindings($cui);
 }
 
 sub _build_title {
-    my ($self) = @_;
+    my ($self, $cui) = @_;
     my $title = 'cpan2pkg - generating native linux packages from cpan';
-    my $tb = $self->add(undef, 'Window', -height => 1);
+    my $tb = $cui->add(undef, 'Window', -height => 1);
     $tb->add(undef, 'Label', -bold=>1, -text=>$title);
 }
 
 sub _build_notebook {
-    my ($self) = @_;
+    my ($self, $cui) = @_;
 
     my ($rows, $cols);
     getmaxyx($rows, $cols);
-    my $mw = $self->add(undef, 'Window',
+    my $mw = $cui->add(undef, 'Window',
         '-y'    => 2,
         -height => $rows - 3,
     );
@@ -146,15 +152,15 @@ sub _build_notebook {
 }
 
 sub _build_queue {
-    my ($self) = @_;
+    my ($self, $cui) = @_;
     my $pane = $self->nb->add_page('Package queue');
     my $list = $pane->add(undef, 'Listbox');
     $self->lb($list);
 }
 
 sub _set_bindings {
-    my ($self) = @_;
-    $self->set_binding( sub{ die; }, "\cQ" );
+    my ($self, $cui) = @_;
+    $cui->set_binding( sub{ die; }, "\cQ" );
 }
 
 
@@ -187,8 +193,7 @@ application controller (see C<App::CPAN2Pkg>).
 This method will create a POE session responsible for creating the
 curses UI and reacting to it.
 
-It will return a C<App::CPAN2Pkg::Curses> object, which inherits from
-C<Curses::UI::POE>.
+It will return a C<Curses::UI::POE> object.
 
 You can tune the session by passing some arguments as a hash
 reference, where the hash keys are:
@@ -199,6 +204,30 @@ reference, where the hash keys are:
 
 A list of modules to start packaging.
 
+
+=back
+
+
+
+=head1 METHODS
+
+This package is also a class, used B<internally> to store private data
+needed for the curses interface. The following methods are therefore
+available, but should not be used directly:
+
+=over 4
+
+=item new()
+
+=item lb()
+
+=item listbox()
+
+=item nb()
+
+=item notebook()
+
+=item opts()
 
 =back
 
