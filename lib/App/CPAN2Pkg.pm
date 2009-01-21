@@ -112,6 +112,19 @@ A list of modules to start packaging.
 
 
 
+=head1 PUBLIC EVENTS ACCEPTED
+
+The following events are the module's API.
+
+
+=head2 package( $module )
+
+Request the application to package (if needed) the perl C<$module>. Note
+that the module can be either the top-most module of a distribution or
+deep inside said distribution.
+
+
+
 =head1 BUGS
 
 Please report any bugs or feature requests to C<app-cpan2pkg at
