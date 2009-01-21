@@ -209,6 +209,19 @@ A list of modules to start packaging.
 
 
 
+=head1 PUBLIC EVENTS ACCEPTED
+
+The following events are the module's API.
+
+
+=head2 new_module( $module )
+
+Sent when a new module has been requested to be packaged. The argment
+C<$module> is a C<App::CPAN2Pkg::Module> object with all the needed
+information.
+
+
+
 =head1 METHODS
 
 This package is also a class, used B<internally> to store private data
