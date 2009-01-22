@@ -13,7 +13,7 @@ use strict;
 use warnings;
 
 use Class::XSAccessor
-    constructor => 'new',
+    constructor => '_new',
     accessors   => {
         name      => 'name',
         shortname => 'shortname',
@@ -71,7 +71,7 @@ sub spawn {
     my $short = $module;
     $short =~ s/::/:/g;
     $short =~ s/[[:lower:]]//g;
-    my $obj = App::CPAN2Pkg::Module->new(
+    my $obj = App::CPAN2Pkg::Module->_new(
         name      => $module,
         shortname => $short,
         _wheels    => {},
@@ -226,16 +226,14 @@ Start looking for any other module needed by current module.
 =head1 METHODS
 
 This package is also a class, used B<internally> to store private data
-needed for the packaging stuff. The following methods are therefore
+needed for the packaging stuff. The following accessors are therefore
 available, but should not be used directly:
 
 =over 4
 
-=item new()
+=item name() - the module name
 
-=item name()
-
-=item shortname()
+=item shortname() - the module shortname (only capital letters)
 
 =back
 
