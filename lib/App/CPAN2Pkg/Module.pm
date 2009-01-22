@@ -17,8 +17,11 @@ use Class::XSAccessor
     accessors   => {
         name      => 'name',
         shortname => 'shortname',
+        _wheels    => '_wheels',
     };
 use POE;
+use POE::Filter::Line;
+use POE::Wheel::Run;
 
 #
 # if ( not available in cooker )                is_in_dist
@@ -71,11 +74,18 @@ sub spawn {
     my $obj = App::CPAN2Pkg::Module->new(
         name      => $module,
         shortname => $short,
+        _wheels    => {},
     );
 
     # spawning the session
     my $session = POE::Session->create(
         inline_states => {
+            # public events
+            find_prereqs => \&find_prereqs,
+            # private events
+            _find_prereqs_end    => \&_find_prereqs_end,
+            _find_prereqs_stderr => \&_find_prereqs_stderr,
+            _find_prereqs_stdout => \&_find_prereqs_stdout,
             # poe inline states
             _start => \&_start,
             _stop  => sub { warn "stop"; },
@@ -89,7 +99,48 @@ sub spawn {
 #--
 # SUBS
 
-#-- poe inline states
+# -- public events
+
+sub find_prereqs {
+    my ($k, $self) = @_[KERNEL, HEAP];
+
+    # FIXME: update gui
+
+    my $module = $self->name;
+    my $cmd = "cpanp /prereqs show $module";
+    my $wheel = POE::Wheel::Run->new(
+        Program      => $cmd,
+        CloseEvent   => '_find_prereqs_end',
+        StdoutEvent  => '_find_prereqs_stdout',
+        StderrEvent  => '_find_prereqs_stderr',
+        #ErrorEvent   => '_find_prereqs_error',
+        StdoutFilter => POE::Filter::Line->new,
+        StderrFilter => POE::Filter::Line->new,
+    );
+    $wheel->shutdown_stdin;
+    $self->_wheels->{ $wheel->ID } = $wheel;
+    #$k->sig(CHLD => '_find_prereqs_reap');
+}
+
+# -- private events
+
+sub _find_prereqs_end {
+    warn "end!";
+}
+
+sub _find_prereqs_stderr {
+    my ($k, $self, $line) = @_[KERNEL, HEAP, ARG0];
+    $k->post('ui', 'append', $self, $line);
+}
+
+sub _find_prereqs_stdout {
+    my ($k, $self, $line) = @_[KERNEL, HEAP, ARG0];
+
+    $k->post('ui', 'append', $self, $line);
+}
+
+
+# -- poe inline states
 
 sub _start {
     my ($k, $self) = @_[KERNEL, HEAP];
@@ -97,6 +148,7 @@ sub _start {
     $k->alias_set($self);
     $k->post('ui',  'new_module', $self);
     $k->post('app', 'new_module', $self);
+    $k->yield('find_prereqs');
 }
 
 #
@@ -160,6 +212,14 @@ This method will create a POE session responsible for packaging &
 installing the wanted C<$module>.
 
 It will return the POE id of the session newly created.
+
+
+
+=head1 PUBLIC EVENTS ACCEPTED
+
+=head2 find_prereqs()
+
+Start looking for any other module needed by current module.
 
 
 
