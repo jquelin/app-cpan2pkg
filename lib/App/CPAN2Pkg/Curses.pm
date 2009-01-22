@@ -14,13 +14,13 @@ use warnings;
 
 use App::CPAN2Pkg;
 use Class::XSAccessor
-    constructor => 'new',
+    constructor => '_new',
     accessors   => {
-        lb       => 'listbox',
-        listbox  => 'listbox',
-        nb       => 'notebook',
-        notebook => 'notebook',
-        opts     => 'opts',
+        _lb       => '_listbox',
+        _listbox  => '_listbox',
+        _nb       => '_notebook',
+        _notebook => '_notebook',
+        _opts     => '_opts',
     };
 use Curses;
 use Curses::UI::POE;
@@ -34,7 +34,7 @@ sub spawn {
     my ($class, $opts) = @_;
 
     # the userdata object
-    my $self = $class->new( opts => $opts );
+    my $self = $class->_new( _opts => $opts );
 
     # the curses::ui object
     my $cui  = Curses::UI::POE->new(
@@ -76,7 +76,7 @@ sub new_module {
 
     my $name = $module->name;
     # adding a notebook pane
-    my $nb = $self->notebook;
+    my $nb = $self->_notebook;
     my $pane = $nb->add_page($module->shortname);
     my $textviewer = $pane->add(
         undef, 'TextViewer',
@@ -87,7 +87,7 @@ sub new_module {
     $nb->draw;
     
     #
-    my $lb = $self->listbox;
+    my $lb = $self->_listbox;
     my $values = $lb->values;
     my $pos = scalar @$values;
     $lb->add_labels( { $module => $module->name } );
@@ -105,7 +105,7 @@ sub _start {
     $k->alias_set('ui');
     $self->_build_gui($cui);
 
-    my $opts = $self->opts;
+    my $opts = $self->_opts;
     App::CPAN2Pkg->spawn($opts);
 }
 
@@ -167,14 +167,14 @@ sub _build_notebook {
         -height => $rows - 3,
     );
     my $nb = $mw->add(undef, 'Notebook');
-    $self->notebook($nb);
+    $self->_notebook($nb);
 }
 
 sub _build_queue {
     my ($self, $cui) = @_;
-    my $pane = $self->nb->add_page('Package queue');
+    my $pane = $self->_nb->add_page('Package queue');
     my $list = $pane->add(undef, 'Listbox');
-    $self->lb($list);
+    $self->_lb($list);
 }
 
 sub _set_bindings {
@@ -244,30 +244,6 @@ additional C<$line>.
 Sent when a new module has been requested to be packaged. The argment
 C<$module> is a C<App::CPAN2Pkg::Module> object with all the needed
 information.
-
-
-
-=head1 METHODS
-
-This package is also a class, used B<internally> to store private data
-needed for the curses interface. The following methods are therefore
-available, but should not be used directly:
-
-=over 4
-
-=item new()
-
-=item lb()
-
-=item listbox()
-
-=item nb()
-
-=item notebook()
-
-=item opts()
-
-=back
 
 
 
