@@ -42,6 +42,7 @@ sub spawn {
         -userdata      => $self,
         inline_states  => {
             # public events
+            append     => \&append,
             new_module => \&new_module,
             # inline states
             _start => \&_start,
@@ -57,20 +58,38 @@ sub spawn {
 
 # -- public events
 
+sub append {
+    my ($cui, $module, $line) = @_[HEAP, ARG0, ARG1];
+    my $self = $cui->userdata;
+
+    my $name = $module->name;
+    my $tv = $self->{textviewers}->{$name};
+    my $text = $tv->text;
+    $text .= "$line\n";
+    $tv->text($text);
+    $tv->focus;
+}
+
 sub new_module {
     my ($k, $cui, $module) = @_[KERNEL, HEAP, ARG0];
     my $self = $cui->userdata;
 
+    my $name = $module->name;
     # adding a notebook pane
     my $nb = $self->notebook;
     my $pane = $nb->add_page($module->shortname);
+    my $textviewer = $pane->add(
+        undef, 'TextViewer',
+        -text => '',
+        -vscrollbar => 1,
+    );
+    $self->{textviewers}->{$name} = $textviewer;
     $nb->draw;
     
     #
     my $lb = $self->listbox;
     my $values = $lb->values;
     my $pos = scalar @$values;
-    warn "$pos => $module";
     $lb->add_labels( { $module => $module->name } );
     $lb->insert_at($pos, $module);
     $lb->draw;
@@ -212,6 +231,12 @@ A list of modules to start packaging.
 =head1 PUBLIC EVENTS ACCEPTED
 
 The following events are the module's API.
+
+
+=head2 append( $module, $line )
+
+Update the specific part of the ui devoluted to C<$module> with an
+additional C<$line>.
 
 
 =head2 new_module( $module )
