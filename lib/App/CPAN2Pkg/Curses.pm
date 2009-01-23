@@ -25,6 +25,7 @@ use Class::XSAccessor
         _opts     => '_opts',
     };
 use Curses;
+use Curses::UI::Common;
 use Curses::UI::POE;
 use POE;
 
@@ -152,6 +153,13 @@ sub _focus_to_listbox {
     $lb->focus;
 }
 
+sub _focus_to_viewer {
+    my ($self) = @_;
+
+    #my $lb = $self->_listbox;
+    $self->_win->focus;
+}
+
 
 sub _listbox_item_selected {
     my ($self) = @_;
@@ -190,6 +198,7 @@ sub _build_queue {
         undef, 'Listbox',
         -onchange => sub { $self->_listbox_item_selected },
     );
+    $list->set_binding( sub {$self->_focus_to_viewer}, CUI_TAB );
     $self->_listbox($list);
 }
 
