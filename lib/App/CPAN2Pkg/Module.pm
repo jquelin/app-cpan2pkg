@@ -169,32 +169,6 @@ sub _start {
     $k->yield('find_prereqs');
 }
 
-#
-
-
-#    CPAN2Mdv - generating mandriva rpms from cpan
-#
-#    - Packages queue ------------------------------------------
-#    Language::Befunge [ok]
-#        Test::Exception [ok]
-#            Test::Harness [ok]
-#                File::Spec [ok]
-#                    Scalar::Util [ok]
-#                    Carp [ok]
-#                    Module::Build [ok]
-#                        Test::More [ok]
-#                    ExtUtils::CBuilder [ok]
-#            Sub::Uplevel [ok]
-#        Storable [ok]
-#        aliased [ok]
-#        Readonly [ok]
-#        Class::XSAccessor [ok]
-#            AutoXS::Header [ok]
-#        Math::BaseCalc [ok]
-#        UNIVERSAL::require [ok]
-#
-#    enter = jump to, n = new, d = delete
-
 
 #--
 # METHODS
