@@ -75,10 +75,7 @@ sub append {
     $viewer->text($text);
 
     # forcing redraw if needed
-    if ( $self->_current eq $name ) {
-        $viewer->draw;
-        $viewer->focus;
-    }
+    $viewer->draw if $self->_current eq $name;
 }
 
 sub new_module {
