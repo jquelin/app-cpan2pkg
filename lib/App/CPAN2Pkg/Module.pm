@@ -17,11 +17,13 @@ use Class::XSAccessor
     accessors   => {
         name      => 'name',
         shortname => 'shortname',
+        _output    => '_output',
         _wheels    => '_wheels',
     };
 use POE;
 use POE::Filter::Line;
 use POE::Wheel::Run;
+
 
 #
 # if ( not available in cooker )                is_in_dist
@@ -104,10 +106,14 @@ sub spawn {
 sub find_prereqs {
     my ($k, $self) = @_[KERNEL, HEAP];
 
-    # FIXME: update gui
-
+    # preparing command
     my $module = $self->name;
     my $cmd = "cpanp /prereqs show $module";
+
+    $self->_log_new_step($k, 'Finding module prereqs',
+        "Running command: $cmd" );
+
+    $self->_output('');
     my $wheel = POE::Wheel::Run->new(
         Program      => $cmd,
         CloseEvent   => '_find_prereqs_end',
@@ -119,13 +125,20 @@ sub find_prereqs {
     );
     $wheel->shutdown_stdin;
     $self->_wheels->{ $wheel->ID } = $wheel;
-    #$k->sig(CHLD => '_find_prereqs_reap');
 }
 
 # -- private events
 
 sub _find_prereqs_end {
-    warn "end!";
+    my ($k, $self, $id) = @_[KERNEL, HEAP, ARG0];
+
+    my $wheel  = delete $self->{_wheels}->{$id};
+    my @prereqs =
+        map { (split /\s+/, $_)[0] }
+        grep { s/^\s+// }
+        split /\n/, $self->_output;
+
+    $k->post('ui', 'append', $self, "prereq found: $_\n") for @prereqs;
 }
 
 sub _find_prereqs_stderr {
@@ -185,6 +198,12 @@ sub _start {
 
 # -- private methods
 
+sub _log_new_step {
+    my ($self, $k, $step, $comment) = @_;
+
+    my $out = "\n\n" . '*' x 10 . "\n$step\n\n$comment\n\n";
+    $k->post('ui', 'append', $self, $out);
+}
 
 1;
 __END__
