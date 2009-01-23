@@ -130,12 +130,14 @@ sub _find_prereqs_end {
 
 sub _find_prereqs_stderr {
     my ($k, $self, $line) = @_[KERNEL, HEAP, ARG0];
+    $line .= "\n";
     $k->post('ui', 'append', $self, $line);
 }
 
 sub _find_prereqs_stdout {
     my ($k, $self, $line) = @_[KERNEL, HEAP, ARG0];
-
+    $line .= "\n";
+    $self->_output( $self->_output . $line );
     $k->post('ui', 'append', $self, $line);
 }
 

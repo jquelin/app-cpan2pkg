@@ -65,7 +65,7 @@ sub append {
     my $name = $module->name;
     my $tv = $self->{textviewers}->{$name};
     my $text = $tv->text;
-    $text .= "$line\n";
+    $text .= $line;
     $tv->text($text);
     $tv->focus;
 }
