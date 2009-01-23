@@ -15,7 +15,7 @@ use warnings;
 use App::CPAN2Pkg::Module;
 use POE;
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.1.0';
 
 sub spawn {
     my ($class, $opts) = @_;

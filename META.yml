@@ -1,6 +1,6 @@
 ---
 name: App-CPAN2Pkg
-version: 0.0.2
+version: 0.1.0
 author:
   - 'Jerome Quelin <jquelin@cpan.org>'
 abstract: generating native linux packages from cpan
@@ -8,6 +8,7 @@ license: perl
 resources:
   license: http://dev.perl.org/licenses/
 requires:
+  CPANPLUS::Shell::Default::Plugins::Prereqs: 0
   Class::XSAccessor: 0
   Curses: 0
   Curses::UI: 0
@@ -16,6 +17,7 @@ requires:
   Hook::Output::File: 0
   POE: 0
 build_requires:
+  CPANPLUS::Shell::Default::Plugins::Prereqs: 0
   Class::XSAccessor: 0
   Curses: 0
   Curses::UI: 0
@@ -30,7 +32,7 @@ recommends:
 provides:
   App::CPAN2Pkg:
     file: lib/App/CPAN2Pkg.pm
-    version: 0.0.2
+    version: 0.1.0
   App::CPAN2Pkg::Curses:
     file: lib/App/CPAN2Pkg/Curses.pm
   App::CPAN2Pkg::Module:

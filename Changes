@@ -3,10 +3,17 @@ Revision history for App-CPAN2Pkg
 High-level changelog
 ====================
 
+0.1.x    finding prereqs, better gui
 0.0.x    initial work, with basic gui
 
 Low-level changelog
 ===================
+
+0.1.0 Fri Jan 23 18:13:27 CET 2009
+ - finding module prereqs
+ - revamped gui, getting rid of notebook
+
+**
 
 0.0.2 Wed Jan 21 16:43:28 CET 2009
  - fix to support latest curses::ui::poe version
