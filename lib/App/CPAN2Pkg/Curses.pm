@@ -75,9 +75,8 @@ sub append {
     $viewer->text($text);
 
     # forcing redraw if needed
-    if ( not defined $self->_current ) {
+    if ( $self->_current eq $name ) {
         $viewer->draw;
-        $self->_panes->{$name}->draw;
         $viewer->focus;
     }
 }
