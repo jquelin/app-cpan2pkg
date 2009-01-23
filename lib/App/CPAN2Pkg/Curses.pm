@@ -16,6 +16,7 @@ use App::CPAN2Pkg;
 use Class::XSAccessor
     constructor => '_new',
     accessors   => {
+        _current  => '_current',
         _lb       => '_listbox',
         _listbox  => '_listbox',
         _panes    => '_panes',
@@ -67,12 +68,18 @@ sub append {
     my ($cui, $module, $line) = @_[HEAP, ARG0, ARG1];
     my $self = $cui->userdata;
 
-    my $name = $module->name;
-    my $tv = $self->_viewers->{$name};
-    my $text = $tv->text;
+    my $name   = $module->name;
+    my $viewer = $self->_viewers->{$name};
+    my $text   = $viewer->text;
     $text .= $line;
-    $tv->text($text);
-    $tv->focus;
+    $viewer->text($text);
+
+    # forcing redraw if needed
+    if ( not defined $self->_current ) {
+        $viewer->draw;
+        $self->_panes->{$name}->draw;
+        $viewer->focus;
+    }
 }
 
 sub new_module {
@@ -80,6 +87,14 @@ sub new_module {
     my $self = $cui->userdata;
 
     my $name = $module->name;
+
+    # updating list of modules
+    my $lb = $self->_listbox;
+    my $values = $lb->values;
+    my $pos = scalar @$values;
+    $lb->add_labels( { $module => $module->name } );
+    $lb->insert_at($pos, $module);
+    $lb->draw;
 
     # adding a new pane
     my $win = $self->_win;
@@ -96,19 +111,18 @@ sub new_module {
         -text       => '',
         -vscrollbar => 1,
     );
-    $viewer->draw;
 
+    # storing the new ui elements
     $self->_panes->{$name} = $pane;
     $self->_viewers->{$name} = $viewer;
-    
-    #
-    my $lb = $self->_listbox;
-    my $values = $lb->values;
-    my $pos = scalar @$values;
-    $lb->add_labels( { $module => $module->name } );
-    $lb->insert_at($pos, $module);
-    $lb->draw;
-    $lb->focus;
+
+    # forcing redraw if needed
+    if ( not defined $self->_current ) {
+        $self->_current($name);
+        $win->draw;
+        $viewer->draw;
+        $viewer->focus;
+    }
 }
 
 #-- poe inline states
