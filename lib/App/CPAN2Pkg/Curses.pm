@@ -125,9 +125,6 @@ sub new_module {
 }
 
 
-# -- gui events
-
-
 # -- poe inline states
 
 sub _start {
@@ -145,6 +142,18 @@ sub _start {
 
 #--
 # METHODS
+
+# -- gui events
+
+sub _listbox_item_selected {
+    my ($self) = @_;
+
+    my $lb = $self->_listbox;
+    my $labels = $lb->labels;
+    my $name   = $labels->{ $lb->get_active_value };
+    $self->_current($name);
+    $self->_viewers->{$name}->focus;
+}
 
 # -- private methods
 
@@ -169,7 +178,10 @@ sub _build_queue {
     my $win = $cui->add(undef, 'Window',
         qw/ -y 2 -width 40 -vscrollbar 1 -border 1 /,
     );
-    my $list = $win->add(undef, 'Listbox');
+    my $list = $win->add(
+        undef, 'Listbox',
+        -onchange => sub { $self->_listbox_item_selected },
+    );
     $self->_listbox($list);
 }
 
