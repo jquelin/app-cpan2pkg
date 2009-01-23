@@ -133,10 +133,13 @@ sub _find_prereqs_end {
     my ($k, $self, $id) = @_[KERNEL, HEAP, ARG0];
 
     my $wheel  = delete $self->{_wheels}->{$id};
-    my @prereqs =
-        map { (split /\s+/, $_)[0] }
+    my @lines  =
         grep { s/^\s+// }
         split /\n/, $self->_output;
+    shift @lines; # remove the title line
+    my @prereqs =
+        map  { (split /\s+/, $_)[0] }
+        @lines;
 
     $k->post('ui', 'append', $self, "prereq found: $_\n") for @prereqs;
 }
