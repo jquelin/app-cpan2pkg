@@ -18,8 +18,9 @@ use Class::XSAccessor
     accessors   => {
         _lb       => '_listbox',
         _listbox  => '_listbox',
-        _nb       => '_notebook',
-        _notebook => '_notebook',
+        _panes    => '_panes',
+        _viewers  => '_viewers',
+        _win      => '_win',
         _opts     => '_opts',
     };
 use Curses;
@@ -34,7 +35,11 @@ sub spawn {
     my ($class, $opts) = @_;
 
     # the userdata object
-    my $self = $class->_new( _opts => $opts );
+    my $self = $class->_new(
+        _opts    => $opts,
+        _panes   => {},
+        _viewers => {},
+    );
 
     # the curses::ui object
     my $cui  = Curses::UI::POE->new(
@@ -63,7 +68,7 @@ sub append {
     my $self = $cui->userdata;
 
     my $name = $module->name;
-    my $tv = $self->{textviewers}->{$name};
+    my $tv = $self->_viewers->{$name};
     my $text = $tv->text;
     $text .= $line;
     $tv->text($text);
@@ -75,16 +80,26 @@ sub new_module {
     my $self = $cui->userdata;
 
     my $name = $module->name;
-    # adding a notebook pane
-    my $nb = $self->_notebook;
-    my $pane = $nb->add_page($module->shortname);
-    my $textviewer = $pane->add(
+
+    # adding a new pane
+    my $win = $self->_win;
+    my $pane = $win->add(undef, 'Window');
+
+    my $label = $pane->add(
+        undef, 'Label',
+        -height => 1,
+        -text   => $name,
+    );
+    my $viewer = $pane->add(
         undef, 'TextViewer',
-        -text => '',
+        '-y'        => 2,
+        -text       => '',
         -vscrollbar => 1,
     );
-    $self->{textviewers}->{$name} = $textviewer;
-    $nb->draw;
+    $viewer->draw;
+
+    $self->_panes->{$name} = $pane;
+    $self->_viewers->{$name} = $viewer;
     
     #
     my $lb = $self->_listbox;
@@ -120,8 +135,8 @@ sub _build_gui {
     my ($self, $cui) = @_;
 
     $self->_build_title($cui);
-    $self->_build_notebook($cui);
     $self->_build_queue($cui);
+    $self->_build_right_window($cui);
     $self->_set_bindings($cui);
 }
 
@@ -132,24 +147,21 @@ sub _build_title {
     $tb->add(undef, 'Label', -bold=>1, -text=>$title);
 }
 
-sub _build_notebook {
-    my ($self, $cui) = @_;
-
-    my ($rows, $cols);
-    getmaxyx($rows, $cols);
-    my $mw = $cui->add(undef, 'Window',
-        '-y'    => 2,
-        -height => $rows - 3,
-    );
-    my $nb = $mw->add(undef, 'Notebook');
-    $self->_notebook($nb);
-}
-
 sub _build_queue {
     my ($self, $cui) = @_;
-    my $pane = $self->_nb->add_page('Package queue');
-    my $list = $pane->add(undef, 'Listbox');
-    $self->_lb($list);
+    my $win = $cui->add(undef, 'Window',
+        qw/ -y 2 -width 40 -vscrollbar 1 -border 1 /,
+    );
+    my $list = $win->add(undef, 'Listbox');
+    $self->_listbox($list);
+}
+
+sub _build_right_window {
+    my ($self, $cui) = @_;
+    my $win = $cui->add(undef, 'Window',
+        qw/ -x 41 -y 2 -border 1 /,
+    );
+    $self->_win($win);
 }
 
 sub _set_bindings {
