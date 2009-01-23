@@ -145,6 +145,14 @@ sub _start {
 
 # -- gui events
 
+sub _focus_to_listbox {
+    my ($self) = @_;
+
+    my $lb = $self->_listbox;
+    $lb->focus;
+}
+
+
 sub _listbox_item_selected {
     my ($self) = @_;
 
@@ -199,14 +207,6 @@ sub _set_bindings {
     $widget->set_binding( sub{ die; }, "\cQ" );
     $widget->set_binding( sub {$self->_focus_to_listbox}, KEY_F(2) );
 }
-
-sub _focus_to_listbox {
-    my ($self) = @_;
-
-    my $lb = $self->_listbox;
-    $lb->focus;
-}
-
 
 1;
 __END__
