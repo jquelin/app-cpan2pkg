@@ -111,6 +111,9 @@ sub new_module {
         -vscrollbar => 1,
     );
 
+    #$self->_set_bindings($pane);
+    #$self->_set_bindings($viewer);
+
     # storing the new ui elements
     $self->_panes->{$name} = $pane;
     $self->_viewers->{$name} = $viewer;
@@ -124,7 +127,11 @@ sub new_module {
     }
 }
 
-#-- poe inline states
+
+# -- gui events
+
+
+# -- poe inline states
 
 sub _start {
     my ($k, $cui) = @_[KERNEL, HEAP];
@@ -175,13 +182,21 @@ sub _build_right_window {
         qw/ -x 41 -y 2 -border 1 /,
     );
     $self->_win($win);
+    #$self->_set_bindings($win);
 }
 
 sub _set_bindings {
-    my ($self, $cui) = @_;
-    $cui->set_binding( sub{ die; }, "\cQ" );
+    my ($self, $widget) = @_;
+    $widget->set_binding( sub{ die; }, "\cQ" );
+    $widget->set_binding( sub {$self->_focus_to_listbox}, KEY_F(2) );
 }
 
+sub _focus_to_listbox {
+    my ($self) = @_;
+
+    my $lb = $self->_listbox;
+    $lb->focus;
+}
 
 
 1;
