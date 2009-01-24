@@ -77,7 +77,8 @@ sub spawn {
     my $obj = App::CPAN2Pkg::Module->_new(
         name      => $module,
         shortname => $short,
-        _wheels    => {},
+        _prereqs  => {},
+        _wheels   => {},
     );
 
     # spawning the session
