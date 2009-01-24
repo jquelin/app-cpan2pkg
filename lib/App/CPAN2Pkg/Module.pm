@@ -140,6 +140,7 @@ sub is_in_dist {
     $self->_log_new_step($k, 'Checking if packaged upstream',
         "Running command: $cmd" );
 
+    # running command
     $self->_output('');
     $ENV{LC_ALL} = 'C';
     my $wheel = POE::Wheel::Run->new(
@@ -151,6 +152,8 @@ sub is_in_dist {
         StdoutFilter => POE::Filter::Line->new,
         StderrFilter => POE::Filter::Line->new,
     );
+
+    # need to store the wheel, otherwise the process goes woo!
     $self->_wheels->{ $wheel->ID } = $wheel;
 }
 
