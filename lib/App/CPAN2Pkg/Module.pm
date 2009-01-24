@@ -87,9 +87,9 @@ sub spawn {
             # public events
             find_prereqs => \&find_prereqs,
             # private events
-            _find_prereqs_end    => \&_find_prereqs_end,
-            _find_prereqs_stderr => \&_stderr,
-            _find_prereqs_stdout => \&_stdout,
+            _find_prereqs_end => \&_find_prereqs_end,
+            _stderr => \&_stderr,
+            _stdout => \&_stdout,
             # poe inline states
             _start => \&_start,
             _stop  => sub { warn "stop"; },
@@ -119,8 +119,8 @@ sub find_prereqs {
     my $wheel = POE::Wheel::Run->new(
         Program      => $cmd,
         CloseEvent   => '_find_prereqs_end',
-        StdoutEvent  => '_find_prereqs_stdout',
-        StderrEvent  => '_find_prereqs_stderr',
+        StdoutEvent  => '_stdout',
+        StderrEvent  => '_stderr',
         #ErrorEvent   => '_find_prereqs_error',
         StdoutFilter => POE::Filter::Line->new,
         StderrFilter => POE::Filter::Line->new,
