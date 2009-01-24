@@ -166,7 +166,7 @@ sub _find_prereqs {
     my $wheel  = delete $self->{_wheels}->{$id};
 
     # extract prereqs
-    my @lines  =
+    my @lines =
         grep { s/^\s+// }
         split /\n/, $self->_output;
     shift @lines; # remove the title line
