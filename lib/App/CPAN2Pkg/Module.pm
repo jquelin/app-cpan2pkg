@@ -18,6 +18,7 @@ use Class::XSAccessor
         name      => 'name',
         shortname => 'shortname',
         _output    => '_output',
+        _prereqs   => '_prereqs',
         _wheels    => '_wheels',
     };
 use POE;
@@ -132,7 +133,10 @@ sub find_prereqs {
 sub _find_prereqs_end {
     my ($k, $self, $id) = @_[KERNEL, HEAP, ARG0];
 
+    # terminate wheel
     my $wheel  = delete $self->{_wheels}->{$id};
+
+    # extract prereqs
     my @lines  =
         grep { s/^\s+// }
         split /\n/, $self->_output;
@@ -141,7 +145,12 @@ sub _find_prereqs_end {
         map  { (split /\s+/, $_)[0] }
         @lines;
 
-    $k->post('ui', 'append', $self, "prereq found: $_\n") for @prereqs;
+    # store prereqs
+    foreach my $prereq ( @prereqs ) {
+        $k->post('ui', 'append', $self, "prereq found: $prereq\n");
+        $self->_prereqs->{$prereq} = 1;
+    }
+
     $k->post('app', 'prereqs', $self, @prereqs);
 }
 
