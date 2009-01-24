@@ -88,7 +88,7 @@ sub spawn {
             find_prereqs => \&find_prereqs,
             # private events
             _find_prereqs_end    => \&_find_prereqs_end,
-            _find_prereqs_stderr => \&_append,
+            _find_prereqs_stderr => \&_stderr,
             _find_prereqs_stdout => \&_stdout,
             # poe inline states
             _start => \&_start,
@@ -155,7 +155,7 @@ sub _find_prereqs_end {
     $k->post('app', 'prereqs', $self, @prereqs);
 }
 
-sub _append {
+sub _stderr {
     my ($k, $self, $line) = @_[KERNEL, HEAP, ARG0];
     $k->post('ui', 'append', $self, "$line\n");
 }
