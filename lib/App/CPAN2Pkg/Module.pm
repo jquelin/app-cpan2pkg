@@ -42,7 +42,7 @@ use POE::Wheel::Run;
 #   ack available (manual?)
 #
 # else
-#   yes | urpmi perl(module::to::install)       install_from_dist
+#   urpmi --auto perl(module::to::install)       install_from_dist
 # fi
 
 # on debian / ubuntu
