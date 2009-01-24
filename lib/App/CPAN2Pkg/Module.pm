@@ -146,7 +146,7 @@ sub is_in_dist {
         CloseEvent   => '_is_in_dist',
         StdoutEvent  => '_stdout',
         StderrEvent  => '_stderr',
-        Conduit      => 'pty-pipe',
+        Conduit      => 'pty-pipe', # urpmq wants a pty
         StdoutFilter => POE::Filter::Line->new,
         StderrFilter => POE::Filter::Line->new,
     );
