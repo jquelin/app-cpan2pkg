@@ -86,6 +86,7 @@ sub spawn {
         inline_states => {
             # public events
             find_prereqs => \&find_prereqs,
+            is_in_dist   => \&is_in_dist,
             # private events
             _find_prereqs => \&_find_prereqs,
             _stderr       => \&_stderr,
@@ -126,6 +127,29 @@ sub find_prereqs {
         StderrFilter => POE::Filter::Line->new,
     );
     $wheel->shutdown_stdin;
+    $self->_wheels->{ $wheel->ID } = $wheel;
+}
+
+sub is_in_dist {
+    my ($k, $self) = @_[KERNEL, HEAP];
+
+    # preparing command
+    my $name = $self->name;
+    my $cmd  = "urpmq --whatprovides 'perl($name)'";
+    $self->_log_new_step($k, 'Checking if packaged upstream',
+        "Running command: $cmd" );
+
+    $self->_output('');
+    $ENV{LC_ALL} = 'C';
+    my $wheel = POE::Wheel::Run->new(
+        Program      => $cmd,
+        CloseEvent   => '_is_in_dist',
+        StdoutEvent  => '_stdout',
+        StderrEvent  => '_stderr',
+        Conduit      => 'pty-pipe',
+        StdoutFilter => POE::Filter::Line->new,
+        StderrFilter => POE::Filter::Line->new,
+    );
     $self->_wheels->{ $wheel->ID } = $wheel;
 }
 
@@ -176,7 +200,7 @@ sub _start {
     $k->alias_set($self);
     $k->post('ui',  'new_module', $self);
     $k->post('app', 'new_module', $self);
-    $k->yield('find_prereqs');
+    $k->yield('is_in_dist');
 }
 
 
@@ -229,6 +253,10 @@ It will return the POE id of the session newly created.
 
 Start looking for any other module needed by current module.
 
+
+=head2 is_in_dist()
+
+Check whether the package is provided by an existing upstream package.
 
 
 =head1 METHODS
