@@ -112,21 +112,22 @@ sub find_prereqs {
     # preparing command
     my $module = $self->name;
     my $cmd = "cpanp /prereqs show $module";
-
     $self->_log_new_step($k, 'Finding module prereqs',
         "Running command: $cmd" );
 
+    # running command
     $self->_output('');
+    $ENV{LC_ALL} = 'C';
     my $wheel = POE::Wheel::Run->new(
         Program      => $cmd,
         CloseEvent   => '_find_prereqs',
         StdoutEvent  => '_stdout',
         StderrEvent  => '_stderr',
-        #ErrorEvent   => '_find_prereqs_error',
         StdoutFilter => POE::Filter::Line->new,
         StderrFilter => POE::Filter::Line->new,
     );
-    $wheel->shutdown_stdin;
+
+    # need to store the wheel, otherwise the process goes woo!
     $self->_wheels->{ $wheel->ID } = $wheel;
 }
 
