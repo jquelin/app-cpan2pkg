@@ -142,6 +142,7 @@ sub _find_prereqs_end {
         @lines;
 
     $k->post('ui', 'append', $self, "prereq found: $_\n") for @prereqs;
+    $k->post('app', 'prereqs', $self, @prereqs);
 }
 
 sub _find_prereqs_stderr {
