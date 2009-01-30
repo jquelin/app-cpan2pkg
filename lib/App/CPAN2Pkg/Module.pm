@@ -25,8 +25,6 @@ use POE;
 use POE::Filter::Line;
 use POE::Wheel::Run;
 
-my $PREFIX = '*';
-
 
 #
 # if ( not available in cooker )                is_in_dist
@@ -246,13 +244,18 @@ sub _log_empty_line {
     POE::Kernel->post('ui', 'append', $self, "\n" x $nb);
 }
 
+sub _log_prefixed_lines {
+    my ($self, @lines) = @_;
+
+    my $prefix = '*';
+    POE::Kernel->post('ui', 'append', $self, $_)
+        for map { "$prefix $_\n" } @lines;
+}
+
 sub _log_new_step {
     my ($self, $k, $step, $comment) = @_;
 
-    my @lines =
-        map { "$PREFIX $_\n" }
-        ( '-' x 10, $step, '', $comment, '' );
-    $k->post('ui', 'append', $self, $_) for @lines;
+    $self->_log_prefixed_lines('-' x 10, $step, '', $comment, '');
     $self->_log_empty_line;
 }
 
@@ -260,11 +263,7 @@ sub _log_result {
     my ($self, $text) = @_;
 
     $self->_log_empty_line;
-    my @lines =
-        map { "$PREFIX $_\n" }
-        ( '', $text, '' );
-    POE::Kernel->post('ui', 'append', $self, $_) for @lines;
-    $self->_log_empty_line(2);
+    $self->_log_prefixed_lines( '', $text, '', '' );
 }
 
 
