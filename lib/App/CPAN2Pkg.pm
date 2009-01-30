@@ -57,9 +57,6 @@ sub _start {
     $k->yield('package', $_) for @$modules;
 }
 
-sub _stop {
-    warn "_stop";
-}
 
 1;
 __END__
