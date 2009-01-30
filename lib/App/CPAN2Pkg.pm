@@ -76,6 +76,7 @@ sub install_status {
         return;
     }
 
+    $k->post('ui', 'module_available', $module);
     # update prereqs
 }
 

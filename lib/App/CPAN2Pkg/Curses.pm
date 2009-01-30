@@ -49,8 +49,9 @@ sub spawn {
         -userdata      => $self,
         inline_states  => {
             # public events
-            append         => \&append,
-            module_spawned => \&module_spawned,
+            append           => \&append,
+            module_available => \&module_available,
+            module_spawned   => \&module_spawned,
             # inline states
             _start => \&_start,
             _stop  => sub { warn "_stop"; },
@@ -89,7 +90,7 @@ sub module_spawned {
     my $lb = $self->_listbox;
     my $values = $lb->values;
     my $pos = scalar @$values;
-    $lb->add_labels( { $module => $module->name } );
+    $lb->add_labels( { $module => "- $name" } );
     $lb->insert_at($pos, $module);
     $lb->draw;
 
@@ -123,6 +124,16 @@ sub module_spawned {
         $viewer->draw;
         $viewer->focus;
     }
+}
+
+sub module_available {
+    my ($cui, $module) = @_[HEAP, ARG0];
+    my $self = $cui->userdata;
+
+    my $name = $module->name;
+    my $lb = $self->_listbox;
+    $lb->add_labels( { $module => "+ $name" } );
+    $lb->draw;
 }
 
 
@@ -270,6 +281,12 @@ The following events are the module's API.
 
 Update the specific part of the ui devoluted to C<$module> with an
 additional C<$line>.
+
+
+=head2 module_available( $module )
+
+Sent when C<$module> is available. Updating list of modules to reflect
+this new status.
 
 
 =head2 module_spawned( $module )
