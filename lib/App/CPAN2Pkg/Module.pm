@@ -262,10 +262,10 @@ sub _log_new_step {
 }
 
 sub _log_result {
-    my ($self, $text) = @_;
+    my ($self, @lines) = @_;
 
     $self->_log_empty_line;
-    $self->_log_prefixed_lines( '', $text, '', '' );
+    $self->_log_prefixed_lines( '', @lines, '', '' );
 }
 
 
