@@ -228,7 +228,6 @@ sub _start {
     $k->alias_set($self);
     $k->post('ui',  'new_module', $self);
     $k->post('app', 'new_module', $self);
-    $k->yield('is_in_dist');
 }
 
 

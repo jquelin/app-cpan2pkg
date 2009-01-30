@@ -23,7 +23,8 @@ sub spawn {
     my $session = POE::Session->create(
         inline_states => {
             # public events
-            package => \&package,
+            new_module  => \&new_module,
+            package     => \&package,
             # poe inline states
             _start => \&_start,
             _stop  => sub { warn "stop"; },
@@ -39,6 +40,11 @@ sub spawn {
 # SUBS
 
 # -- public events
+
+sub new_module {
+    my ($k, $module) = @_[KERNEL, ARG0];
+    $k->post($module, 'is_in_dist');
+}
 
 sub package {
     my ($k, $module) = @_[KERNEL, ARG0];
