@@ -39,6 +39,25 @@ sub spawn {
 #--
 # SUBS
 
+#
+# if ( not available in cooker )                is_in_dist
+# then
+#   compute dependencies                        find_prereqs
+#   repeat with each dep
+#   cpan2dist                                   cpan2dist
+#   install local                               install_from_local
+#   while ( not available locally )             is_installed
+#   do
+#       prompt user to fix manually
+#   done
+#   import                                      import_local_to_dist
+#   submit                                              (included above)
+#   ack available (manual?)
+#
+# else
+#   urpmi --auto perl(module::to::install)       install_from_dist
+# fi
+
 # -- public events
 
 sub new_module {
