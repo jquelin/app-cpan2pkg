@@ -69,9 +69,9 @@ sub upstream_status {
 }
 
 sub install_status {
-    my ($k, $module, $installed) = @_[KERNEL, ARG0, ARG1];
+    my ($k, $module, $is_installed) = @_[KERNEL, ARG0, ARG1];
 
-    if ( not $installed ) {
+    if ( not $is_installed ) {
         $k->post($module, 'is_in_dist');
         return;
     }
