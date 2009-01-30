@@ -23,8 +23,7 @@ sub spawn {
     my $session = POE::Session->create(
         inline_states => {
             # public events
-            module_available     => \&module_available,
-            module_not_available => \&module_not_available,
+            upstream_status      => \&upstream_status,
             install_status       => \&install_status,
             module_spawned       => \&module_spawned,
             package              => \&package,
@@ -63,14 +62,10 @@ sub spawn {
 
 # -- public events
 
-sub module_available {
-    my ($k, $module) = @_[KERNEL, ARG0];
-    $k->post($module, 'install_from_dist');
-}
-
-sub module_not_available {
-    my ($k, $module) = @_[KERNEL, ARG0];
-    $k->post($module, 'find_prereqs');
+sub upstream_status {
+    my ($k, $module, $is_available) = @_[KERNEL, ARG0, ARG1];
+    my $event = $is_available ? 'install_from_dist' : 'find_prereqs';
+    $k->post($module, $event);
 }
 
 sub install_status {
@@ -163,16 +158,6 @@ A list of modules to start packaging.
 The following events are the module's API.
 
 
-=head2 module_available( $module )
-
-Sent when C<$module> knows it is available upstream.
-
-
-=head2 module_not_available( $module )
-
-Sent when C<$module> knows it isn't available upstream.
-
-
 =head2 install_status( $module, $is_installed )
 
 Sent when C<$module> knows whether it is installed locally (C<$is_installed>
@@ -189,6 +174,12 @@ Sent when C<$module> has been spawned successfully.
 Request the application to package (if needed) the perl C<$module>. Note
 that the module can be either the top-most module of a distribution or
 deep inside said distribution.
+
+
+=head2 upstream_status( $module, $is_available )
+
+Sent when C<$module> knows whether it is available upstream (C<$is_available>
+set to true) or not.
 
 
 
