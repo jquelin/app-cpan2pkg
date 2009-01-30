@@ -204,7 +204,7 @@ sub _is_in_dist {
 
     my $text = $exval ? "not" : "already";
     $self->_log_result( "$name is $text packaged upstream." );
-    $k->post('app', 'is_in_dist', $self, !$rv);
+    $k->post('app', 'is_in_dist', $self, !$exval);
 }
 
 sub _stderr {
