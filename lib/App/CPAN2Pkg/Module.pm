@@ -202,10 +202,12 @@ sub _is_in_dist {
     $self->_wheel(undef);
 
     # check if we got a hit
+    # urpmq returns 0 if found, 1 otherwise.
     my $name  = $self->name;
     my $exval = $rv >> 8;
 
-    # urpmq returns 0 if found, 1 otherwise.
+    my $text = $exval ? "not" : "already";
+    $self->_log_result( "$name is $text packaged upstream." );
     $k->post('app', 'is_in_dist', $self, !$rv);
 }
 
@@ -253,6 +255,18 @@ sub _log_new_step {
     $k->post('ui', 'append', $self, $_) for @lines;
     $self->_log_empty_line;
 }
+
+sub _log_result {
+    my ($self, $text) = @_;
+
+    $self->_log_empty_line;
+    my @lines =
+        map { "$PREFIX $_\n" }
+        ( '', $text, '' );
+    POE::Kernel->post('ui', 'append', $self, $_) for @lines;
+    $self->_log_empty_line(2);
+}
+
 
 1;
 __END__
