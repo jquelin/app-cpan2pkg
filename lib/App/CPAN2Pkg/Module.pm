@@ -234,8 +234,8 @@ sub _start {
     my ($k, $self) = @_[KERNEL, HEAP];
 
     $k->alias_set($self);
-    $k->post('ui',  'new_module', $self);
-    $k->post('app', 'new_module', $self);
+    $k->post('ui',  'module_spawned', $self);
+    $k->post('app', 'module_spawned', $self);
 }
 
 

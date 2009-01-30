@@ -27,7 +27,7 @@ sub spawn {
             module_not_available => \&module_not_available,
             module_installed     => \&module_installed,
             module_not_installed => \&module_not_installed,
-            new_module           => \&new_module,
+            module_spawned       => \&module_spawned,
             package              => \&package,
             # poe inline states
             _start => \&_start,
@@ -84,7 +84,7 @@ sub module_not_installed {
     $k->post($module, 'is_in_dist');
 }
 
-sub new_module {
+sub module_spawned {
     my ($k, $module) = @_[KERNEL, ARG0];
     $k->post($module, 'is_installed');
 }
@@ -173,7 +173,7 @@ Sent when C<$module> knows it is available upstream.
 Sent when C<$module> knows it isn't available upstream.
 
 
-=head2 new_module( $module )
+=head2 module_spawned( $module )
 
 Sent when C<$module> has been spawned successfully.
 

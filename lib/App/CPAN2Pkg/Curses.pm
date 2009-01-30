@@ -49,8 +49,8 @@ sub spawn {
         -userdata      => $self,
         inline_states  => {
             # public events
-            append     => \&append,
-            new_module => \&new_module,
+            append         => \&append,
+            module_spawned => \&module_spawned,
             # inline states
             _start => \&_start,
             _stop  => sub { warn "_stop"; },
@@ -79,7 +79,7 @@ sub append {
     $viewer->draw if $self->_current eq $name;
 }
 
-sub new_module {
+sub module_spawned {
     my ($k, $cui, $module) = @_[KERNEL, HEAP, ARG0];
     my $self = $cui->userdata;
 
@@ -272,7 +272,7 @@ Update the specific part of the ui devoluted to C<$module> with an
 additional C<$line>.
 
 
-=head2 new_module( $module )
+=head2 module_spawned( $module )
 
 Sent when a new module has been requested to be packaged. The argment
 C<$module> is a C<App::CPAN2Pkg::Module> object with all the needed
