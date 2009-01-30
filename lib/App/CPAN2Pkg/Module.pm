@@ -159,7 +159,6 @@ sub is_installed {
     my $status = $is_installed ? 'installed' : 'not installed';
     $self->_log_result("$name is $status locally.");
     $k->post('app', 'install_status', $self, $is_installed);
-    $k->post('ui',  'install_status', $self, $is_installed);
 }
 
 # -- private events
