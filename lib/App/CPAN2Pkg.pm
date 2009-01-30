@@ -173,6 +173,16 @@ Sent when C<$module> knows it is available upstream.
 Sent when C<$module> knows it isn't available upstream.
 
 
+=head2 module_installed( $module )
+
+Sent when C<$module> knows it is installed locally.
+
+
+=head2 module_not_installed( $module )
+
+Sent when C<$module> knows it isn't installed locally.
+
+
 =head2 module_spawned( $module )
 
 Sent when C<$module> has been spawned successfully.
