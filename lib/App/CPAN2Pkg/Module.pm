@@ -180,11 +180,10 @@ sub _find_prereqs {
         @lines;
 
     # store prereqs
-    foreach my $prereq ( @prereqs ) {
-        $k->post('ui', 'append', $self, "prereq found: $prereq\n");
-        $self->_prereqs->{$prereq} = 1;
-    }
-
+    my @logs = @prereqs
+        ? map { "prereq found: $_" } @prereqs
+        : 'No prereqs found.';
+    $self->_log_result(@logs);
     $k->post('app', 'prereqs', $self, @prereqs);
 }
 
