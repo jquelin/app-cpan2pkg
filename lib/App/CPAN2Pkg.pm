@@ -25,6 +25,8 @@ sub spawn {
             # public events
             module_available     => \&module_available,
             module_not_available => \&module_not_available,
+            module_installed     => \&module_installed,
+            module_not_installed => \&module_not_installed,
             new_module           => \&new_module,
             package              => \&package,
             # poe inline states
@@ -72,9 +74,19 @@ sub module_not_available {
     $k->post($module, 'find_prereqs');
 }
 
-sub new_module {
+sub module_installed {
+    my ($k, $module) = @_[KERNEL, ARG0];
+    # update prereqs
+}
+
+sub module_not_installed {
     my ($k, $module) = @_[KERNEL, ARG0];
     $k->post($module, 'is_in_dist');
+}
+
+sub new_module {
+    my ($k, $module) = @_[KERNEL, ARG0];
+    $k->post($module, 'is_installed');
 }
 
 sub package {
