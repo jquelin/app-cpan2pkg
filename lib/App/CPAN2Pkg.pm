@@ -145,6 +145,17 @@ A list of modules to start packaging.
 The following events are the module's API.
 
 
+=head2 is_in_dist( $module, $result )
+
+Sent when C<$module> knows whether it is available upstream (C<$result>
+being true) or not.
+
+
+=head2 new_module( $module )
+
+Sent when C<$module> has been spawned successfully.
+
+
 =head2 package( $module )
 
 Request the application to package (if needed) the perl C<$module>. Note
