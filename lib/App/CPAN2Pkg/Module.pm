@@ -20,7 +20,6 @@ use Class::XSAccessor
         _output    => '_output',
         _prereqs   => '_prereqs',
         _wheel     => '_wheel',
-        _wheels    => '_wheels',
     };
 use POE;
 use POE::Filter::Line;
@@ -79,7 +78,7 @@ sub spawn {
         name      => $module,
         shortname => $short,
         _prereqs  => {},
-        _wheels   => {},
+        _wheel    => undef,
     );
 
     # spawning the session
@@ -130,7 +129,7 @@ sub find_prereqs {
     );
 
     # need to store the wheel, otherwise the process goes woo!
-    $self->_wheels->{ $wheel->ID } = $wheel;
+    $self->_wheel($wheel);
 }
 
 sub is_in_dist {
@@ -166,7 +165,8 @@ sub _find_prereqs {
     my ($k, $self, $id) = @_[KERNEL, HEAP, ARG0];
 
     # terminate wheel
-    my $wheel  = delete $self->{_wheels}->{$id};
+    my $wheel  = $self->_wheel;
+    $self->_wheel(undef);
 
     # extract prereqs
     my @lines =
