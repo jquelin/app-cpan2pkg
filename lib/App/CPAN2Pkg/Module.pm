@@ -69,6 +69,7 @@ sub spawn {
             # public events
             find_prereqs => \&find_prereqs,
             is_in_dist   => \&is_in_dist,
+            is_installed => \&is_installed,
             # private events
             _find_prereqs => \&_find_prereqs,
             _is_in_dist   => \&_is_in_dist,
@@ -137,6 +138,27 @@ sub is_in_dist {
 
     # need to store the wheel, otherwise the process goes woo!
     $self->_wheel($wheel);
+}
+
+
+sub is_installed {
+    my ($k, $self) = @_[KERNEL, HEAP];
+
+    my $name = $self->name;
+    my $cmd  = qq{ require $name };
+    $self->_log_new_step(
+        'Checking if module is installed',
+        "Evaluating command: $cmd"
+    );
+
+    eval $cmd;
+    my $what = $@ || "$name loaded successfully\n";
+    $k->post('ui', 'append', $self, $what);
+
+    my $event  = $@ ? 'module_not_installed' : 'module_installed';
+    my $status = $@ ? 'not installed' : 'installed';
+    $self->_log_result("$name is $status locally.");
+    $k->post('app', $event, $self);
 }
 
 # -- private events
