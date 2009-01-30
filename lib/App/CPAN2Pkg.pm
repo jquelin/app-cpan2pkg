@@ -23,9 +23,10 @@ sub spawn {
     my $session = POE::Session->create(
         inline_states => {
             # public events
-            is_in_dist  => \&is_in_dist,
-            new_module  => \&new_module,
-            package     => \&package,
+            module_available     => \&module_available,
+            module_not_available => \&module_not_available,
+            new_module           => \&new_module,
+            package              => \&package,
             # poe inline states
             _start => \&_start,
             _stop  => sub { warn "stop"; },
@@ -61,9 +62,14 @@ sub spawn {
 
 # -- public events
 
-sub is_in_dist {
-    my ($k, $module, $is_in_dist) = @_[KERNEL, ARG0, ARG1];
-    $k->post($module, $is_in_dist ? 'install_from_dist' : 'find_prereqs');
+sub module_available {
+    my ($k, $module) = @_[KERNEL, ARG0];
+    $k->post($module, 'install_from_dist');
+}
+
+sub module_not_available {
+    my ($k, $module) = @_[KERNEL, ARG0];
+    $k->post($module, 'find_prereqs');
 }
 
 sub new_module {
@@ -145,10 +151,14 @@ A list of modules to start packaging.
 The following events are the module's API.
 
 
-=head2 is_in_dist( $module, $result )
+=head2 module_available( $module )
 
-Sent when C<$module> knows whether it is available upstream (C<$result>
-being true) or not.
+Sent when C<$module> knows it is available upstream.
+
+
+=head2 module_not_available( $module )
+
+Sent when C<$module> knows it isn't available upstream.
 
 
 =head2 new_module( $module )

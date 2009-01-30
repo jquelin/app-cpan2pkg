@@ -184,9 +184,13 @@ sub _is_in_dist {
     my $name  = $self->name;
     my $exval = $rv >> 8;
 
-    my $text = $exval ? "not" : "already";
-    $self->_log_result( "$name is $text packaged upstream." );
-    $k->post('app', 'is_in_dist', $self, !$exval);
+    if ( ! $exval ) {
+        $self->_log_result( "$name is already packaged upstream." );
+        $k->post('app', 'module_available', $self);
+    } else {
+        $self->_log_result( "$name is not packaged upstream." );
+        $k->post('app', 'module_not_available', $self);
+    }
 }
 
 sub _stderr {
