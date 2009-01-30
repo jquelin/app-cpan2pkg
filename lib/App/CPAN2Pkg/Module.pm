@@ -19,6 +19,7 @@ use Class::XSAccessor
         shortname => 'shortname',
         _output    => '_output',
         _prereqs   => '_prereqs',
+        _wheel     => '_wheel',
         _wheels    => '_wheels',
     };
 use POE;
@@ -89,6 +90,7 @@ sub spawn {
             is_in_dist   => \&is_in_dist,
             # private events
             _find_prereqs => \&_find_prereqs,
+            _is_in_dist   => \&_is_in_dist,
             _stderr       => \&_stderr,
             _stdout       => \&_stdout,
             # poe inline states
@@ -145,16 +147,17 @@ sub is_in_dist {
     $ENV{LC_ALL} = 'C';
     my $wheel = POE::Wheel::Run->new(
         Program      => $cmd,
-        CloseEvent   => '_is_in_dist',
+        #CloseEvent   => '_is_in_dist', # FIXME: cf rt#42757
         StdoutEvent  => '_stdout',
         StderrEvent  => '_stderr',
         Conduit      => 'pty-pipe', # urpmq wants a pty
         StdoutFilter => POE::Filter::Line->new,
         StderrFilter => POE::Filter::Line->new,
     );
+    $k->sig( CHLD => '_is_in_dist' );
 
     # need to store the wheel, otherwise the process goes woo!
-    $self->_wheels->{ $wheel->ID } = $wheel;
+    $self->_wheel($wheel);
 }
 
 # -- private events
@@ -181,6 +184,26 @@ sub _find_prereqs {
     }
 
     $k->post('app', 'prereqs', $self, @prereqs);
+}
+
+sub _is_in_dist {
+    my($k, $self, $pid, $rv) = @_[KERNEL, HEAP, ARG1, ARG2];
+
+    # since it's a sigchld handler, it also gets called for other
+    # spawned processes. therefore, screen out processes that are
+    # not related to this object.
+    return unless $self->_wheel->PID == $pid;
+
+    # terminate wheel
+    # FIXME: should be done in CloseEvent
+    $self->_wheel(undef);
+
+    # check if we got a hit
+    my $name  = $self->name;
+    my $exval = $rv >> 8;
+
+    # urpmq returns 0 if found, 1 otherwise.
+    $k->post('app', 'is_in_dist', $self, !$rv);
 }
 
 sub _stderr {
