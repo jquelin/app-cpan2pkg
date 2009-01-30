@@ -316,6 +316,11 @@ Start looking for any other module needed by current module.
 Check whether the package is provided by an existing upstream package.
 
 
+=head2 is_installed()
+
+Check whether the package is installed locally.
+
+
 =head1 METHODS
 
 This package is also a class, used B<internally> to store private data
