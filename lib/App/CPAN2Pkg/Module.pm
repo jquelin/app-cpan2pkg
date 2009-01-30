@@ -192,6 +192,7 @@ sub _is_in_dist {
     # since it's a sigchld handler, it also gets called for other
     # spawned processes. therefore, screen out processes that are
     # not related to this object.
+    return unless defined $self->_wheel;
     return unless $self->_wheel->PID == $pid;
 
     # terminate wheel
