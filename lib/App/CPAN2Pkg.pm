@@ -23,6 +23,7 @@ sub spawn {
     my $session = POE::Session->create(
         inline_states => {
             # public events
+            is_in_dist  => \&is_in_dist,
             new_module  => \&new_module,
             package     => \&package,
             # poe inline states
@@ -59,6 +60,11 @@ sub spawn {
 # fi
 
 # -- public events
+
+sub is_in_dist {
+    my ($k, $module, $is_in_dist) = @_[KERNEL, ARG0, ARG1];
+    $k->post($module, $is_in_dist ? 'install_from_dist' : 'find_prereqs');
+}
 
 sub new_module {
     my ($k, $module) = @_[KERNEL, ARG0];
