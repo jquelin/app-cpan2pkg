@@ -25,8 +25,7 @@ sub spawn {
             # public events
             module_available     => \&module_available,
             module_not_available => \&module_not_available,
-            module_installed     => \&module_installed,
-            module_not_installed => \&module_not_installed,
+            install_status       => \&install_status,
             module_spawned       => \&module_spawned,
             package              => \&package,
             # poe inline states
@@ -74,14 +73,15 @@ sub module_not_available {
     $k->post($module, 'find_prereqs');
 }
 
-sub module_installed {
-    my ($k, $module) = @_[KERNEL, ARG0];
-    # update prereqs
-}
+sub install_status {
+    my ($k, $module, $installed) = @_[KERNEL, ARG0, ARG1];
 
-sub module_not_installed {
-    my ($k, $module) = @_[KERNEL, ARG0];
-    $k->post($module, 'is_in_dist');
+    if ( not $installed ) {
+        $k->post($module, 'is_in_dist');
+        return;
+    }
+
+    # update prereqs
 }
 
 sub module_spawned {
@@ -173,14 +173,10 @@ Sent when C<$module> knows it is available upstream.
 Sent when C<$module> knows it isn't available upstream.
 
 
-=head2 module_installed( $module )
+=head2 install_status( $module, $is_installed )
 
-Sent when C<$module> knows it is installed locally.
-
-
-=head2 module_not_installed( $module )
-
-Sent when C<$module> knows it isn't installed locally.
+Sent when C<$module> knows whether it is installed locally (C<$is_installed>
+set to true) or not.
 
 
 =head2 module_spawned( $module )

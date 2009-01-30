@@ -155,10 +155,9 @@ sub is_installed {
     my $what = $@ || "$name loaded successfully\n";
     $k->post('ui', 'append', $self, $what);
 
-    my $event  = $@ ? 'module_not_installed' : 'module_installed';
     my $status = $@ ? 'not installed' : 'installed';
     $self->_log_result("$name is $status locally.");
-    $k->post('app', $event, $self);
+    $k->post('app', 'install_status', $self, $@ eq '');
 }
 
 # -- private events
