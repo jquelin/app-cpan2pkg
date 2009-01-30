@@ -113,8 +113,7 @@ sub find_prereqs {
     # preparing command
     my $module = $self->name;
     my $cmd = "cpanp /prereqs show $module";
-    $self->_log_new_step($k, 'Finding module prereqs',
-        "Running command: $cmd" );
+    $self->_log_new_step('Finding module prereqs', "Running command: $cmd" );
 
     # running command
     $self->_output('');
@@ -138,8 +137,7 @@ sub is_in_dist {
     # preparing command
     my $name = $self->name;
     my $cmd  = "urpmq --whatprovides 'perl($name)'";
-    $self->_log_new_step($k, 'Checking if packaged upstream',
-        "Running command: $cmd" );
+    $self->_log_new_step('Checking if packaged upstream', "Running command: $cmd" );
 
     # running command
     $self->_output('');
@@ -253,7 +251,7 @@ sub _log_prefixed_lines {
 }
 
 sub _log_new_step {
-    my ($self, $k, $step, $comment) = @_;
+    my ($self, $step, $comment) = @_;
 
     $self->_log_prefixed_lines('-' x 10, $step, '', $comment, '');
     $self->_log_empty_line;
