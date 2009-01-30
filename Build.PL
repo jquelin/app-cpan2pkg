@@ -13,6 +13,7 @@ use warnings;
 use Module::Build;
 
 my %requires = (
+    perl                 => '5.010',
     'Class::XSAccessor'  => 0,
     'CPANPLUS::Shell::Default::Plugins::Prereqs' => 0,
     'Curses'             => 0,
