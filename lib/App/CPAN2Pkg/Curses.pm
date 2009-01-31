@@ -54,6 +54,7 @@ sub spawn {
             append           => \&append,
             module_available => \&module_available,
             module_spawned   => \&module_spawned,
+            prereqs          => \&prereqs,
             # inline states
             _start => \&_start,
             _stop  => sub { warn "_stop"; },
@@ -157,6 +158,22 @@ sub module_available {
     my $lb = $self->_listbox;
     $lb->add_labels( { $module => "+ $name" } );
     $lb->draw;
+}
+
+sub prereqs {
+    my ($cui, $module, @prereqs) = @_[HEAP, ARG0..$#_];
+    my $self = $cui->userdata;
+
+    my $name  = $module->name;
+    my $label = $self->_prereqs->{$name};
+    if ( @prereqs ) {
+        $label->set_color_fg('red');
+        $label->text(join ',', sort @prereqs);
+
+    } else {
+        $label->set_color_fg('green');
+        $label->text('none');
+    }
 }
 
 
@@ -318,6 +335,10 @@ Sent when a new module has been requested to be packaged. The argment
 C<$module> is a C<App::CPAN2Pkg::Module> object with all the needed
 information.
 
+
+=head2 prereqs( $module, @prereqs )
+
+Update the missing C<@prereqs> of C<$module> in the ui.
 
 
 =head1 SEE ALSO

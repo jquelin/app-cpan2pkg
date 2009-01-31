@@ -115,6 +115,7 @@ sub prereqs {
         push @missing, $m unless exists $h->_complete->{$m};
     }
 
+    $k->post('ui', 'prereqs', $module, @missing);
     if ( @missing ) {
         # module misses some prereqs - wait for them.
         my $name = $module->name;
