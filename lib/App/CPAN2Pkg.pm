@@ -13,6 +13,13 @@ use strict;
 use warnings;
 
 use App::CPAN2Pkg::Module;
+use Class::XSAccessor
+    constructor => '_new',
+    accessors   => {
+        _depends   => '_depends',
+        _modules   => '_modules',
+        _prereq_of => '_prereq',
+    };
 use POE;
 
 our $VERSION = '0.2.2';
@@ -20,6 +27,11 @@ our $VERSION = '0.2.2';
 sub spawn {
     my ($class, $opts) = @_;
 
+    my $obj = App::CPAN2Pkg->_new(
+        _depends => {},
+        _modules => {},
+        _prereq  => {},
+    );
     my $session = POE::Session->create(
         inline_states => {
             # public events
@@ -33,6 +45,7 @@ sub spawn {
             _stop  => sub { warn "stop"; },
         },
         args => $opts,
+        heap => $obj,
     );
     return $session->ID;
 }
@@ -76,7 +89,9 @@ sub install_status {
 }
 
 sub module_spawned {
-    my ($k, $module) = @_[KERNEL, ARG0];
+    my ($k, $h, $module) = @_[KERNEL, HEAP, ARG0];
+    my $name = $module->name;
+    $h->_modules->{$name} = $module;
     $k->post($module, 'is_installed');
 }
 
