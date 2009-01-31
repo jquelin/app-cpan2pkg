@@ -3,12 +3,18 @@ Revision history for App-CPAN2Pkg
 High-level changelog
 ====================
 
+0.3.x    dealing with prereqs
 0.2.x    upstream availability
 0.1.x    finding prereqs, better gui
 0.0.x    initial work, with basic gui
 
 Low-level changelog
 ===================
+
+0.3.0 Sat Jan 31 14:48:59 CET 2009
+ - spawning prereqs
+
+**
 
 0.2.2 Sat Jan 31 12:32:05 CET 2009
  - installing module from upstream dist
