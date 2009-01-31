@@ -20,6 +20,7 @@ use Class::XSAccessor
         _lb       => '_listbox',
         _listbox  => '_listbox',
         _panes    => '_panes',
+        _prereqs  => '_prereqs',
         _viewers  => '_viewers',
         _win      => '_win',
         _opts     => '_opts',
@@ -40,6 +41,7 @@ sub spawn {
     my $self = $class->_new(
         _opts    => $opts,
         _panes   => {},
+        _prereqs => {},
         _viewers => {},
     );
 
@@ -98,14 +100,34 @@ sub module_spawned {
     my $win = $self->_win;
     my $pane = $win->add(undef, 'Window');
 
-    my $label = $pane->add(
+    # title
+    $pane->add(
         undef, 'Label',
         -height => 1,
         -text   => $name,
     );
+
+    # prereqs
+    my $text = 'Missing prereqs: ';
+    my $a = $pane->add(
+        undef, 'Label',
+        '-y'    => 2,
+        -width  => length($text),
+        -height => 1,
+        -text   => $text,
+    );
+    my $prereqs = $pane->add(
+        undef, 'Label',
+        -x      => length($text),
+        '-y'    => 2,
+        -height => 1,
+        -text   => 'unknown',
+    );
+
+    # viewer
     my $viewer = $pane->add(
         undef, 'TextViewer',
-        '-y'        => 2,
+        '-y'        => 4,
         -text       => '',
         -vscrollbar => 1,
     );
@@ -114,7 +136,8 @@ sub module_spawned {
     #$self->_set_bindings($viewer);
 
     # storing the new ui elements
-    $self->_panes->{$name} = $pane;
+    $self->_panes->{$name}   = $pane;
+    $self->_prereqs->{$name} = $prereqs;
     $self->_viewers->{$name} = $viewer;
 
     # forcing redraw if needed
