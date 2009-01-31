@@ -26,6 +26,8 @@ use POE;
 use POE::Filter::Line;
 use POE::Wheel::Run;
 
+my $rpm_locked = '';   # only one rpm transaction at a time
+
 
 # on debian / ubuntu
 # $ apt-file find Audio/MPD.pm
@@ -118,9 +120,17 @@ sub find_prereqs {
 
 sub install_from_dist {
     my ($k, $self) = @_[KERNEL, HEAP];
+    my $name = $self->name;
+
+    # check whether there's another rpm transaction
+    if ( $rpm_locked ) {
+        $self->_log_prefixed_lines("waiting for rpm lock... (owned by $rpm_locked)");
+        $k->delay( install_from_dist => 1 );
+        return;
+    }
+    $rpm_locked = $name;
 
     # preparing command
-    my $name = $self->name;
     my $cmd  = "sudo urpmi --auto 'perl($name)'";
     $self->_log_new_step('Installing from upstream', "Running command: $cmd" );
 
@@ -225,6 +235,9 @@ sub _install_from_dist {
 
     # terminate wheel
     $self->_wheel(undef);
+
+    # release rpm lock
+    $rpm_locked = '';
 
     # log result
     my $name  = $self->name;
