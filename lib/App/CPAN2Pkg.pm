@@ -27,6 +27,7 @@ sub spawn {
             install_status       => \&install_status,
             module_spawned       => \&module_spawned,
             package              => \&package,
+            upstream_install     => \&upstream_install,
             # poe inline states
             _start => \&_start,
             _stop  => sub { warn "stop"; },
@@ -90,6 +91,10 @@ sub package {
     App::CPAN2Pkg::Module->spawn($module);
 }
 
+sub upstream_install {
+    my ($k, $module, $success) = @_[KERNEL, ARG0, ARG1];
+    #update prereqs
+}
 
 # -- poe inline states
 
