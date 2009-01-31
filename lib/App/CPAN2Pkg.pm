@@ -83,12 +83,14 @@ sub install_status {
     my ($k, $module, $is_installed) = @_[KERNEL, ARG0, ARG1];
 
     if ( not $is_installed ) {
+        # module is not installed, check if it's available upstream.
         $k->post($module, 'is_in_dist');
         return;
     }
 
+    # module is already installed.
     $k->post('ui', 'module_available', $module);
-    # update prereqs
+    # FIXME: update prereqs
 }
 
 sub module_spawned {
@@ -131,7 +133,7 @@ sub prereqs {
 
 sub upstream_install {
     my ($k, $module, $success) = @_[KERNEL, ARG0, ARG1];
-    #update prereqs
+    #FIXME: update prereqs
 }
 
 sub upstream_status {
