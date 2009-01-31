@@ -353,6 +353,11 @@ It will return the POE id of the session newly created.
 Start looking for any other module needed by current module.
 
 
+=head2 install_from_dist()
+
+Try to install module from upstream distribution.
+
+
 =head2 is_in_dist()
 
 Check whether the package is provided by an existing upstream package.
