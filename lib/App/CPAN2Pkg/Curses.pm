@@ -92,9 +92,9 @@ sub module_spawned {
     # updating list of modules
     my $lb = $self->_listbox;
     my $values = $lb->values;
-    my $pos = scalar @$values;
+    push @$values, $module;
     $lb->add_labels( { $module => "- $name" } );
-    $lb->insert_at($pos, $module);
+    $lb->values([ sort { $a->name cmp $b->name } @$values ]);
     $lb->draw;
 
     # adding a new pane
