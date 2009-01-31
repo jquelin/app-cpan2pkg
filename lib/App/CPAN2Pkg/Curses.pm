@@ -57,7 +57,7 @@ sub spawn {
             prereqs          => \&prereqs,
             # inline states
             _start => \&_start,
-            _stop  => sub { warn "_stop"; },
+            #_stop  => sub { warn "stop ui\n"; },
         },
     );
     return $cui;

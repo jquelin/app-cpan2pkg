@@ -48,7 +48,7 @@ sub spawn {
             upstream_install     => \&upstream_install,
             # poe inline states
             _start => \&_start,
-            _stop  => sub { warn "stop"; },
+            #_stop  => sub { warn "stop app\n"; },
         },
         args => $opts,
         heap => $obj,

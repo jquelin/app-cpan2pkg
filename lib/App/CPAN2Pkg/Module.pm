@@ -82,7 +82,7 @@ sub spawn {
             _stdout            => \&_stdout,
             # poe inline states
             _start => \&_start,
-            _stop  => sub { warn "stop"; },
+            #_stop  => sub { warn "stop " . $_[HEAP]->name . "\n"; },
         },
         heap => $obj,
     );
