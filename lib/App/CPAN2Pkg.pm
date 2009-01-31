@@ -28,12 +28,15 @@ our $VERSION = '0.3.0';
 sub spawn {
     my ($class, $opts) = @_;
 
+    # create the heap object
     my $obj = App::CPAN2Pkg->_new(
         _complete => {},
-        _missing  => {},
-        _module   => {},
-        _prereq   => {},
+        _missing  => {}, # hoh: {a}{b}=1   mod a needs b
+        _module   => {}, #      {name}=obj store the objects
+        _prereq   => {}, # hoh: {a}{b}=1   mod a is a prereq of b
     );
+
+    # create the main session
     my $session = POE::Session->create(
         inline_states => {
             # public events
