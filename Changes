@@ -11,6 +11,11 @@ High-level changelog
 Low-level changelog
 ===================
 
+0.3.1
+ - moving appli forward when no more missing prereqs
+ - listing missing prereqs in ui
+ - sorting list of modules
+
 0.3.0 Sat Jan 31 14:48:59 CET 2009
  - spawning prereqs
 
