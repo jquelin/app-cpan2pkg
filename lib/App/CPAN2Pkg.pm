@@ -83,19 +83,39 @@ sub spawn {
 # -- public events
 
 sub install_status {
-    my ($k, $module, $is_installed) = @_[KERNEL, ARG0, ARG1];
+    my ($k, $h, $module, $is_installed) = @_[KERNEL, HEAP, ARG0, ARG1];
 
     if ( not $is_installed ) {
-        # module is not installed, check if it's available upstream.
+        # module is not installed locally, check if
+        # it's available upstream.
         $k->post($module, 'is_in_dist');
         return;
     }
 
-    # module is already installed.
+    # module is already installed locally.
     $k->post('ui', 'module_available', $module);
     $k->post('ui', 'prereqs', $module);
 
-    # FIXME: update prereqs
+    # module available: nothing depends on it anymore.
+    my $name = $module->name;
+    my $depends = delete $h->_prereq->{$name};
+    my @depends = keys %$depends;
+
+    # update all modules that were depending on it
+    my $missing = $h->_missing;
+    foreach my $m ( @depends ) {
+        # remove dependency on module
+        my $mobj = $h->_module->{$m};
+        my $missed = $missing->{$m};
+        delete $missed->{$name};
+        $k->post('ui', 'prereqs', $mobj, keys %$missed);
+
+        if ( scalar keys %$missed == 0 ) {
+            # huzzah! no more missing prereqs - let's create a
+            # native package for it.
+            $k->post($mobj, 'cpan2dist');
+        }
+    }
 }
 
 sub module_spawned {
