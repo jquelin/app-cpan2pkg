@@ -226,6 +226,12 @@ that the module can be either the top-most module of a distribution or
 deep inside said distribution.
 
 
+=head2 prereqs( $module, @prereqs )
+
+Inform main application that C<$module> needs some C<@prereqs> (possibly
+empty).
+
+
 =head2 upstream_install( $module, $success )
 
 Sent after trying to install C<$module> from upstream dist. Result is passed
