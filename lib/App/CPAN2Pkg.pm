@@ -16,9 +16,10 @@ use App::CPAN2Pkg::Module;
 use Class::XSAccessor
     constructor => '_new',
     accessors   => {
-        _depends   => '_depends',
-        _modules   => '_modules',
-        _prereq_of => '_prereq',
+        _complete  => '_complete',
+        _missing   => '_missing',
+        _module    => '_module',
+        _prereq    => '_prereq',
     };
 use POE;
 
@@ -28,9 +29,10 @@ sub spawn {
     my ($class, $opts) = @_;
 
     my $obj = App::CPAN2Pkg->_new(
-        _depends => {},
-        _modules => {},
-        _prereq  => {},
+        _complete => {},
+        _missing  => {},
+        _module   => {},
+        _prereq   => {},
     );
     my $session = POE::Session->create(
         inline_states => {
@@ -39,6 +41,7 @@ sub spawn {
             install_status       => \&install_status,
             module_spawned       => \&module_spawned,
             package              => \&package,
+            prereqs              => \&prereqs,
             upstream_install     => \&upstream_install,
             # poe inline states
             _start => \&_start,
@@ -91,13 +94,38 @@ sub install_status {
 sub module_spawned {
     my ($k, $h, $module) = @_[KERNEL, HEAP, ARG0];
     my $name = $module->name;
-    $h->_modules->{$name} = $module;
+    $h->_module->{$name} = $module;
     $k->post($module, 'is_installed');
 }
 
 sub package {
-    my ($k, $module) = @_[KERNEL, ARG0];
+    my ($k, $h, $module) = @_[KERNEL, HEAP, ARG0];
     App::CPAN2Pkg::Module->spawn($module);
+}
+
+sub prereqs {
+    my ($k, $h, $module, @prereqs) = @_[KERNEL, HEAP, ARG0..$#_];
+
+    my @missing;
+    foreach my $m ( @prereqs ) {
+        # check if module is new. in which case, let's treat it.
+        $k->yield('package', $m) unless exists $h->_module->{$m};
+
+        # store missing module.
+        push @missing, $m unless exists $h->_complete->{$m};
+    }
+
+    if ( @missing ) {
+        # module misses some prereqs - wait for them.
+        my $name = $module->name;
+        $h->_missing->{$name}{$_} = 1 for @missing;
+        $h->_prereq->{$_}{$name}  = 1 for @missing;
+
+    } else {
+        # no prereqs, move on
+        $k->yield('prereqs_completed', $module);
+        return;
+    }
 }
 
 sub upstream_install {
