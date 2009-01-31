@@ -122,8 +122,8 @@ sub module_spawned {
         -x      => length($text),
         '-y'    => 2,
         -height => 1,
-        -text   => 'unknown',
     );
+    $prereqs->text('unknown');
 
     # viewer
     my $viewer = $pane->add(
