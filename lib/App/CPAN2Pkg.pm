@@ -183,6 +183,12 @@ that the module can be either the top-most module of a distribution or
 deep inside said distribution.
 
 
+=head2 upstream_install( $module, $success )
+
+Sent after trying to install C<$module> from upstream dist. Result is passed
+along with C<$success>.
+
+
 =head2 upstream_status( $module, $is_available )
 
 Sent when C<$module> knows whether it is available upstream (C<$is_available>
