@@ -69,6 +69,7 @@ sub spawn {
     my $session = POE::Session->create(
         inline_states => {
             # public events
+            cpan2dist         => \&cpan2dist,
             find_prereqs      => \&find_prereqs,
             install_from_dist => \&install_from_dist,
             is_in_dist        => \&is_in_dist,
@@ -93,6 +94,12 @@ sub spawn {
 # SUBS
 
 # -- public events
+
+sub cpan2dist {
+    my ($k, $self) = @_[KERNEL, HEAP];
+    my $name = $self->name;
+    warn "running: cpan2dist $name\n";
+}
 
 sub find_prereqs {
     my ($k, $self) = @_[KERNEL, HEAP];
