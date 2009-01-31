@@ -63,12 +63,6 @@ sub spawn {
 
 # -- public events
 
-sub upstream_status {
-    my ($k, $module, $is_available) = @_[KERNEL, ARG0, ARG1];
-    my $event = $is_available ? 'install_from_dist' : 'find_prereqs';
-    $k->post($module, $event);
-}
-
 sub install_status {
     my ($k, $module, $is_installed) = @_[KERNEL, ARG0, ARG1];
 
@@ -95,6 +89,13 @@ sub upstream_install {
     my ($k, $module, $success) = @_[KERNEL, ARG0, ARG1];
     #update prereqs
 }
+
+sub upstream_status {
+    my ($k, $module, $is_available) = @_[KERNEL, ARG0, ARG1];
+    my $event = $is_available ? 'install_from_dist' : 'find_prereqs';
+    $k->post($module, $event);
+}
+
 
 # -- poe inline states
 
