@@ -67,14 +67,16 @@ sub spawn {
     my $session = POE::Session->create(
         inline_states => {
             # public events
-            find_prereqs => \&find_prereqs,
-            is_in_dist   => \&is_in_dist,
-            is_installed => \&is_installed,
+            find_prereqs      => \&find_prereqs,
+            install_from_dist => \&install_from_dist,
+            is_in_dist        => \&is_in_dist,
+            is_installed      => \&is_installed,
             # private events
-            _find_prereqs => \&_find_prereqs,
-            _is_in_dist   => \&_is_in_dist,
-            _stderr       => \&_stderr,
-            _stdout       => \&_stdout,
+            _find_prereqs      => \&_find_prereqs,
+            _install_from_dist => \&_install_from_dist,
+            _is_in_dist        => \&_is_in_dist,
+            _stderr            => \&_stderr,
+            _stdout            => \&_stdout,
             # poe inline states
             _start => \&_start,
             _stop  => sub { warn "stop"; },
@@ -109,6 +111,31 @@ sub find_prereqs {
         StdoutFilter => POE::Filter::Line->new,
         StderrFilter => POE::Filter::Line->new,
     );
+
+    # need to store the wheel, otherwise the process goes woo!
+    $self->_wheel($wheel);
+}
+
+sub install_from_dist {
+    my ($k, $self) = @_[KERNEL, HEAP];
+
+    # preparing command
+    my $name = $self->name;
+    my $cmd  = "sudo urpmi --auto 'perl($name)'";
+    $self->_log_new_step('Installing from upstream', "Running command: $cmd" );
+
+    # running command
+    $self->_output('');
+    $ENV{LC_ALL} = 'C';
+    my $wheel = POE::Wheel::Run->new(
+        Program      => $cmd,
+        StdoutEvent  => '_stdout',
+        StderrEvent  => '_stderr',
+        Conduit      => 'pty-pipe', # urpmi wants a pty
+        StdoutFilter => POE::Filter::Line->new,
+        StderrFilter => POE::Filter::Line->new,
+    );
+    $k->sig( CHLD => '_install_from_dist' );
 
     # need to store the wheel, otherwise the process goes woo!
     $self->_wheel($wheel);
@@ -185,6 +212,26 @@ sub _find_prereqs {
         : 'No prereqs found.';
     $self->_log_result(@logs);
     $k->post('app', 'prereqs', $self, @prereqs);
+}
+
+sub _install_from_dist {
+    my($k, $self, $pid, $rv) = @_[KERNEL, HEAP, ARG1, ARG2];
+
+    # since it's a sigchld handler, it also gets called for other
+    # spawned processes. therefore, screen out processes that are
+    # not related to this object.
+    return unless defined $self->_wheel;
+    return unless $self->_wheel->PID == $pid;
+
+    # terminate wheel
+    $self->_wheel(undef);
+
+    # log result
+    my $name  = $self->name;
+    my $exval = $rv >> 8;
+    my $status = $exval ? 'not been' : 'been';
+    $self->_log_result( "$name has $status installed from upstream." );
+    $k->post('app', 'upstream_install', $self, !$exval);
 }
 
 sub _is_in_dist {
