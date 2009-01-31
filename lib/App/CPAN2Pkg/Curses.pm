@@ -154,9 +154,6 @@ sub module_available {
     my ($k, $cui, $module) = @_[KERNEL, HEAP, ARG0];
     my $self = $cui->userdata;
 
-    # update module prereqs
-    $k->yield('prereqs', $module);
-
     # update list of modules
     my $name = $module->name;
     my $lb = $self->_listbox;

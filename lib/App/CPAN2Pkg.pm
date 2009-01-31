@@ -90,6 +90,8 @@ sub install_status {
 
     # module is already installed.
     $k->post('ui', 'module_available', $module);
+    $k->post('ui', 'prereqs', $module);
+
     # FIXME: update prereqs
 }
 
