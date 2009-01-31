@@ -177,7 +177,7 @@ sub _listbox_item_selected {
 
     my $lb = $self->_listbox;
     my $labels = $lb->labels;
-    my $name   = $labels->{ $lb->get_active_value };
+    my $name   = substr $labels->{ $lb->get_active_value }, 2;
     $self->_current($name);
     $self->_viewers->{$name}->focus;
 }
