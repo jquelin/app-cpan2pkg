@@ -10,6 +10,10 @@ High-level changelog
 Low-level changelog
 ===================
 
+0.2.2 Sat Jan 31 12:32:05 CET 2009
+ - installing module from upstream dist
+ - module status in listbox
+
 0.2.1 Fri Jan 30 18:56:23 CET 2009
  - checking if module is installed locally
  - better output for prereqs
