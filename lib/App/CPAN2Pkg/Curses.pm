@@ -169,7 +169,7 @@ sub prereqs {
     my $label = $self->_prereqs->{$name};
     if ( @prereqs ) {
         $label->set_color_fg('red');
-        $label->text(join ',', sort @prereqs);
+        $label->text(join ', ', sort @prereqs);
 
     } else {
         $label->set_color_fg('green');
