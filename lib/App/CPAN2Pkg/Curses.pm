@@ -20,7 +20,7 @@ use Class::XSAccessor
         _lb       => '_listbox',
         _listbox  => '_listbox',
         _panes    => '_panes',
-        _prereqs  => '_prereqs',
+        _missing  => '_missing',
         _viewers  => '_viewers',
         _win      => '_win',
         _opts     => '_opts',
@@ -41,7 +41,7 @@ sub spawn {
     my $self = $class->_new(
         _opts    => $opts,
         _panes   => {},
-        _prereqs => {},
+        _missing => {},
         _viewers => {},
     );
 
@@ -117,13 +117,13 @@ sub module_spawned {
         -height => 1,
         -text   => $text,
     );
-    my $prereqs = $pane->add(
+    my $missing = $pane->add(
         undef, 'Label',
         -x      => length($text),
         '-y'    => 2,
         -height => 1,
     );
-    $prereqs->text('unknown');
+    $missing->text('unknown');
 
     # viewer
     my $viewer = $pane->add(
@@ -138,7 +138,7 @@ sub module_spawned {
 
     # storing the new ui elements
     $self->_panes->{$name}   = $pane;
-    $self->_prereqs->{$name} = $prereqs;
+    $self->_missing->{$name} = $missing;
     $self->_viewers->{$name} = $viewer;
 
     # forcing redraw if needed
@@ -166,7 +166,7 @@ sub prereqs {
     my $self = $cui->userdata;
 
     my $name  = $module->name;
-    my $label = $self->_prereqs->{$name};
+    my $label = $self->_missing->{$name};
     if ( @prereqs ) {
         $label->set_color_fg('red');
         $label->text(join ', ', sort @prereqs);
