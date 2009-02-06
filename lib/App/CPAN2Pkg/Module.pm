@@ -17,7 +17,6 @@ use Class::XSAccessor
     constructor => '_new',
     accessors   => {
         name      => 'name',
-        shortname => 'shortname',
         _output    => '_output',
         _prereqs   => '_prereqs',
         _wheel     => '_wheel',
@@ -55,12 +54,8 @@ sub spawn {
     my ($class, $module) = @_;
 
     # creating the object
-    my $short = $module;
-    $short =~ s/::/:/g;
-    $short =~ s/[[:lower:]]//g;
     my $obj = App::CPAN2Pkg::Module->_new(
         name      => $module,
-        shortname => $short,
         _prereqs  => {},
         _wheel    => undef,
     );
@@ -447,8 +442,6 @@ available, but should not be used directly:
 =over 4
 
 =item name() - the module name
-
-=item shortname() - the module shortname (only capital letters)
 
 =back
 
