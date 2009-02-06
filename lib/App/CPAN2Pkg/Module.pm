@@ -101,9 +101,8 @@ sub cpan2dist {
 
     # preparing command
     my $name = $self->name;
-    my $cmd = "cpan2dist --format=CPANPLUS::Dist::Mdv --install $name";
-    $self->_log_new_step('Building & installing package',
-        "Running command: $cmd" );
+    my $cmd = "cpan2dist --force --format=CPANPLUS::Dist::Mdv $name";
+    $self->_log_new_step('Building package', "Running command: $cmd" );
 
     # running command
     $self->_output('');
@@ -235,11 +234,20 @@ sub _cpan2dist {
     my $wheel  = $self->_wheel;
     $self->_wheel(undef);
 
-    if ( $self->_output =~ /successfully installed/ ) {
-        $self->_log_result("$name has been successfully built & installed");
+    my $output = $self->_output;
+    my ($rpm, $srpm);
+    $rpm  = $1 if $output =~ /rpm created successfully: (.*\.rpm)/;
+    $srpm = $1 if $output =~ /srpm available: (.*\.src.rpm)/;
+
+    if ( $rpm && $srpm ) {
+        $self->_log_result(
+            "$name has been successfully built",
+            "srpm created: $srpm",
+            "rpm created:  $rpm",
+        );
         $k->post('app', 'cpan2dist', $self, 1);
     } else {
-        $self->_log_result("error while building/installing $name");
+        $self->_log_result("error while building $name");
         $k->post('app', 'cpan2dist', $self, 0);
     }
 }
@@ -407,8 +415,7 @@ It will return the POE id of the session newly created.
 
 =head2 cpan2dist()
 
-Build B<and> install a native package for this module, using
-C<cpan2dist> with the C<--install> flag.
+Build a native package for this module, using C<cpan2dist> with the C<--force> flag.
 
 
 =head2 find_prereqs()
