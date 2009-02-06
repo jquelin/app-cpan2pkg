@@ -151,7 +151,7 @@ sub prereqs {
 
     } else {
         # no prereqs, move on
-        $k->yield('prereqs_completed', $module);
+        $k->post($module, 'cpan2dist');
         return;
     }
 }
