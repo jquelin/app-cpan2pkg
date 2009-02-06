@@ -368,6 +368,12 @@ It will return the POE id of the session newly created.
 
 =head1 PUBLIC EVENTS ACCEPTED
 
+=head2 cpan2dist()
+
+Build B<and> install a native package for this module, using
+C<cpan2dist> with the C<--install> flag.
+
+
 =head2 find_prereqs()
 
 Start looking for any other module needed by current module.
