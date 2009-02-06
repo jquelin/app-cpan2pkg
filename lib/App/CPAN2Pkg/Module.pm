@@ -250,7 +250,7 @@ sub _cpan2dist {
 
     # update main application
     $self->_log_result(@result);
-    $k->post('app', 'cpan2dist', $self, $status);
+    $k->post('app', 'cpan2dist_status', $self, $status);
 }
 
 sub _find_prereqs {
