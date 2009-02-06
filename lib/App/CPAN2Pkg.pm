@@ -84,6 +84,10 @@ sub spawn {
 # -- public events
 
 sub cpan2dist_status {
+    my ($k, $h, $module, $status) = @_[KERNEL, HEAP, ARG0, ARG1];
+    # FIXME: what if $status is false
+
+    $k->post($module, 'install_from_local');
 }
 
 
