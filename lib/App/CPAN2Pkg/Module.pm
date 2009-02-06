@@ -336,6 +336,7 @@ sub _start {
     my ($k, $self) = @_[KERNEL, HEAP];
 
     $k->alias_set($self);
+    $k->alias_set($self->name);
     $k->post('ui',  'module_spawned', $self);
     $k->post('app', 'module_spawned', $self);
 }
