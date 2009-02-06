@@ -66,18 +66,20 @@ sub spawn {
     my $session = POE::Session->create(
         inline_states => {
             # public events
-            cpan2dist         => \&cpan2dist,
-            find_prereqs      => \&find_prereqs,
-            install_from_dist => \&install_from_dist,
-            is_in_dist        => \&is_in_dist,
-            is_installed      => \&is_installed,
+            cpan2dist          => \&cpan2dist,
+            find_prereqs       => \&find_prereqs,
+            install_from_dist  => \&install_from_dist,
+            install_from_local => \&install_from_local,
+            is_in_dist         => \&is_in_dist,
+            is_installed       => \&is_installed,
             # private events
-            _cpan2dist         => \&_cpan2dist,
-            _find_prereqs      => \&_find_prereqs,
-            _install_from_dist => \&_install_from_dist,
-            _is_in_dist        => \&_is_in_dist,
-            _stderr            => \&_stderr,
-            _stdout            => \&_stdout,
+            _cpan2dist          => \&_cpan2dist,
+            _find_prereqs       => \&_find_prereqs,
+            _install_from_dist  => \&_install_from_dist,
+            _install_from_local => \&_install_from_local,
+            _is_in_dist         => \&_is_in_dist,
+            _stderr             => \&_stderr,
+            _stdout             => \&_stdout,
             # poe inline states
             _start => \&_start,
             #_stop  => sub { warn "stop " . $_[HEAP]->name . "\n"; },
@@ -169,6 +171,39 @@ sub install_from_dist {
         StderrFilter => POE::Filter::Line->new,
     );
     $k->sig( CHLD => '_install_from_dist' );
+
+    # need to store the wheel, otherwise the process goes woo!
+    $self->_wheel($wheel);
+}
+
+sub install_from_local {
+    my ($k, $self) = @_[KERNEL, HEAP];
+    my $name = $self->name;
+
+    # check whether there's another rpm transaction
+    if ( $rpm_locked ) {
+        $self->_log_prefixed_lines("waiting for rpm lock... (owned by $rpm_locked)");
+        $k->delay( install_from_local => 1 );
+        return;
+    }
+    $rpm_locked = $name;
+
+    # preparing command
+    my $rpm = $self->_rpm;
+    my $cmd = "sudo rpm -Uv $rpm";
+    $self->_log_new_step('Installing from local', "Running command: $cmd" );
+
+    # running command
+    $self->_output('');
+    $ENV{LC_ALL} = 'C';
+    my $wheel = POE::Wheel::Run->new(
+        Program      => $cmd,
+        StdoutEvent  => '_stdout',
+        StderrEvent  => '_stderr',
+        StdoutFilter => POE::Filter::Line->new,
+        StderrFilter => POE::Filter::Line->new,
+    );
+    $k->sig( CHLD => '_install_from_local' );
 
     # need to store the wheel, otherwise the process goes woo!
     $self->_wheel($wheel);
@@ -307,6 +342,32 @@ sub _install_from_dist {
     $k->post('app', 'upstream_install', $self, !$exval);
 }
 
+
+sub _install_from_local {
+    my($k, $self, $pid, $rv) = @_[KERNEL, HEAP, ARG1, ARG2];
+
+    # since it's a sigchld handler, it also gets called for other
+    # spawned processes. therefore, screen out processes that are
+    # not related to this object.
+    return unless defined $self->_wheel;
+    return unless $self->_wheel->PID == $pid;
+
+    # terminate wheel
+    $self->_wheel(undef);
+
+    # release rpm lock
+    $rpm_locked = '';
+
+    # log result
+    my $name  = $self->name;
+    my $rpm   = $self->_rpm;
+    my $exval = $rv >> 8;
+    my $status = $exval ? 'not been' : 'been';
+    $self->_log_result( "$name has $status installed from $rpm." );
+    $k->post('app', 'local_install', $self, !$exval);
+}
+
+
 sub _is_in_dist {
     my($k, $self, $pid, $rv) = @_[KERNEL, HEAP, ARG1, ARG2];
 
@@ -435,6 +496,11 @@ Start looking for any other module needed by current module.
 =head2 install_from_dist()
 
 Try to install module from upstream distribution.
+
+
+=head2 install_from_local()
+
+Try to install module from package freshly build.
 
 
 =head2 is_in_dist()
