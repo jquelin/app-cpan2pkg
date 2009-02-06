@@ -229,22 +229,28 @@ sub _cpan2dist {
     my $wheel  = $self->_wheel;
     $self->_wheel(undef);
 
+    # check whether the package has been built correctly.
     my $output = $self->_output;
     my ($rpm, $srpm);
     $rpm  = $1 if $output =~ /rpm created successfully: (.*\.rpm)/;
     $srpm = $1 if $output =~ /srpm available: (.*\.src.rpm)/;
 
+    my ($status, @result);
     if ( $rpm && $srpm ) {
-        $self->_log_result(
+        $status = 1;
+        @result = (
             "$name has been successfully built",
             "srpm created: $srpm",
             "rpm created:  $rpm",
         );
-        $k->post('app', 'cpan2dist', $self, 1);
     } else {
-        $self->_log_result("error while building $name");
-        $k->post('app', 'cpan2dist', $self, 0);
+        $status = 0;
+        @result = ( "error while building $name" );
     }
+
+    # update main application
+    $self->_log_result(@result);
+    $k->post('app', 'cpan2dist', $self, $status);
 }
 
 sub _find_prereqs {
