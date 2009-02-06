@@ -23,7 +23,7 @@ use Class::XSAccessor
     };
 use POE;
 
-our $VERSION = '0.3.1';
+our $VERSION = '0.4.0';
 
 sub spawn {
     my ($class, $opts) = @_;

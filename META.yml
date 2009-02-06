@@ -1,6 +1,6 @@
 ---
 name: App-CPAN2Pkg
-version: 0.3.1
+version: 0.4.0
 author:
   - 'Jerome Quelin <jquelin@cpan.org>'
 abstract: generating native linux packages from cpan
@@ -34,7 +34,7 @@ recommends:
 provides:
   App::CPAN2Pkg:
     file: lib/App/CPAN2Pkg.pm
-    version: 0.3.1
+    version: 0.4.0
   App::CPAN2Pkg::Curses:
     file: lib/App/CPAN2Pkg/Curses.pm
   App::CPAN2Pkg::Module:

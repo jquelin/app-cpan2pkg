@@ -12,8 +12,9 @@ High-level changelog
 Low-level changelog
 ===================
 
-0.4.0 
+0.4.0 Fri Feb  6 18:13:23 CET 2009
  - building package for module
+ - installing freshly build package
 
 **
 
