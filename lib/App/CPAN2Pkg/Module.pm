@@ -75,6 +75,7 @@ sub spawn {
             is_in_dist        => \&is_in_dist,
             is_installed      => \&is_installed,
             # private events
+            _cpan2dist         => \&_cpan2dist,
             _find_prereqs      => \&_find_prereqs,
             _install_from_dist => \&_install_from_dist,
             _is_in_dist        => \&_is_in_dist,
@@ -97,8 +98,27 @@ sub spawn {
 
 sub cpan2dist {
     my ($k, $self) = @_[KERNEL, HEAP];
+
+    # preparing command
     my $name = $self->name;
-    warn "running: cpan2dist $name\n";
+    my $cmd = "cpan2dist --format=CPANPLUS::Dist::Mdv --install $name";
+    $self->_log_new_step('Building & installing package',
+        "Running command: $cmd" );
+
+    # running command
+    $self->_output('');
+    $ENV{LC_ALL} = 'C';
+    my $wheel = POE::Wheel::Run->new(
+        Program      => $cmd,
+        CloseEvent   => '_cpan2dist',
+        StdoutEvent  => '_stdout',
+        StderrEvent  => '_stderr',
+        StdoutFilter => POE::Filter::Line->new,
+        StderrFilter => POE::Filter::Line->new,
+    );
+
+    # need to store the wheel, otherwise the process goes woo!
+    $self->_wheel($wheel);
 }
 
 sub find_prereqs {
@@ -206,6 +226,23 @@ sub is_installed {
 }
 
 # -- private events
+
+sub _cpan2dist {
+    my ($k, $self, $id) = @_[KERNEL, HEAP, ARG0];
+    my $name = $self->name;
+
+    # terminate wheel
+    my $wheel  = $self->_wheel;
+    $self->_wheel(undef);
+
+    if ( $self->_output =~ /successfully installed/ ) {
+        $self->_log_result("$name has been successfully built & installed");
+        $k->post('app', 'cpan2dist', $self, 1);
+    } else {
+        $self->_log_result("error while building/installing $name");
+        $k->post('app', 'cpan2dist', $self, 0);
+    }
+}
 
 sub _find_prereqs {
     my ($k, $self, $id) = @_[KERNEL, HEAP, ARG0];
