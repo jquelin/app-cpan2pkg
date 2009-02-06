@@ -19,6 +19,8 @@ use Class::XSAccessor
         name      => 'name',
         _output    => '_output',
         _prereqs   => '_prereqs',
+        _rpm       => '_rpm',
+        _srpm      => '_srpm',
         _wheel     => '_wheel',
     };
 use POE;
@@ -243,6 +245,11 @@ sub _cpan2dist {
             "srpm created: $srpm",
             "rpm created:  $rpm",
         );
+
+        # storing path to interesting files
+        $self->_rpm($rpm);
+        $self->_srpm($srpm);
+
     } else {
         $status = 0;
         @result = ( "error while building $name" );
