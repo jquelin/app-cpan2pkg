@@ -41,7 +41,7 @@ sub spawn {
         inline_states => {
             # public events
             upstream_status      => \&upstream_status,
-            install_status       => \&install_status,
+            local_status         => \&local_status,
             module_spawned       => \&module_spawned,
             package              => \&package,
             prereqs              => \&prereqs,
@@ -82,7 +82,7 @@ sub spawn {
 
 # -- public events
 
-sub install_status {
+sub local_status {
     my ($k, $h, $module, $is_installed) = @_[KERNEL, HEAP, ARG0, ARG1];
 
     if ( not $is_installed ) {
@@ -236,7 +236,7 @@ A list of modules to start packaging.
 The following events are the module's API.
 
 
-=head2 install_status( $module, $is_installed )
+=head2 local_status( $module, $is_installed )
 
 Sent when C<$module> knows whether it is installed locally (C<$is_installed>
 set to true) or not.

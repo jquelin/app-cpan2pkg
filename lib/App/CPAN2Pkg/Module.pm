@@ -202,7 +202,7 @@ sub is_installed {
     my $is_installed = $@ eq '';
     my $status = $is_installed ? 'installed' : 'not installed';
     $self->_log_result("$name is $status locally.");
-    $k->post('app', 'install_status', $self, $is_installed);
+    $k->post('app', 'local_status', $self, $is_installed);
 }
 
 # -- private events
