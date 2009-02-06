@@ -51,11 +51,11 @@ my $rpm_locked = '';   # only one rpm transaction at a time
 # CONSTRUCTOR
 
 sub spawn {
-    my ($class, $module) = @_;
+    my ($class, $name) = @_;
 
     # creating the object
     my $obj = App::CPAN2Pkg::Module->_new(
-        name      => $module,
+        name      => $name,
         _prereqs  => {},
         _wheel    => undef,
     );
@@ -119,8 +119,8 @@ sub find_prereqs {
     my ($k, $self) = @_[KERNEL, HEAP];
 
     # preparing command
-    my $module = $self->name;
-    my $cmd = "cpanp /prereqs show $module";
+    my $name = $self->name;
+    my $cmd = "cpanp /prereqs show $name";
     $self->_log_new_step('Finding module prereqs', "Running command: $cmd" );
 
     # running command
