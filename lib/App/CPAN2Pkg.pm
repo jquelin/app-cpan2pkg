@@ -40,6 +40,7 @@ sub spawn {
     my $session = POE::Session->create(
         inline_states => {
             # public events
+            cpan2dist_status     => \&cpan2dist_status,
             upstream_status      => \&upstream_status,
             local_status         => \&local_status,
             module_spawned       => \&module_spawned,
@@ -81,6 +82,10 @@ sub spawn {
 # fi
 
 # -- public events
+
+sub cpan2dist_status {
+}
+
 
 sub local_status {
     my ($k, $h, $module, $is_installed) = @_[KERNEL, HEAP, ARG0, ARG1];
@@ -234,6 +239,12 @@ A list of modules to start packaging.
 =head1 PUBLIC EVENTS ACCEPTED
 
 The following events are the module's API.
+
+
+=head2 cpan2dist_status( $module, $success )
+
+Sent when C<$module> has been C<cpan2dist>-ed, with C<$success> being true
+if everything went fine.
 
 
 =head2 local_status( $module, $is_installed )
