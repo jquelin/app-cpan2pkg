@@ -58,7 +58,7 @@ sub spawn {
     # creating the object
     my $obj = App::CPAN2Pkg::Module->_new(
         name      => $name,
-        _prereqs  => {},
+        _prereqs  => [],
         _wheel    => undef,
     );
 
@@ -98,9 +98,19 @@ sub spawn {
 sub cpan2dist {
     my ($k, $self) = @_[KERNEL, HEAP];
 
-    # preparing command
+    # we don't want to re-build the prereqs, even if we're not at their
+    # most recent version. and cpanplus --nobuildprereqs does not work
+    # as one thinks (it's "don't rebuild prereqs if we're at latest version,
+    # but rebuild anyway if we're not at latest version").
+    # and somehow, the ignore list with regex /(?<!$name)$/ does not work.
+    # so we're stuck with ignore modules one by one - sigh.
+    my $ignore = '';
+    $ignore .= "--ignore '^$_\$' " foreach @{ $self->_prereqs };
+
+    # preparing command. note that we do want --force, to be able to extract
+    # the rpm and srpm pathes from the output.
     my $name = $self->name;
-    my $cmd = "cpan2dist --force --format=CPANPLUS::Dist::Mdv $name";
+    my $cmd = "cpan2dist $ignore --force --format=CPANPLUS::Dist::Mdv $name";
     $self->_log_new_step('Building package', "Running command: $cmd" );
 
     # running command
@@ -312,6 +322,7 @@ sub _find_prereqs {
         @lines;
 
     # store prereqs
+    $self->_prereqs( \@prereqs );
     my @logs = @prereqs
         ? map { "prereq found: $_" } @prereqs
         : 'No prereqs found.';
