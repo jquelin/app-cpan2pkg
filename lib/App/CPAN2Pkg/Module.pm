@@ -23,6 +23,7 @@ use Class::XSAccessor
         _srpm      => '_srpm',
         _wheel     => '_wheel',
     };
+use List::MoreUtils qw{ firstidx };
 use POE;
 use POE::Filter::Line;
 use POE::Wheel::Run;
@@ -313,13 +314,11 @@ sub _find_prereqs {
     $self->_wheel(undef);
 
     # extract prereqs
-    my @lines =
-        grep { s/^\s+// }
-        split /\n/, $self->_output;
-    shift @lines; # remove the title line
-    my @prereqs =
-        map  { (split /\s+/, $_)[0] }
-        @lines;
+    my @lines   = split /\n/, $self->_output;
+    my @tabbed  = grep { s/^\s+// } @lines;
+    my $idx     = firstidx { /^Module\s+Req Ver.*Satisfied/ } @tabbed;
+    my @wanted  = @tabbed[ $idx+1 .. $#tabbed ];
+    my @prereqs = map  { (split /\s+/, $_)[0] } @wanted;
 
     # store prereqs
     $self->_prereqs( \@prereqs );
