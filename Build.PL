@@ -21,6 +21,7 @@ my %requires = (
     'Curses::UI::POE'    => 0,
     'FindBin'            => 0,
     'Hook::Output::File' => 0,
+    'List::MoreUtils'    => 0,
     'POE'                => 0,
 );
 my %build_requires = (
