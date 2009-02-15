@@ -124,6 +124,8 @@ sub local_install {
             $k->post($mobj, 'cpan2dist');
         }
     }
+
+    # FIXME: import package upstream
 }
 
 
