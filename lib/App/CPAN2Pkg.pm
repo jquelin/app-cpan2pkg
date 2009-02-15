@@ -292,6 +292,11 @@ Sent when C<$module> has been C<cpan2dist>-ed, with C<$success> being true
 if everything went fine.
 
 
+=head2 local_install( $module, $success )
+
+Sent when C<$module> has been installed locally, with C<$success> return value.
+
+
 =head2 local_status( $module, $is_installed )
 
 Sent when C<$module> knows whether it is installed locally (C<$is_installed>
