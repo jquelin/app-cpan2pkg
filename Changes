@@ -12,6 +12,12 @@ High-level changelog
 Low-level changelog
 ===================
 
+0.4.1 Sun Feb 15 19:07:12 CET 2009
+ - storing when a module is complete
+ - build module when all prereqs has been built & installed
+ - better prereqs extraction
+ - local part of cpan2pkg is complete
+
 0.4.0 Fri Feb  6 18:13:23 CET 2009
  - building package for module
  - installing freshly build package

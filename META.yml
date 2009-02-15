@@ -1,6 +1,6 @@
 ---
 name: App-CPAN2Pkg
-version: 0.4.0
+version: 0.4.1
 author:
   - 'Jerome Quelin <jquelin@cpan.org>'
 abstract: generating native linux packages from cpan
@@ -15,6 +15,7 @@ requires:
   Curses::UI::POE: 0
   FindBin: 0
   Hook::Output::File: 0
+  List::MoreUtils: 0
   POE: 0
   perl: 5.010
 build_requires:
@@ -25,6 +26,7 @@ build_requires:
   Curses::UI::POE: 0
   FindBin: 0
   Hook::Output::File: 0
+  List::MoreUtils: 0
   POE: 0
   Test::More: 0
   perl: 5.010
@@ -34,7 +36,7 @@ recommends:
 provides:
   App::CPAN2Pkg:
     file: lib/App/CPAN2Pkg.pm
-    version: 0.4.0
+    version: 0.4.1
   App::CPAN2Pkg::Curses:
     file: lib/App/CPAN2Pkg/Curses.pm
   App::CPAN2Pkg::Module:
