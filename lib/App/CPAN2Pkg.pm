@@ -106,6 +106,7 @@ sub local_install {
 
     # module available: nothing depends on it anymore.
     my $name = $module->name;
+    $h->_complete->{$name} = 1;
     my $depends = delete $h->_prereq->{$name};
     my @depends = keys %$depends;
 
@@ -145,6 +146,7 @@ sub local_status {
 
     # module available: nothing depends on it anymore.
     my $name = $module->name;
+    $h->_complete->{$name} = 1;
     my $depends = delete $h->_prereq->{$name};
     my @depends = keys %$depends;
 
@@ -205,6 +207,7 @@ sub prereqs {
 
 sub upstream_install {
     my ($k, $module, $success) = @_[KERNEL, ARG0, ARG1];
+    #$h->_complete->{$name} = 1;
     #FIXME: update prereqs
 }
 
