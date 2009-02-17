@@ -19,6 +19,7 @@ my %requires = (
     'Curses'             => 0,
     'Curses::UI'         => 0,
     'Curses::UI::POE'    => 0,
+    'File::Basename'     => 0,
     'FindBin'            => 0,
     'Hook::Output::File' => 0,
     'List::MoreUtils'    => 0,
