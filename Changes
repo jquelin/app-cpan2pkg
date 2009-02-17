@@ -3,6 +3,7 @@ Revision history for App-CPAN2Pkg
 High-level changelog
 ====================
 
+0.5.x    importing + building upstream
 0.4.x    building & installing
 0.3.x    dealing with prereqs
 0.2.x    upstream availability
@@ -11,6 +12,14 @@ High-level changelog
 
 Low-level changelog
 ===================
+
+0.5.0 Tue Feb 17 19:33:15 CET 2009
+ - importing package upstream
+ - submitting package upstream
+ - waiting for user confirmation when package is available on upstream
+   build system.
+
+**
 
 0.4.1 Sun Feb 15 19:07:12 CET 2009
  - storing when a module is complete
