@@ -47,6 +47,7 @@ sub spawn {
             module_spawned       => \&module_spawned,
             package              => \&package,
             prereqs              => \&prereqs,
+            upstream_import      => \&upstream_import,
             upstream_install     => \&upstream_install,
             # poe inline states
             _start => \&_start,
@@ -210,6 +211,14 @@ sub upstream_install {
     #$h->_complete->{$name} = 1;
     #FIXME: update prereqs
 }
+
+
+sub upstream_import {
+    my ($k, $module, $success) = @_[KERNEL, ARG0, ARG1];
+    #FIXME: what if wrong
+    $k->post($module, 'build_upstream');
+}
+
 
 sub upstream_status {
     my ($k, $module, $is_available) = @_[KERNEL, ARG0, ARG1];
