@@ -330,6 +330,11 @@ Inform main application that C<$module> needs some C<@prereqs> (possibly
 empty).
 
 
+=head2 upstream_import( $module, $success )
+
+Sent when C<$module> package has been imported in upstream repository.
+
+
 =head2 upstream_install( $module, $success )
 
 Sent after trying to install C<$module> from upstream dist. Result is passed
