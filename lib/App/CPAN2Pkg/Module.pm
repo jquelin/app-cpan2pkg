@@ -69,6 +69,7 @@ sub spawn {
             # public events
             cpan2dist          => \&cpan2dist,
             find_prereqs       => \&find_prereqs,
+            import_upstream    => \&import_upstream,
             install_from_dist  => \&install_from_dist,
             install_from_local => \&install_from_local,
             is_in_dist         => \&is_in_dist,
@@ -76,6 +77,7 @@ sub spawn {
             # private events
             _cpan2dist          => \&_cpan2dist,
             _find_prereqs       => \&_find_prereqs,
+            _import_upstream    => \&_import_upstream,
             _install_from_dist  => \&_install_from_dist,
             _install_from_local => \&_install_from_local,
             _is_in_dist         => \&_is_in_dist,
@@ -125,6 +127,32 @@ sub cpan2dist {
         StdoutFilter => POE::Filter::Line->new,
         StderrFilter => POE::Filter::Line->new,
     );
+
+    # need to store the wheel, otherwise the process goes woo!
+    $self->_wheel($wheel);
+}
+
+
+sub import_upstream {
+    my ($k, $self) = @_[KERNEL, HEAP];
+
+    # preparing command.
+    my $name = $self->name;
+    my $srpm = $self->_srpm;
+    my $cmd = "mdvsys import $srpm";
+    $self->_log_new_step('Building package', "Running command: $cmd" );
+
+    # running command
+    $self->_output('');
+    $ENV{LC_ALL} = 'C';
+    my $wheel = POE::Wheel::Run->new(
+        Program      => $cmd,
+        StdoutEvent  => '_stdout',
+        StderrEvent  => '_stderr',
+        StdoutFilter => POE::Filter::Line->new,
+        StderrFilter => POE::Filter::Line->new,
+    );
+    $k->sig( CHLD => '_import_upstream' );
 
     # need to store the wheel, otherwise the process goes woo!
     $self->_wheel($wheel);
@@ -305,6 +333,27 @@ sub _cpan2dist {
     $self->_log_result(@result);
     $k->post('app', 'cpan2dist_status', $self, $status);
 }
+
+sub _import_upstream {
+    my($k, $self, $pid, $rv) = @_[KERNEL, HEAP, ARG1, ARG2];
+
+    # since it's a sigchld handler, it also gets called for other
+    # spawned processes. therefore, screen out processes that are
+    # not related to this object.
+    return unless defined $self->_wheel;
+    return unless $self->_wheel->PID == $pid;
+
+    # terminate wheel
+    $self->_wheel(undef);
+
+    # log result
+    my $name  = $self->name;
+    my $exval = $rv >> 8;
+    my $status = $exval ? 'not been' : 'been';
+    $self->_log_result( "$name has $status imported upstream." );
+    $k->post('app', 'upstream_import', $self, !$exval);
+}
+
 
 sub _find_prereqs {
     my ($k, $self, $id) = @_[KERNEL, HEAP, ARG0];
@@ -501,6 +550,11 @@ Build a native package for this module, using C<cpan2dist> with the C<--force> f
 =head2 find_prereqs()
 
 Start looking for any other module needed by current module.
+
+
+=head2 import_upstream()
+
+Try to import module into upstream distribution.
 
 
 =head2 install_from_dist()
