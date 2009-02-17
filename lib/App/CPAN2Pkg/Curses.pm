@@ -19,6 +19,7 @@ use Class::XSAccessor
         _current  => '_current',
         _lb       => '_listbox',
         _listbox  => '_listbox',
+        _module   => '_module',
         _panes    => '_panes',
         _missing  => '_missing',
         _viewers  => '_viewers',
@@ -39,6 +40,7 @@ sub spawn {
 
     # the userdata object
     my $self = $class->_new(
+        _module  => {},
         _opts    => $opts,
         _panes   => {},
         _missing => {},
@@ -88,6 +90,7 @@ sub module_spawned {
     my $self = $cui->userdata;
 
     my $name = $module->name;
+    $self->_module->{$name} = $module;
 
     # updating list of modules
     my $lb = $self->_listbox;
