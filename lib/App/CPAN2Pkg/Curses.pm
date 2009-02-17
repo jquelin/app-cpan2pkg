@@ -17,6 +17,7 @@ use Class::XSAccessor
     constructor => '_new',
     accessors   => {
         _current  => '_current',
+        _events   => '_events',
         _lb       => '_listbox',
         _listbox  => '_listbox',
         _module   => '_module',
@@ -40,6 +41,7 @@ sub spawn {
 
     # the userdata object
     my $self = $class->_new(
+        _events  => {},
         _module  => {},
         _opts    => $opts,
         _panes   => {},
@@ -54,6 +56,7 @@ sub spawn {
         inline_states  => {
             # public events
             append           => \&append,
+            ask_user         => \&ask_user,
             module_available => \&module_available,
             module_spawned   => \&module_spawned,
             prereqs          => \&prereqs,
@@ -84,6 +87,29 @@ sub append {
     # forcing redraw if needed
     $viewer->draw if $self->_current eq $name;
 }
+
+
+sub ask_user {
+    my ($k, $cui, $module, $question, $event) = @_[KERNEL, HEAP, ARG0..$#_];
+    my $self = $cui->userdata;
+
+    # update list of modules
+    my $name = $module->name;
+    my $lb = $self->_listbox;
+    $lb->add_labels( { $module => "? $name" } );
+    $lb->draw;
+
+    # update the viewer pane
+    my $viewer = $self->_viewers->{$name};
+    my $text   = $viewer->text;
+    $text .= $question;
+    $viewer->text($text);
+    $self->_events->{$name} = $event;
+
+    # forcing redraw if needed
+    $viewer->draw if $self->_current eq $name;
+}
+
 
 sub module_spawned {
     my ($k, $cui, $module) = @_[KERNEL, HEAP, ARG0];
@@ -135,6 +161,7 @@ sub module_spawned {
         -text       => '',
         -vscrollbar => 1,
     );
+    $viewer->set_binding( sub {$self->_key_enter($name)}, KEY_ENTER );
 
     #$self->_set_bindings($pane);
     #$self->_set_bindings($viewer);
@@ -200,6 +227,21 @@ sub _start {
 # METHODS
 
 # -- gui events
+
+sub _key_enter {
+    my ($self, $name) = @_;
+
+    my $event = delete $self->_events->{$name};
+    return unless defined $event;
+    POE::Kernel->post($name, $event);
+
+    # update list of modules
+    my $module = $self->_module->{$name};
+    my $lb = $self->_listbox;
+    $lb->add_labels( { $module => "- $name" } );
+    $lb->draw;
+}
+
 
 sub _focus_to_listbox {
     my ($self) = @_;
@@ -319,6 +361,14 @@ A list of modules to start packaging.
 =head1 PUBLIC EVENTS ACCEPTED
 
 The following events are the module's API.
+
+
+=head2 ask_user( $module, $question, $event )
+
+Ask user the wanted C<$question> about the C<$module>. The answer is sent
+back to the C<$event> of the requesting session. Currently, the only
+type of question supported is C<"Type enter">. (ie, nothing back will be
+sent alongside the answer).
 
 
 =head2 append( $module, $line )
