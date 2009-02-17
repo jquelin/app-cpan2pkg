@@ -126,7 +126,7 @@ sub local_install {
         }
     }
 
-    # FIXME: import package upstream
+    $k->post($module, 'import_upstream');
 }
 
 
