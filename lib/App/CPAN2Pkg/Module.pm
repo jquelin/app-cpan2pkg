@@ -142,7 +142,7 @@ sub import_upstream {
     my $name = $self->name;
     my $srpm = $self->_srpm;
     my $cmd = "mdvsys import $srpm";
-    $self->_log_new_step('Building package', "Running command: $cmd" );
+    $self->_log_new_step('Importing package upstream', "Running command: $cmd" );
 
     # running command
     $self->_output('');
