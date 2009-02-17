@@ -40,6 +40,7 @@ sub spawn {
     my $session = POE::Session->create(
         inline_states => {
             # public events
+            available_on_bs      => \&available_on_bs,
             cpan2dist_status     => \&cpan2dist_status,
             upstream_status      => \&upstream_status,
             local_install        => \&local_install,
@@ -84,6 +85,11 @@ sub spawn {
 # fi
 
 # -- public events
+
+sub available_on_bs {
+    # FIXME: start submitting upstream what depends on this
+}
+
 
 sub cpan2dist_status {
     my ($k, $h, $module, $status) = @_[KERNEL, HEAP, ARG0, ARG1];
@@ -215,7 +221,8 @@ sub upstream_install {
 
 sub upstream_import {
     my ($k, $module, $success) = @_[KERNEL, ARG0, ARG1];
-    #FIXME: what if wrong
+    # FIXME: what if wrong
+    # FIXME: don't submit if missing deps on bs
     $k->post($module, 'build_upstream');
 }
 
@@ -293,6 +300,11 @@ A list of modules to start packaging.
 =head1 PUBLIC EVENTS ACCEPTED
 
 The following events are the module's API.
+
+
+=head2 available_on_bs()
+
+Sent when module is available on upstream build system.
 
 
 =head2 cpan2dist_status( $module, $success )
