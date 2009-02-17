@@ -18,11 +18,13 @@ use Class::XSAccessor
     accessors   => {
         name      => 'name',
         _output    => '_output',
+        _pkgname   => '_pkgname',
         _prereqs   => '_prereqs',
         _rpm       => '_rpm',
         _srpm      => '_srpm',
         _wheel     => '_wheel',
     };
+use File::Basename  qw{ basename };
 use List::MoreUtils qw{ firstidx };
 use POE;
 use POE::Filter::Line;
@@ -323,6 +325,11 @@ sub _cpan2dist {
         # storing path to interesting files
         $self->_rpm($rpm);
         $self->_srpm($srpm);
+
+        # storing package name
+        my $pkgname = basename $srpm;
+        $pkgname =~ s/-\d.*$//;
+        $self->_pkgname( $pkgname );
 
     } else {
         $status = 0;
