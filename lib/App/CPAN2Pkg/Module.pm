@@ -69,6 +69,8 @@ sub spawn {
     my $session = POE::Session->create(
         inline_states => {
             # public events
+            available_on_bs    => \&available_on_bs,
+            build_upstream     => \&build_upstream,
             cpan2dist          => \&cpan2dist,
             find_prereqs       => \&find_prereqs,
             import_upstream    => \&import_upstream,
@@ -77,6 +79,7 @@ sub spawn {
             is_in_dist         => \&is_in_dist,
             is_installed       => \&is_installed,
             # private events
+            _build_upstream     => \&_build_upstream,
             _cpan2dist          => \&_cpan2dist,
             _find_prereqs       => \&_find_prereqs,
             _import_upstream    => \&_import_upstream,
@@ -99,6 +102,36 @@ sub spawn {
 # SUBS
 
 # -- public events
+
+sub available_on_bs {
+    my ($k, $self) = @_[KERNEL, HEAP];
+    $k->post('app', 'available_on_bs', $self);
+}
+
+sub build_upstream {
+    my ($k, $self) = @_[KERNEL, HEAP];
+
+    # preparing command.
+    my $name    = $self->name;
+    my $pkgname = $self->_pkgname;
+    my $cmd = "mdvsys submit $pkgname";
+    $self->_log_new_step('Submitting package upstream', "Running command: $cmd" );
+
+    # running command
+    $self->_output('');
+    $ENV{LC_ALL} = 'C';
+    my $wheel = POE::Wheel::Run->new(
+        Program      => $cmd,
+        StdoutEvent  => '_stdout',
+        StderrEvent  => '_stderr',
+        StdoutFilter => POE::Filter::Line->new,
+        StderrFilter => POE::Filter::Line->new,
+    );
+    $k->sig( CHLD => '_build_upstream' );
+
+    # need to store the wheel, otherwise the process goes woo!
+    $self->_wheel($wheel);
+}
 
 sub cpan2dist {
     my ($k, $self) = @_[KERNEL, HEAP];
@@ -298,6 +331,28 @@ sub is_installed {
 }
 
 # -- private events
+
+sub _build_upstream {
+    my($k, $self, $pid, $rv) = @_[KERNEL, HEAP, ARG1, ARG2];
+
+    # since it's a sigchld handler, it also gets called for other
+    # spawned processes. therefore, screen out processes that are
+    # not related to this object.
+    return unless defined $self->_wheel;
+    return unless $self->_wheel->PID == $pid;
+
+    # terminate wheel
+    $self->_wheel(undef);
+
+    # we don't have a real way to know when the build is finished,
+    # and when the package is available upstream. therefore, we're going
+    # to ask the user to signal when it's available...
+    my $name = $self->name;
+    $self->_log_result( "$name has been submitted upstream." );
+    my $question = "type 'enter' when package is available on build system upstream";
+    $k->post('ui', 'ask_user', $self, $question, 'available_on_bs');
+}
+
 
 sub _cpan2dist {
     my ($k, $self, $id) = @_[KERNEL, HEAP, ARG0];
@@ -548,6 +603,16 @@ It will return the POE id of the session newly created.
 
 
 =head1 PUBLIC EVENTS ACCEPTED
+
+=head2 available_on_bs()
+
+Sent when module is available on upstream build system.
+
+
+=head2 build_upstream()
+
+Submit package to be build on upstream build system.
+
 
 =head2 cpan2dist()
 
