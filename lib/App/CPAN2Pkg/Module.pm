@@ -16,7 +16,10 @@ use warnings;
 use Class::XSAccessor
     constructor => '_new',
     accessors   => {
-        name      => 'name',
+        # public
+        is_local => 'is_local',  # if module is available locally
+        name     => 'name',
+        # private
         _output    => '_output',
         _pkgname   => '_pkgname',
         _prereqs   => '_prereqs',
@@ -61,6 +64,7 @@ sub spawn {
     # creating the object
     my $obj = App::CPAN2Pkg::Module->_new(
         name      => $name,
+        is_local  => 0,
         _prereqs  => [],
         _wheel    => undef,
     );
@@ -656,6 +660,8 @@ needed for the packaging stuff. The following accessors are therefore
 available, but should not be used directly:
 
 =over 4
+
+=item is_local() - whether the module is installed locally
 
 =item name() - the module name
 

@@ -16,7 +16,6 @@ use App::CPAN2Pkg::Module;
 use Class::XSAccessor
     constructor => '_new',
     accessors   => {
-        _complete  => '_complete',
         _missing   => '_missing',
         _module    => '_module',
         _prereq    => '_prereq',
@@ -30,7 +29,6 @@ sub spawn {
 
     # create the heap object
     my $obj = App::CPAN2Pkg->_new(
-        _complete => {},
         _missing  => {}, # hoh: {a}{b}=1   mod a needs b
         _module   => {}, #      {name}=obj store the objects
         _prereq   => {}, # hoh: {a}{b}=1   mod a is a prereq of b
@@ -113,7 +111,7 @@ sub local_install {
 
     # module available: nothing depends on it anymore.
     my $name = $module->name;
-    $h->_complete->{$name} = 1;
+    $module->is_local(1);
     my $depends = delete $h->_prereq->{$name};
     my @depends = keys %$depends;
 
@@ -153,7 +151,7 @@ sub local_status {
 
     # module available: nothing depends on it anymore.
     my $name = $module->name;
-    $h->_complete->{$name} = 1;
+    $module->is_local(1);
     my $depends = delete $h->_prereq->{$name};
     my @depends = keys %$depends;
 
@@ -195,7 +193,9 @@ sub prereqs {
         $k->yield('package', $m) unless exists $h->_module->{$m};
 
         # store missing module.
-        push @missing, $m unless exists $h->_complete->{$m};
+        push @missing, $m unless
+            exists $h->_module->{$m}
+            && $h->_module->{$m}->is_local;
     }
 
     $k->post('ui', 'prereqs', $module, @missing);
@@ -214,7 +214,7 @@ sub prereqs {
 
 sub upstream_install {
     my ($k, $module, $success) = @_[KERNEL, ARG0, ARG1];
-    #$h->_complete->{$name} = 1;
+    #$h->_module->{$name}->is_local(1);
     #FIXME: update prereqs
 }
 
