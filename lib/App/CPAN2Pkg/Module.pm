@@ -14,7 +14,6 @@ use strict;
 use warnings;
 
 use Class::XSAccessor
-    constructor => '_new',
     accessors   => {
         # public
         is_local => 'is_local',  # if module is available locally
@@ -54,53 +53,15 @@ my $rpm_locked = '';   # only one rpm transaction at a time
 #
 
 
-
-
-#--
-# CONSTRUCTOR
-
-sub spawn {
-    my ($class, $name) = @_;
-
-    # creating the object
-    my $obj = App::CPAN2Pkg::Module->_new(
-        name      => $name,
-        is_local  => 0,
-        _missing  => {},
-        _prereqs  => [],
-        _wheel    => undef,
-    );
-
-    # spawning the session
-    my $session = POE::Session->create(
-        inline_states => {
-            # public events
-            available_on_bs    => \&available_on_bs,
-            build_upstream     => \&build_upstream,
-            cpan2dist          => \&cpan2dist,
-            find_prereqs       => \&find_prereqs,
-            import_upstream    => \&import_upstream,
-            install_from_dist  => \&install_from_dist,
-            install_from_local => \&install_from_local,
-            is_in_dist         => \&is_in_dist,
-            is_installed       => \&is_installed,
-            # private events
-            _build_upstream     => \&_build_upstream,
-            _cpan2dist          => \&_cpan2dist,
-            _find_prereqs       => \&_find_prereqs,
-            _import_upstream    => \&_import_upstream,
-            _install_from_dist  => \&_install_from_dist,
-            _install_from_local => \&_install_from_local,
-            _is_in_dist         => \&_is_in_dist,
-            _stderr             => \&_stderr,
-            _stdout             => \&_stdout,
-            # poe inline states
-            _start => \&_start,
-            #_stop  => sub { warn "stop " . $_[HEAP]->name . "\n"; },
-        },
-        heap => $obj,
-    );
-    return $session->ID;
+sub new {
+    my ($pkg, %params) = @_;
+    my $self = {
+        _missing => {},
+        %params,
+    };
+    my $class = ref($pkg) || $pkg;
+    bless $self, $class;
+    return $self;
 }
 
 
@@ -110,12 +71,12 @@ sub spawn {
 # -- public events
 
 sub available_on_bs {
-    my ($k, $self) = @_[KERNEL, HEAP];
+    my ($k, $self) = @_[KERNEL, OBJECT];
     $k->post('app', 'available_on_bs', $self);
 }
 
 sub build_upstream {
-    my ($k, $self) = @_[KERNEL, HEAP];
+    my ($k, $self) = @_[KERNEL, OBJECT];
 
     # preparing command.
     my $name    = $self->name;
@@ -140,7 +101,7 @@ sub build_upstream {
 }
 
 sub cpan2dist {
-    my ($k, $self) = @_[KERNEL, HEAP];
+    my ($k, $self) = @_[KERNEL, OBJECT];
 
     # we don't want to re-build the prereqs, even if we're not at their
     # most recent version. and cpanplus --nobuildprereqs does not work
@@ -175,7 +136,7 @@ sub cpan2dist {
 
 
 sub import_upstream {
-    my ($k, $self) = @_[KERNEL, HEAP];
+    my ($k, $self) = @_[KERNEL, OBJECT];
 
     # preparing command.
     my $name = $self->name;
@@ -200,7 +161,7 @@ sub import_upstream {
 }
 
 sub find_prereqs {
-    my ($k, $self) = @_[KERNEL, HEAP];
+    my ($k, $self) = @_[KERNEL, OBJECT];
 
     # preparing command
     my $name = $self->name;
@@ -224,7 +185,7 @@ sub find_prereqs {
 }
 
 sub install_from_dist {
-    my ($k, $self) = @_[KERNEL, HEAP];
+    my ($k, $self) = @_[KERNEL, OBJECT];
     my $name = $self->name;
 
     # check whether there's another rpm transaction
@@ -257,7 +218,7 @@ sub install_from_dist {
 }
 
 sub install_from_local {
-    my ($k, $self) = @_[KERNEL, HEAP];
+    my ($k, $self) = @_[KERNEL, OBJECT];
     my $name = $self->name;
 
     # check whether there's another rpm transaction
@@ -290,7 +251,7 @@ sub install_from_local {
 }
 
 sub is_in_dist {
-    my ($k, $self) = @_[KERNEL, HEAP];
+    my ($k, $self) = @_[KERNEL, OBJECT];
 
     # preparing command
     my $name = $self->name;
@@ -317,7 +278,7 @@ sub is_in_dist {
 
 
 sub is_installed {
-    my ($k, $self) = @_[KERNEL, HEAP];
+    my ($k, $self) = @_[KERNEL, OBJECT];
 
     my $name = $self->name;
     my $cmd  = qq{ require $name };
@@ -339,7 +300,7 @@ sub is_installed {
 # -- private events
 
 sub _build_upstream {
-    my($k, $self, $pid, $rv) = @_[KERNEL, HEAP, ARG1, ARG2];
+    my($k, $self, $pid, $rv) = @_[KERNEL, OBJECT, ARG1, ARG2];
 
     # since it's a sigchld handler, it also gets called for other
     # spawned processes. therefore, screen out processes that are
@@ -361,7 +322,7 @@ sub _build_upstream {
 
 
 sub _cpan2dist {
-    my ($k, $self, $id) = @_[KERNEL, HEAP, ARG0];
+    my ($k, $self, $id) = @_[KERNEL, OBJECT, ARG0];
     my $name = $self->name;
 
     # terminate wheel
@@ -403,7 +364,7 @@ sub _cpan2dist {
 }
 
 sub _import_upstream {
-    my($k, $self, $pid, $rv) = @_[KERNEL, HEAP, ARG1, ARG2];
+    my($k, $self, $pid, $rv) = @_[KERNEL, OBJECT, ARG1, ARG2];
 
     # since it's a sigchld handler, it also gets called for other
     # spawned processes. therefore, screen out processes that are
@@ -424,7 +385,7 @@ sub _import_upstream {
 
 
 sub _find_prereqs {
-    my ($k, $self, $id) = @_[KERNEL, HEAP, ARG0];
+    my ($k, $self, $id) = @_[KERNEL, OBJECT, ARG0];
 
     # terminate wheel
     my $wheel  = $self->_wheel;
@@ -447,7 +408,7 @@ sub _find_prereqs {
 }
 
 sub _install_from_dist {
-    my($k, $self, $pid, $rv) = @_[KERNEL, HEAP, ARG1, ARG2];
+    my($k, $self, $pid, $rv) = @_[KERNEL, OBJECT, ARG1, ARG2];
 
     # since it's a sigchld handler, it also gets called for other
     # spawned processes. therefore, screen out processes that are
@@ -471,7 +432,7 @@ sub _install_from_dist {
 
 
 sub _install_from_local {
-    my($k, $self, $pid, $rv) = @_[KERNEL, HEAP, ARG1, ARG2];
+    my($k, $self, $pid, $rv) = @_[KERNEL, OBJECT, ARG1, ARG2];
 
     # since it's a sigchld handler, it also gets called for other
     # spawned processes. therefore, screen out processes that are
@@ -496,7 +457,7 @@ sub _install_from_local {
 
 
 sub _is_in_dist {
-    my($k, $self, $pid, $rv) = @_[KERNEL, HEAP, ARG1, ARG2];
+    my($k, $self, $pid, $rv) = @_[KERNEL, OBJECT, ARG1, ARG2];
 
     # since it's a sigchld handler, it also gets called for other
     # spawned processes. therefore, screen out processes that are
@@ -519,12 +480,12 @@ sub _is_in_dist {
 }
 
 sub _stderr {
-    my ($k, $self, $line) = @_[KERNEL, HEAP, ARG0];
+    my ($k, $self, $line) = @_[KERNEL, OBJECT, ARG0];
     $k->post('ui', 'append', $self, "stderr: $line\n");
 }
 
 sub _stdout {
-    my ($k, $self, $line) = @_[KERNEL, HEAP, ARG0];
+    my ($k, $self, $line) = @_[KERNEL, OBJECT, ARG0];
     $line .= "\n";
     $self->_output( $self->_output . $line );
     $k->post('ui', 'append', $self, "stdout: $line");
@@ -534,7 +495,7 @@ sub _stdout {
 # -- poe inline states
 
 sub _start {
-    my ($k, $self) = @_[KERNEL, HEAP];
+    my ($k, $self) = @_[KERNEL, OBJECT];
 
     $k->alias_set($self);
     $k->alias_set($self->name);
@@ -550,6 +511,7 @@ sub _start {
 
 sub missing_add {
     my ($self, $name) = @_;
+    warn "$self / $name";
     $self->_missing->{$name} = 1;
 }
 
@@ -615,65 +577,6 @@ the module availability in the distribution.
 
 
 
-=head1 PUBLIC PACKAGE METHODS
-
-=head2 my $id = App::CPAN2Pkg::Module->spawn( $module )
-
-This method will create a POE session responsible for packaging &
-installing the wanted C<$module>.
-
-It will return the POE id of the session newly created.
-
-
-
-=head1 PUBLIC EVENTS ACCEPTED
-
-=head2 available_on_bs()
-
-Sent when module is available on upstream build system.
-
-
-=head2 build_upstream()
-
-Submit package to be build on upstream build system.
-
-
-=head2 cpan2dist()
-
-Build a native package for this module, using C<cpan2dist> with the C<--force> flag.
-
-
-=head2 find_prereqs()
-
-Start looking for any other module needed by current module.
-
-
-=head2 import_upstream()
-
-Try to import module into upstream distribution.
-
-
-=head2 install_from_dist()
-
-Try to install module from upstream distribution.
-
-
-=head2 install_from_local()
-
-Try to install module from package freshly build.
-
-
-=head2 is_in_dist()
-
-Check whether the package is provided by an existing upstream package.
-
-
-=head2 is_installed()
-
-Check whether the package is installed locally.
-
-
-
 =head1 METHODS
 
 This package is also a class, used B<internally> to store private data
@@ -681,7 +584,7 @@ needed for the packaging stuff.
 
 
 
-=head2 ACCESSORS
+=head2 Accessors
 
 The following accessors are available:
 
@@ -695,7 +598,7 @@ The following accessors are available:
 
 
 
-=head2 PUBLIC METHODS
+=head2 Public methods
 
 =over 4
 
@@ -714,6 +617,61 @@ module has been built and installed by cpan2pkg.
 =item missing_list( )
 
 Get the list of modules missing before trying to build the object.
+
+
+=back
+
+
+
+
+=head2 Public events accepted
+
+
+=over 4
+
+=item available_on_bs()
+
+Sent when module is available on upstream build system.
+
+
+=item build_upstream()
+
+Submit package to be build on upstream build system.
+
+
+=item cpan2dist()
+
+Build a native package for this module, using C<cpan2dist> with the C<--force> flag.
+
+
+=item find_prereqs()
+
+Start looking for any other module needed by current module.
+
+
+=item import_upstream()
+
+Try to import module into upstream distribution.
+
+
+=item install_from_dist()
+
+Try to install module from upstream distribution.
+
+
+=item install_from_local()
+
+Try to install module from package freshly build.
+
+
+=item is_in_dist()
+
+Check whether the package is provided by an existing upstream package.
+
+
+=item is_installed()
+
+Check whether the package is installed locally.
 
 
 =back

@@ -13,6 +13,7 @@ use strict;
 use warnings;
 
 use App::CPAN2Pkg::Module;
+use App::CPAN2Pkg::Worker;
 use Class::XSAccessor
     constructor => '_new',
     accessors   => {
@@ -177,7 +178,7 @@ sub module_spawned {
 
 sub package {
     my ($k, $h, $module) = @_[KERNEL, HEAP, ARG0];
-    App::CPAN2Pkg::Module->spawn($module);
+    App::CPAN2Pkg::Worker->spawn($module);
 }
 
 sub prereqs {
@@ -186,12 +187,14 @@ sub prereqs {
     my @missing;
     foreach my $m ( @prereqs ) {
         # check if module is new. in which case, let's treat it.
-        $k->yield('package', $m) unless exists $h->_module->{$m};
+        if ( ! exists $h->_module->{$m} ) {
+            my $mobj = App::CPAN2Pkg::Module->new( name => $m );
+            $k->yield('package', $mobj);
+            $h->_module->{$m} = $mobj;
+        }
 
         # store missing module.
-        push @missing, $m unless
-            exists $h->_module->{$m}
-            && $h->_module->{$m}->is_local;
+        push @missing, $m unless $h->_module->{$m}->is_local;
     }
 
     $k->post('ui', 'prereqs', $module, @missing);
@@ -238,7 +241,10 @@ sub _start {
 
     # start packaging some modules
     my $modules = $opts->{modules};
-    $k->yield('package', $_) for @$modules;
+    foreach my $name ( @$modules ) {
+        my $module = App::CPAN2Pkg::Module->new( name => $name );
+        $k->yield('package', $module);
+    }
 }
 
 
@@ -327,9 +333,8 @@ Sent when C<$module> has been spawned successfully.
 
 =head2 package( $module )
 
-Request the application to package (if needed) the perl C<$module>. Note
-that the module can be either the top-most module of a distribution or
-deep inside said distribution.
+Request the application to package (if needed) a C<$module> (an
+C<App::CPAN2Pkg::Module> object).
 
 
 =head2 prereqs( $module, @prereqs )
