@@ -16,7 +16,6 @@ use App::CPAN2Pkg::Module;
 use Class::XSAccessor
     constructor => '_new',
     accessors   => {
-        _missing   => '_missing',
         _module    => '_module',
         _prereq    => '_prereq',
     };
@@ -29,7 +28,6 @@ sub spawn {
 
     # create the heap object
     my $obj = App::CPAN2Pkg->_new(
-        _missing  => {}, # hoh: {a}{b}=1   mod a needs b
         _module   => {}, #      {name}=obj store the objects
         _prereq   => {}, # hoh: {a}{b}=1   mod a is a prereq of b
     );
@@ -116,15 +114,14 @@ sub local_install {
     my @depends = keys %$depends;
 
     # update all modules that were depending on it
-    my $missing = $h->_missing;
     foreach my $m ( @depends ) {
         # remove dependency on module
         my $mobj = $h->_module->{$m};
-        my $missed = $missing->{$m};
-        delete $missed->{$name};
-        $k->post('ui', 'prereqs', $mobj, keys %$missed);
+        $mobj->missing_del($name);
+        my @missing = $mobj->missing_list;
+        $k->post('ui', 'prereqs', $mobj, @missing);
 
-        if ( scalar keys %$missed == 0 ) {
+        if ( scalar @missing == 0 ) {
             # huzzah! no more missing prereqs - let's create a
             # native package for it.
             $k->post($mobj, 'cpan2dist');
@@ -156,15 +153,14 @@ sub local_status {
     my @depends = keys %$depends;
 
     # update all modules that were depending on it
-    my $missing = $h->_missing;
     foreach my $m ( @depends ) {
         # remove dependency on module
         my $mobj = $h->_module->{$m};
-        my $missed = $missing->{$m};
-        delete $missed->{$name};
-        $k->post('ui', 'prereqs', $mobj, keys %$missed);
+        $mobj->missing_del($name);
+        my @missing = $mobj->missing_list;
+        $k->post('ui', 'prereqs', $mobj, @missing);
 
-        if ( scalar keys %$missed == 0 ) {
+        if ( scalar @missing == 0 ) {
             # huzzah! no more missing prereqs - let's create a
             # native package for it.
             $k->post($mobj, 'cpan2dist');
@@ -202,7 +198,7 @@ sub prereqs {
     if ( @missing ) {
         # module misses some prereqs - wait for them.
         my $name = $module->name;
-        $h->_missing->{$name}{$_} = 1 for @missing;
+        $module->missing_add($_) for @missing;
         $h->_prereq->{$_}{$name}  = 1 for @missing;
 
     } else {

@@ -20,6 +20,7 @@ use Class::XSAccessor
         is_local => 'is_local',  # if module is available locally
         name     => 'name',
         # private
+        _missing   => '_missing',
         _output    => '_output',
         _pkgname   => '_pkgname',
         _prereqs   => '_prereqs',
@@ -65,6 +66,7 @@ sub spawn {
     my $obj = App::CPAN2Pkg::Module->_new(
         name      => $name,
         is_local  => 0,
+        _missing  => {},
         _prereqs  => [],
         _wheel    => undef,
     );
@@ -544,6 +546,24 @@ sub _start {
 #--
 # METHODS
 
+# -- public methods
+
+sub missing_add {
+    my ($self, $name) = @_;
+    $self->_missing->{$name} = 1;
+}
+
+sub missing_del {
+    my ($self, $name) = @_;
+    delete $self->_missing->{$name};
+}
+
+sub missing_list {
+    my ($self) = @_;
+    my $missing = $self->_missing;
+    return sort keys %$missing;
+}
+
 # -- private methods
 
 sub _log_empty_line {
@@ -653,17 +673,48 @@ Check whether the package is provided by an existing upstream package.
 Check whether the package is installed locally.
 
 
+
 =head1 METHODS
 
 This package is also a class, used B<internally> to store private data
-needed for the packaging stuff. The following accessors are therefore
-available, but should not be used directly:
+needed for the packaging stuff.
+
+
+
+=head2 ACCESSORS
+
+The following accessors are available:
 
 =over 4
 
 =item is_local() - whether the module is installed locally
 
 =item name() - the module name
+
+=back
+
+
+
+=head2 PUBLIC METHODS
+
+=over 4
+
+=item missing_add( $module )
+
+Add C<$module> to the list of modules missing locally before trying to build
+the object.
+
+
+=item missing_del( $module )
+
+Remove C<$module> from the list of modules missing locally. This means that
+module has been built and installed by cpan2pkg.
+
+
+=item missing_list( )
+
+Get the list of modules missing before trying to build the object.
+
 
 =back
 
