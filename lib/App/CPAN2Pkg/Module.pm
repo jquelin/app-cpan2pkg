@@ -19,6 +19,7 @@ use Class::XSAccessor
         is_local => 'is_local',  # if module is available locally
         name     => 'name',
         # private
+        _blocking  => '_blocking',
         _missing   => '_missing',
         _output    => '_output',
         _pkgname   => '_pkgname',
@@ -56,7 +57,8 @@ my $rpm_locked = '';   # only one rpm transaction at a time
 sub new {
     my ($pkg, %params) = @_;
     my $self = {
-        _missing => {},
+        _blocking => {},
+        _missing  => {},
         %params,
     };
     my $class = ref($pkg) || $pkg;
@@ -510,6 +512,24 @@ sub _start {
 
 # -- public methods
 
+sub blocking_add {
+    my ($self, $name) = @_;
+    $self->_blocking->{$name} = 1;
+}
+
+sub blocking_clear {
+    my ($self, $name) = @_;
+    $self->_blocking({});
+}
+
+sub blocking_list {
+    my ($self) = @_;
+    my $blocking = $self->_blocking;
+    return sort keys %$blocking;
+}
+
+#
+
 sub missing_add {
     my ($self, $name) = @_;
     warn "$self / $name";
@@ -585,6 +605,16 @@ needed for the packaging stuff.
 
 
 
+=head2 Constructor
+
+=over 4
+
+=item my $module = App::CPAN2Pkg::Module->new(name=>$name)
+
+=back
+
+
+
 =head2 Accessors
 
 The following accessors are available:
@@ -602,6 +632,24 @@ The following accessors are available:
 =head2 Public methods
 
 =over 4
+
+=item blocking_add( $module )
+
+Add C<$module> to the list of modules that current object is blocking
+from locally before trying to build
+the object.
+
+
+=item blocking_clear( $module )
+
+Remove C<$module> from the list of modules missing locally. This means that
+module has been built and installed by cpan2pkg.
+
+
+=item blocking_list( )
+
+Get the list of modules missing before trying to build the object.
+
 
 =item missing_add( $module )
 

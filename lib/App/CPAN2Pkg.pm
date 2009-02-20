@@ -18,7 +18,6 @@ use Class::XSAccessor
     constructor => '_new',
     accessors   => {
         _module    => '_module',
-        _prereq    => '_prereq',
     };
 use POE;
 
@@ -30,7 +29,6 @@ sub spawn {
     # create the heap object
     my $obj = App::CPAN2Pkg->_new(
         _module   => {}, #      {name}=obj store the objects
-        _prereq   => {}, # hoh: {a}{b}=1   mod a is a prereq of b
     );
 
     # create the main session
@@ -111,8 +109,8 @@ sub local_install {
     # module available: nothing depends on it anymore.
     my $name = $module->name;
     $module->is_local(1);
-    my $depends = delete $h->_prereq->{$name};
-    my @depends = keys %$depends;
+    my @depends = $module->blocking_list;
+    $module->blocking_clear;
 
     # update all modules that were depending on it
     foreach my $m ( @depends ) {
@@ -150,8 +148,8 @@ sub local_status {
     # module available: nothing depends on it anymore.
     my $name = $module->name;
     $module->is_local(1);
-    my $depends = delete $h->_prereq->{$name};
-    my @depends = keys %$depends;
+    my @depends = $module->blocking_list;
+    $module->blocking_clear;
 
     # update all modules that were depending on it
     foreach my $m ( @depends ) {
@@ -201,8 +199,8 @@ sub prereqs {
     if ( @missing ) {
         # module misses some prereqs - wait for them.
         my $name = $module->name;
-        $module->missing_add($_) for @missing;
-        $h->_prereq->{$_}{$name}  = 1 for @missing;
+        $module->missing_add($_)               for @missing;
+        $h->_module->{$_}->blocking_add($name) for @missing;
 
     } else {
         # no prereqs, move on
