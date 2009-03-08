@@ -210,9 +210,34 @@ sub prereqs {
 }
 
 sub upstream_install {
-    my ($k, $module, $success) = @_[KERNEL, ARG0, ARG1];
-    #$h->_module->{$name}->is_local(1);
-    #FIXME: update prereqs
+    my ($k, $h, $module, $success) = @_[KERNEL, HEAP, ARG0, ARG1];
+
+    # FIXME: what if $success is a failure?
+
+    # module is already installed locally.
+    $k->post('ui', 'module_available', $module);
+    $k->post('ui', 'prereqs', $module);
+
+    # module available: nothing depends on it anymore.
+    my $name = $module->name;
+    $module->is_local(1);
+    my @depends = $module->blocking_list;
+    $module->blocking_clear;
+
+    # update all modules that were depending on it
+    foreach my $m ( @depends ) {
+        # remove dependency on module
+        my $mobj = $h->_module->{$m};
+        $mobj->missing_del($name);
+        my @missing = $mobj->missing_list;
+        $k->post('ui', 'prereqs', $mobj, @missing);
+
+        if ( scalar @missing == 0 ) {
+            # huzzah! no more missing prereqs - let's create a
+            # native package for it.
+            $k->post($mobj, 'cpan2dist');
+        }
+    }
 }
 
 
