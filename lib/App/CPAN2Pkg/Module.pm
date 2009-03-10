@@ -16,8 +16,9 @@ use warnings;
 use Class::XSAccessor
     accessors   => {
         # public
-        is_local => 'is_local',  # if module is available locally
-        name     => 'name',
+        is_avail_on_bs => 'is_avail_on_bs',
+        is_local       => 'is_local',  # if module is available locally
+        name           => 'name',
         # private
         _blocking  => '_blocking',
         _missing   => '_missing',
@@ -74,6 +75,7 @@ sub new {
 
 sub available_on_bs {
     my ($k, $self) = @_[KERNEL, OBJECT];
+    $self->is_avail_on_bs(1);
     $k->post('app', 'available_on_bs', $self);
 }
 
@@ -477,6 +479,7 @@ sub _is_in_dist {
     my $name  = $self->name;
     my $exval = $rv >> 8;
 
+    $self->is_avail_on_bs( !$exval );
     my $status = $exval ? 'not' : 'already';
     $self->_log_result( "$name is $status packaged upstream." );
     $k->post('app', 'upstream_status', $self, !$exval);
@@ -620,6 +623,8 @@ needed for the packaging stuff.
 The following accessors are available:
 
 =over 4
+
+=item is_avail_on_bs() - whether the module is available on build system
 
 =item is_local() - whether the module is installed locally
 
