@@ -19,12 +19,12 @@ use Class::XSAccessor
         is_avail_on_bs => 'is_avail_on_bs',
         is_local       => 'is_local',  # if module is available locally
         name           => 'name',
+        prereqs        => 'prereqs',
         # private
         _blocking  => '_blocking',
         _missing   => '_missing',
         _output    => '_output',
         _pkgname   => '_pkgname',
-        _prereqs   => '_prereqs',
         _rpm       => '_rpm',
         _srpm      => '_srpm',
         _wheel     => '_wheel',
@@ -114,7 +114,7 @@ sub cpan2dist {
     # and somehow, the ignore list with regex /(?<!$name)$/ does not work.
     # so we're stuck with ignore modules one by one - sigh.
     my $ignore = '';
-    $ignore .= "--ignore '^$_\$' " foreach @{ $self->_prereqs };
+    $ignore .= "--ignore '^$_\$' " foreach @{ $self->prereqs };
 
     # preparing command. note that we do want --force, to be able to extract
     # the rpm and srpm pathes from the output.
@@ -404,7 +404,7 @@ sub _find_prereqs {
     my @prereqs = map  { (split /\s+/, $_)[0] } @wanted;
 
     # store prereqs
-    $self->_prereqs( \@prereqs );
+    $self->prereqs( \@prereqs );
     my @logs = @prereqs
         ? map { "prereq found: $_" } @prereqs
         : 'No prereqs found.';
@@ -629,6 +629,8 @@ The following accessors are available:
 =item is_local() - whether the module is installed locally
 
 =item name() - the module name
+
+=item prereqs() - the module prereqs
 
 =back
 
