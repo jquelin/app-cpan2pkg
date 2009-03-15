@@ -140,7 +140,6 @@ sub cpan2dist {
 
 
 sub import_upstream {
-return;
     my ($k, $self) = @_[KERNEL, OBJECT];
 
     # preparing command.
