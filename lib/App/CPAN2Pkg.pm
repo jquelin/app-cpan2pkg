@@ -244,10 +244,11 @@ sub upstream_install {
 sub upstream_import {
     my ($k, $h, $module, $success) = @_[KERNEL, HEAP, ARG0, ARG1];
     # FIXME: what if wrong
-    foreach my $m ( $module->prereqs ) {
+    my $prereqs = $module->prereqs;
+    foreach my $m ( @$prereqs ) {
         my $mobj = $h->_module->{$m};
-        next if $mobj->is_available_on_bs;
-        $k->delay( build_upstream => 30, $module, $success );
+        next if $mobj->is_avail_on_bs;
+        $k->delay( upstream_import => 30, $module, $success );
     }
     $k->post($module, 'build_upstream');
 }
