@@ -249,6 +249,7 @@ sub upstream_import {
         my $mobj = $h->_module->{$m};
         next if $mobj->is_avail_on_bs;
         $k->delay( upstream_import => 30, $module, $success );
+        return;
     }
     $k->post($module, 'build_upstream');
 }
