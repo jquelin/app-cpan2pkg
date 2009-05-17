@@ -1,12 +1,13 @@
 ---
 name: App-CPAN2Pkg
-version: 0.5.0
+version: 1.0.0
 author:
   - 'Jerome Quelin <jquelin@cpan.org>'
 abstract: generating native linux packages from cpan
 license: perl
 resources:
   license: http://dev.perl.org/licenses/
+  repository: http://repo.or.cz/w/app-cpan2pkg.git
 requires:
   CPANPLUS::Shell::Default::Plugins::Prereqs: 0
   Class::XSAccessor: 0
@@ -15,6 +16,7 @@ requires:
   Curses::UI::POE: 0
   File::Basename: 0
   FindBin: 0
+  Getopt::Euclid: 0
   Hook::Output::File: 0
   List::MoreUtils: 0
   POE: 0
@@ -27,6 +29,7 @@ build_requires:
   Curses::UI::POE: 0
   File::Basename: 0
   FindBin: 0
+  Getopt::Euclid: 0
   Hook::Output::File: 0
   List::MoreUtils: 0
   POE: 0
@@ -38,12 +41,14 @@ recommends:
 provides:
   App::CPAN2Pkg:
     file: lib/App/CPAN2Pkg.pm
-    version: 0.5.0
+    version: 1.0.0
   App::CPAN2Pkg::Curses:
     file: lib/App/CPAN2Pkg/Curses.pm
   App::CPAN2Pkg::Module:
     file: lib/App/CPAN2Pkg/Module.pm
-generated_by: Module::Build version 0.31
+  App::CPAN2Pkg::Worker:
+    file: lib/App/CPAN2Pkg/Worker.pm
+generated_by: Module::Build version 0.32
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
   version: 1.2
