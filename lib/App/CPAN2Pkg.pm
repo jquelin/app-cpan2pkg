@@ -148,6 +148,7 @@ sub local_status {
     # module available: nothing depends on it anymore.
     my $name = $module->name;
     $module->is_local(1);
+    $module->is_avail_on_bs(1);
     my @depends = $module->blocking_list;
     $module->blocking_clear;
 
