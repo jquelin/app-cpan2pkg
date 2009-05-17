@@ -52,8 +52,8 @@ cpan2pkg - generating native packages from cpan
 
 =head2 Purpose of the program
 
-This script is a glue application around cpan2dist, interacting with your upstream
-distribution. When calling this script, it will:
+This script is a glue application around cpan2dist, interacting with
+your upstream distribution. When calling this script, it will:
 
 =over 4
 
@@ -64,8 +64,8 @@ if that's the case.
 
 =item *
 
-otherwise, build a native package with cpan2dist - this implies that there
-is a working C<CPANPLUS::Dist> backend for your OS.
+otherwise, build a native package with cpan2dist - this implies that
+there is a working C<CPANPLUS::Dist> backend for your OS.
 
 =item *
 
@@ -77,33 +77,34 @@ then submit module to upstream buildsystem.
 
 =back
 
-And this, while dealing with dependencies, all the way long, repeating steps
-over and over as needed.
+And this, while dealing with dependencies, all the way long, repeating
+steps over and over as needed.
 
-Read
-L<this blog entry|http://jquelin.blogspot.com/2009/01/cpan-modules-native-linux-packages.html>
-for this module rationale.
+Read L<this blog entry|http://jquelin.blogspot.com/2009/01/cpan-modules-native-linux-
+packages.html> for this module rationale.
+
 
 
 
 =head2 How to use
 
-See the options below (or C<cpan2pkg --help>) for more information on how to launch
-the script. Once launched, you will get a curses application, with a list on the left
-and some text on the right.
+See the options below (or C<cpan2pkg --help>) for more information on
+how to launch the script. Once launched, you will get a curses
+application, with a list on the left and some text on the right.
 
-The left list contains all the modules currently being built / installed / worked
-upon. You can get back to this list at any time by hitting the F2 key. A plus (+)
-prefix means that module is available locally. A minus (-) means that module is
-not yet available locally. A question mark (?) prefix means that module needs help
-and that user should do something before continuing.
+The left list contains all the modules currently being built / installed
+/ worked upon. You can get back to this list at any time by hitting the
+F2 key. A plus (+) prefix means that module is available locally. A
+minus (-) means that module is not yet available locally. A question
+mark (?) prefix means that module needs help and that user should do
+something before continuing.
 
-The right list contains details on a given module: name, missing prereqs, and
-everything being done for this module. One can change the module shown by hitting
-the Enter key in the left list.
+The right list contains details on a given module: name, missing
+prereqs, and everything being done for this module. One can change the
+module shown by hitting the Enter key in the left list.
 
-You can hit C<Ctrl+Q> at any time to quit the application. This will also terminate
-all operations currently running.
+You can hit C<Ctrl+Q> at any time to quit the application. This will
+also terminate all operations currently running.
 
 
 
@@ -146,7 +147,7 @@ Jerome Quelin C<< <jquelin@cpan.org> >>
 
 Copyright (c) 2009 Jerome Quelin, all rights reserved.
 
-This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 
