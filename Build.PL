@@ -50,6 +50,8 @@ my $builder = Module::Build->new(
     create_makefile_pl => 'traditional',
     meta_merge => {
         resources => {
+            bugtracker => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-CPAN2Pkg',
+            homepage   => 'http://search.cpan.org/dist/App-CPAN2Pkg',
             repository => 'http://repo.or.cz/w/app-cpan2pkg.git',
         },
     },
