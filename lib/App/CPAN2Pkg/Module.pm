@@ -113,8 +113,11 @@ sub cpan2dist {
     # but rebuild anyway if we're not at latest version").
     # and somehow, the ignore list with regex /(?<!$name)$/ does not work.
     # so we're stuck with ignore modules one by one - sigh.
+    # 20090606 update: ignore now removes completely the modules from
+    # the prereqs - sigh. so using --ban for now, hoping that it works
+    # this time.
     my $ignore = '';
-    $ignore .= "--ignore '^$_\$' " foreach @{ $self->prereqs };
+    $ignore .= "--ban '^$_\$' " foreach @{ $self->prereqs };
 
     # preparing command. note that we do want --force, to be able to extract
     # the rpm and srpm pathes from the output.
