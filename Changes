@@ -14,6 +14,12 @@ High-level changelog
 Low-level changelog
 ===================
 
+1.1.0 Sat Jun  6 20:27:53 CEST 2009
+ - using cpan2dist --ban instead of --ignore, which somehow seems to have changed
+ - adding resources to meta.yml
+
+**
+
 1.0.0 Sun May 17 12:14:19 CEST 2009
  - updating prereqs + moving on when module installed from upstream
  - splitted module in poe session + worker
