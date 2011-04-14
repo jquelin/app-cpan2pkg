@@ -1,16 +1,9 @@
-#
-# This file is part of App::CPAN2Pkg.
-# Copyright (c) 2009 Jerome Quelin, all rights reserved.
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the same terms as Perl itself.
-#
-#
-
-package App::CPAN2Pkg;
-
+use 5.012;
 use strict;
 use warnings;
+
+package App::CPAN2Pkg;
+# ABSTRACT: generating native linux packages from cpan
 
 use App::CPAN2Pkg::Module;
 use App::CPAN2Pkg::Worker;
@@ -20,8 +13,6 @@ use Class::XSAccessor
         _module    => '_module',
     };
 use POE;
-
-our $VERSION = '1.1.0';
 
 sub spawn {
     my ($class, $opts) = @_;
@@ -281,12 +272,6 @@ sub _start {
 1;
 __END__
 
-=head1 NAME
-
-App::CPAN2Pkg - generating native linux packages from cpan
-
-
-
 =head1 SYNOPSIS
 
     $ cpan2pkg
@@ -425,20 +410,6 @@ L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-CPAN2Pkg>
 
 =back
 
-
-
-=head1 AUTHOR
-
-Jerome Quelin, C<< <jquelin@cpan.org> >>
-
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright (c) 2009 Jerome Quelin, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
 
 =cut
 

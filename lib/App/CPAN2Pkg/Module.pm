@@ -1,17 +1,9 @@
-#
-# This file is part of App::CPAN2Pkg.
-# Copyright (c) 2009 Jerome Quelin, all rights reserved.
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the same terms as Perl itself.
-#
-#
-
-package App::CPAN2Pkg::Module;
-
 use 5.010;
 use strict;
 use warnings;
+
+package App::CPAN2Pkg::Module;
+# ABSTRACT: poe session to drive a module packaging
 
 use Class::XSAccessor
     accessors   => {
@@ -586,13 +578,6 @@ sub _log_result {
 1;
 __END__
 
-
-=head1 NAME
-
-App::CPAN2Pkg::Module - poe session to drive a module packaging
-
-
-
 =head1 DESCRIPTION
 
 C<App::CPAN2Pkg::Module> implements a POE session driving the whole
@@ -734,27 +719,6 @@ Check whether the package is installed locally.
 
 =back
 
-
-
-=head1 SEE ALSO
-
-For all related information (bug reporting, source code repository,
-etc.), refer to C<App::CPAN2Pkg>'s pod, section C<SEE ALSO>.
-
-
-
-=head1 AUTHOR
-
-Jerome Quelin, C<< <jquelin@cpan.org> >>
-
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright (c) 2009 Jerome Quelin, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
 
 =cut
 

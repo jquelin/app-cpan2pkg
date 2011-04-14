@@ -1,15 +1,11 @@
 #!/usr/bin/perl
-#
-# This file is part of App::CPAN2Pkg.
-# Copyright (c) 2009 Jerome Quelin, all rights reserved.
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the same terms as Perl itself.
-#
-#
 
+use 5.012;
 use strict;
 use warnings;
+
+package main;
+# ABSTRACT: generating native linux packages from cpan
 
 # for testing purposes
 use FindBin qw{ $Bin };
@@ -42,11 +38,6 @@ sub _get_development_root {
 }
 
 __END__
-
-=head1 NAME
-
-cpan2pkg - generating native packages from cpan
-
 
 =head1 DESCRIPTION
 
@@ -134,20 +125,5 @@ Module to install / build / package.
 Print the usual program information
 
 =back
-
-
-
-=head1 AUTHOR
-
-Jerome Quelin C<< <jquelin@cpan.org> >>
-
-
-
-=head1 COPYRIGHT
-
-Copyright (c) 2009 Jerome Quelin, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
 
 

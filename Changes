@@ -1,24 +1,13 @@
 Revision history for App-CPAN2Pkg
 
-High-level changelog
-====================
+{{$NEXT}}
+ - using dist::zilla for release
 
-1.0.x    chaining upstream builds + cleanups (doc, fixmes)
-0.5.x    importing + building upstream
-0.4.x    building & installing
-0.3.x    dealing with prereqs
-0.2.x    upstream availability
-0.1.x    finding prereqs, better gui
-0.0.x    initial work, with basic gui
-
-Low-level changelog
-===================
+**
 
 1.1.0 Sat Jun  6 20:27:53 CEST 2009
  - using cpan2dist --ban instead of --ignore, which somehow seems to have changed
  - adding resources to meta.yml
-
-**
 
 1.0.0 Sun May 17 12:14:19 CEST 2009
  - updating prereqs + moving on when module installed from upstream
@@ -35,8 +24,6 @@ Low-level changelog
  - waiting for user confirmation when package is available on upstream
    build system.
 
-**
-
 0.4.1 Sun Feb 15 19:07:12 CET 2009
  - storing when a module is complete
  - build module when all prereqs has been built & installed
@@ -47,8 +34,6 @@ Low-level changelog
  - building package for module
  - installing freshly build package
 
-**
-
 0.3.1 Fri Feb  6 16:32:38 CET 2009
  - moving appli forward when no more missing prereqs
  - listing missing prereqs in ui
@@ -56,8 +41,6 @@ Low-level changelog
 
 0.3.0 Sat Jan 31 14:48:59 CET 2009
  - spawning prereqs
-
-**
 
 0.2.2 Sat Jan 31 12:32:05 CET 2009
  - installing module from upstream dist
@@ -70,13 +53,9 @@ Low-level changelog
 0.2.0 Fri Jan 30 15:36:47 CET 2009
  - checking if module is available upstream
 
-**
-
 0.1.0 Fri Jan 23 18:13:27 CET 2009
  - finding module prereqs
  - revamped gui, getting rid of notebook
-
-**
 
 0.0.2 Wed Jan 21 16:43:28 CET 2009
  - fix to support latest curses::ui::poe version

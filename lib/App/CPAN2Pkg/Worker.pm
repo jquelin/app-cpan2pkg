@@ -1,17 +1,9 @@
-#
-# This file is part of App::CPAN2Pkg.
-# Copyright (c) 2009 Jerome Quelin, all rights reserved.
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the same terms as Perl itself.
-#
-#
-
-package App::CPAN2Pkg::Worker;
-
 use 5.010;
 use strict;
 use warnings;
+
+package App::CPAN2Pkg::Worker;
+# ABSTRACT: poe session to drive a module packaging
 
 use POE;
 
@@ -76,13 +68,6 @@ sub _start {
 1;
 __END__
 
-
-=head1 NAME
-
-App::CPAN2Pkg::Worker - poe session to drive a module packaging
-
-
-
 =head1 DESCRIPTION
 
 C<App::CPAN2Pkg::Worker> implements a POE session driving the whole
@@ -103,28 +88,6 @@ installing the wanted C<$module> (an C<App::CPAN2Pkg::Module> object).
 
 It will return the POE id of the session newly created.
 
-
-
-
-=head1 SEE ALSO
-
-For all related information (bug reporting, source code repository,
-etc.), refer to C<App::CPAN2Pkg>'s pod, section C<SEE ALSO>.
-
-
-
-=head1 AUTHOR
-
-Jerome Quelin, C<< <jquelin@cpan.org> >>
-
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright (c) 2009 Jerome Quelin, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
 
 =cut
 

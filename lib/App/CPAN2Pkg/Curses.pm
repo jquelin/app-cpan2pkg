@@ -1,16 +1,9 @@
-#
-# This file is part of App::CPAN2Pkg.
-# Copyright (c) 2009 Jerome Quelin, all rights reserved.
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the same terms as Perl itself.
-#
-#
-
-package App::CPAN2Pkg::Curses;
-
+use 5.012;
 use strict;
 use warnings;
+
+package App::CPAN2Pkg::Curses;
+# ABSTRACT: curses user interface for cpan2pkg
 
 use App::CPAN2Pkg;
 use Class::XSAccessor
@@ -317,13 +310,6 @@ sub _set_bindings {
 1;
 __END__
 
-
-=head1 NAME
-
-App::CPAN2Pkg::Curses - curses user interface for cpan2pkg
-
-
-
 =head1 DESCRIPTION
 
 C<App::CPAN2Pkg::Curses> implements a POE session driving a curses
@@ -394,26 +380,6 @@ information.
 
 Update the missing C<@prereqs> of C<$module> in the ui.
 
-
-=head1 SEE ALSO
-
-For all related information (bug reporting, source code repository,
-etc.), refer to C<App::CPAN2Pkg>'s pod, section C<SEE ALSO>.
-
-
-
-=head1 AUTHOR
-
-Jerome Quelin, C<< <jquelin@cpan.org> >>
-
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright (c) 2009 Jerome Quelin, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
 
 =cut
 
