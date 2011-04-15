@@ -12,10 +12,13 @@ use MooseX::SemiAffordanceAccessor;
 use Readonly;
 use Tk;
 use Tk::Balloon;
+use Tk::PNG;
 use Tk::Sugar;
 
 with 'Tk::Role::HasWidgets';
 
+use App::CPAN2Pkg::Tk::Utils qw{ cpan2pkg_icon image };
+use App::CPAN2Pkg::Utils     qw{ $SHAREDIR };
 
 Readonly my $K  => $poe_kernel;
 Readonly my $mw => $poe_main_window; # already created by poe
@@ -89,15 +92,34 @@ sub _build_gui {
         -command => $s->postback( 'test' ),
     )->pack( left );
 
+    #
+    $mw->Label( -text=>'Legend', -bg=>'black', -fg=>'white' )->pack( top, fillx );
+
+    my $legend = $mw->Frame->pack( top, fillx );
+    my @lab1 = ( 'not started', 'missing dep', 'building', 'installing', 'available', 'error' );
+    my @col1 = qw{ black yellow orange blue green red };
+    my @lab2 = ( 'not started', 'not available', 'importing', 'building', 'available', 'error' );
+    my @col2 = qw{ black yellow purple orange green red };
+    $legend->Label( -text => 'Local' )->grid( -row => 0, -column => 0, -sticky => 'w' );
+    $legend->Label( -text=>'Build System' )->grid( -row=>1, -column=>0, -sticky=>'w' );
+    my $buldir = $SHAREDIR->subdir( 'bullets' );
+    foreach my $i ( 0 .. $#lab1 ) {
+        $legend->Label( -image=>image( $buldir->file($col1[$i] . ".png")) )->grid( -row=>0, -column=>2*$i+1 );
+        $legend->Label( -image=>image( $buldir->file($col2[$i] . ".png")) )->grid( -row=>1, -column=>2*$i+1 );
+        $legend->Label( -text => $lab1[$i] )->grid( -row=>0, -column=>$i*2+2, -sticky => 'w' );
+        $legend->Label( -text => $lab2[$i] )->grid( -row=>1, -column=>$i*2+2, -sticky => 'w' );
+    }
+
     my $f = $mw->Frame->pack( top, xfill2 );
     my $hlist = $f->Scrolled( 'HList',
         -scrollbars => 'osoe',
         -width      => 30,
-        -columns    => 2,
+        -columns    => 3,
         -header     => 1,
     )->pack( left, filly );
-    $hlist->header( create => 0, -text => 'status' );
-    $hlist->header( create => 1, -text => 'module' );
+    $hlist->header( create => 0, -text => 'local' );
+    $hlist->header( create => 1, -text => 'bs' );
+    $hlist->header( create => 2, -text => 'module' );
 
     # WARNING: we need to create the toolbar object before anything
     # else. indeed, tk::toolbar loads the embedded icons in classinit,
