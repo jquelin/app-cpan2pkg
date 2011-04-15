@@ -12,6 +12,7 @@ use MooseX::SemiAffordanceAccessor;
 use Readonly;
 use Tk;
 use Tk::Balloon;
+use Tk::Sugar;
 
 with 'Tk::Role::HasWidgets';
 
@@ -44,6 +45,11 @@ sub START {
 }
 
 
+# -- events
+
+event test => sub { say "test!" };
+
+
 # -- gui creation
 
 #
@@ -74,6 +80,24 @@ sub _build_gui {
 
     # the tooltip
     $self->_set_w('tooltip', $mw->Balloon);
+
+    #
+    my $ftop = $mw->Frame->pack( top, fillx );
+    $ftop->Label( -text => 'module:' )->pack( left );
+    $ftop->Entry()->pack( left, xfillx );
+    $ftop->Button( -text => 'submit',
+        -command => $s->postback( 'test' ),
+    )->pack( left );
+
+    my $f = $mw->Frame->pack( top, xfill2 );
+    my $hlist = $f->Scrolled( 'HList',
+        -scrollbars => 'osoe',
+        -width      => 30,
+        -columns    => 2,
+        -header     => 1,
+    )->pack( left, filly );
+    $hlist->header( create => 0, -text => 'status' );
+    $hlist->header( create => 1, -text => 'module' );
 
     # WARNING: we need to create the toolbar object before anything
     # else. indeed, tk::toolbar loads the embedded icons in classinit,
