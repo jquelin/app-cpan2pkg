@@ -5,6 +5,21 @@ use warnings;
 package App::CPAN2Pkg;
 # ABSTRACT: generating native linux packages from cpan
 
+# although it's not strictly needed to load POE::Kernel manually (since
+# MooseX::POE will load it anyway), we're doing it here to make sure poe
+# will use tk event loop. this can also be done by loading module tk
+# before poe, for example if we load app::cpan2pkg::tk::main before
+# moosex::poe... but better be safe than sorry, and doing things
+# explicitly is always better.
+use POE::Kernel { loop => 'Tk' };
+
+
+use MooseX::Singleton;
+use Readonly;
+
+use App::CPAN2Pkg::Controller;
+use App::CPAN2Pkg::Tk::Main;
+
 use App::CPAN2Pkg::Module;
 use App::CPAN2Pkg::Worker;
 use Class::XSAccessor
@@ -13,6 +28,15 @@ use Class::XSAccessor
         _module    => '_module',
     };
 use POE;
+
+sub run {
+    # create the poe sessions
+    App::CPAN2Pkg::Controller->new;
+    App::CPAN2Pkg::Tk::Main->new;
+
+    # and let's start the fun!
+    POE::Kernel->run;
+}
 
 sub spawn {
     my ($class, $opts) = @_;
@@ -268,6 +292,8 @@ sub _start {
     }
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 __END__

@@ -11,31 +11,9 @@ package main;
 use FindBin qw{ $Bin };
 use lib "$Bin/../lib";
 
-use Getopt::Euclid;
-use App::CPAN2Pkg::Curses;
-use Hook::Output::File;
-
-my $hook;
-my $dir = _get_development_root();
-if ( defined $dir ) {
-    $hook = Hook::Output::File->redirect(
-        stdout => "$dir/cpan2pkg.stdout",
-        stderr => "$dir/cpan2pkg.stderr",
-    );
-    warn '-' x 40 . "\n";
-}
-
-my $modules = $ARGV{'<module>'};
-my $ui = App::CPAN2Pkg::Curses->spawn({modules=>$modules});
-$ui->mainloop;
-
+use App::CPAN2Pkg;
+App::CPAN2Pkg->run( @ARGV );
 exit;
-
-sub _get_development_root {
-    my $dir = "$Bin/..";
-    return $dir if -d "$dir/.git";
-    return;
-}
 
 __END__
 
@@ -73,57 +51,4 @@ steps over and over as needed.
 
 Read L<this blog entry|http://jquelin.blogspot.com/2009/01/cpan-modules-native-linux-
 packages.html> for this module rationale.
-
-
-
-
-=head2 How to use
-
-See the options below (or C<cpan2pkg --help>) for more information on
-how to launch the script. Once launched, you will get a curses
-application, with a list on the left and some text on the right.
-
-The left list contains all the modules currently being built / installed
-/ worked upon. You can get back to this list at any time by hitting the
-F2 key. A plus (+) prefix means that module is available locally. A
-minus (-) means that module is not yet available locally. A question
-mark (?) prefix means that module needs help and that user should do
-something before continuing.
-
-The right list contains details on a given module: name, missing
-prereqs, and everything being done for this module. One can change the
-module shown by hitting the Enter key in the left list.
-
-You can hit C<Ctrl+Q> at any time to quit the application. This will
-also terminate all operations currently running.
-
-
-
-=head1 REQUIRED ARGUMENTS
-
-=over
-
-=item <module>...
-
-Module to install / build / package.
-
-=back
-
-
-=head1 OPTIONS
-
-=over 4
-
-=item --version
-
-=item --usage
-
-=item --help
-
-=item --man
-
-Print the usual program information
-
-=back
-
 
