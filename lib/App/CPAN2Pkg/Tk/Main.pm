@@ -17,7 +17,7 @@ use Tk::Sugar;
 
 with 'Tk::Role::HasWidgets';
 
-use App::CPAN2Pkg::Tk::Utils qw{ cpan2pkg_icon image };
+use App::CPAN2Pkg::Tk::Utils qw{ image };
 use App::CPAN2Pkg::Utils     qw{ $SHAREDIR };
 
 Readonly my $K  => $poe_kernel;
@@ -73,7 +73,8 @@ sub _build_gui {
 
     # set windowtitle
     $mw->title('cpan2pkg');
-    #$mw->iconimage( pandemic_icon() );
+    $mw->iconimage( image( $SHAREDIR->file('icon.png') ) );
+    $mw->iconmask ( '@' . $SHAREDIR->file('icon-mask.xbm') );
 
     # make sure window is big enough
     #my $config = Games::Pandemic::Config->instance;
