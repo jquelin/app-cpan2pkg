@@ -5,12 +5,24 @@ use warnings;
 package App::CPAN2Pkg::Module;
 # ABSTRACT: poe session to drive a module packaging
 
+use Moose;
+use MooseX::Has::Sugar;
+use MooseX::SemiAffordanceAccessor;
+
+
+# -- public attributes
+
+has name => ( ro, required, isa=>'Str' );
+
+
+# --
+
 use Class::XSAccessor
     accessors   => {
         # public
         is_avail_on_bs => 'is_avail_on_bs',
         is_local       => 'is_local',  # if module is available locally
-        name           => 'name',
+        name__           => 'name',
         prereqs        => 'prereqs',
         # private
         _blocking  => '_blocking',
