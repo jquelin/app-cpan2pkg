@@ -30,8 +30,9 @@ use Class::XSAccessor
 use POE;
 
 sub run {
+    my (undef, @modules) = @_;
     # create the poe sessions
-    App::CPAN2Pkg::Controller->new;
+    App::CPAN2Pkg::Controller->new( queue => \@modules );
     App::CPAN2Pkg::Tk::Main->new;
 
     # and let's start the fun!

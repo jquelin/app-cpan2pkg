@@ -6,10 +6,21 @@ package App::CPAN2Pkg::Controller;
 # ABSTRACT: controller for cpan2pkg interface
 
 use Moose;
+use MooseX::Has::Sugar;
 use MooseX::POE;
+use MooseX::SemiAffordanceAccessor;
 use Readonly;
 
 Readonly my $K => $poe_kernel;
+
+
+=attr queue
+
+A list of modules to be build, to be specified during object creation.
+
+=cut
+
+has queue => ( ro, auto_deref, isa =>'ArrayRef[Str]' );
 
 # -- initialization
 
@@ -21,6 +32,7 @@ Readonly my $K => $poe_kernel;
 sub START {
     my $self = shift;
     $K->alias_set('controller');
+    $self->yield( new_module_wanted => $_ ) for $self->queue;
 }
 
 
