@@ -14,13 +14,22 @@ use Readonly;
 Readonly my $K => $poe_kernel;
 
 
+# -- public attributes
+
 =attr queue
 
 A list of modules to be build, to be specified during object creation.
 
+=attr worker
+
+The type of worker to use, eg C<App::CPAN2Pkg::Worker::Mageia>.
+
 =cut
 
-has queue => ( ro, auto_deref, isa =>'ArrayRef[Str]' );
+has queue  => ( ro, auto_deref, isa =>'ArrayRef[Str]' );
+has worker => ( ro, required, isa=>'Str' );
+
+
 
 # -- initialization
 

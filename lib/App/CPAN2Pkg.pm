@@ -31,14 +31,16 @@ use Class::XSAccessor
 use POE;
 
 sub run {
+    my (undef, @modules) = @_;
+
     # check if the platform is supported
     my $os = Devel::Platform::Info::Linux->new->get_info->{oslabel};
-    eval "require App::CPAN2Pkg::Worker::$os";
+    my $worker = "App::CPAN2Pkg::Worker::$os";
+    eval "require $worker";
     die "Platform $os is not supported" if $@;
 
-    my (undef, @modules) = @_;
     # create the poe sessions
-    App::CPAN2Pkg::Controller->new( queue => \@modules );
+    App::CPAN2Pkg::Controller->new( queue=>\@modules, worker=>$worker );
     App::CPAN2Pkg::Tk::Main->new;
 
     # and let's start the fun!
