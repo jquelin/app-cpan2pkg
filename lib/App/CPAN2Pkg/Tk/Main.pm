@@ -50,7 +50,11 @@ sub START {
 
 # -- events
 
-event test => sub { say "test!" };
+event new_module_wanted => sub {
+    my $self = shift;
+    my $entry = $self->_w( "ent_module" );
+    say $entry->get;
+};
 
 
 # -- gui creation
@@ -87,11 +91,13 @@ sub _build_gui {
 
     #
     my $ftop = $mw->Frame->pack( top, fillx );
-    $ftop->Label( -text => 'module:' )->pack( left );
-    $ftop->Entry()->pack( left, xfillx );
+    $ftop->Label( -text => 'New module wanted:' )->pack( left );
+    my $entry = $ftop->Entry()->pack( left, xfillx );
+    $self->_set_w( ent_module => $entry );
     $ftop->Button( -text => 'submit',
-        -command => $s->postback( 'test' ),
+        -command => $s->postback( 'new_module_wanted' ),
     )->pack( left );
+    $mw->bind( '<Return>', $s->postback( 'new_module_wanted' ) );
 
     #
     $mw->Label( -text=>'Legend', -bg=>'black', -fg=>'white' )->pack( top, fillx );
@@ -133,6 +139,7 @@ sub _build_gui {
     # center & show the window
     # FIXME: restore last position saved?
     $mw->Popup;
+    $self->_w("ent_module")->focus;
 }
 
 no Moose;
