@@ -5,7 +5,26 @@ use warnings;
 package App::CPAN2Pkg::Worker;
 # ABSTRACT: poe session to drive a module packaging
 
+use Moose;
+use MooseX::Has::Sugar;
+use MooseX::POE;
+use MooseX::SemiAffordanceAccessor;
 use POE;
+use Readonly;
+
+Readonly my $K => $poe_kernel;
+
+
+# -- public attributes
+
+has module => ( ro, required, isa=>'App::CPAN2Pkg::Module' );
+
+# -- initialization
+
+sub START {
+    my $self = shift;
+    $K->alias_set( $self->module->name );
+}
 
 
 #--
