@@ -14,6 +14,7 @@ package App::CPAN2Pkg;
 use POE::Kernel { loop => 'Tk' };
 
 
+use Devel::Platform::Info::Linux;
 use MooseX::Singleton;
 use Readonly;
 
@@ -30,6 +31,11 @@ use Class::XSAccessor
 use POE;
 
 sub run {
+    # check if the platform is supported
+    my $os = Devel::Platform::Info::Linux->new->get_info->{oslabel};
+    eval "require App::CPAN2Pkg::Worker::$os";
+    die "Platform $os is not supported" if $@;
+
     my (undef, @modules) = @_;
     # create the poe sessions
     App::CPAN2Pkg::Controller->new( queue => \@modules );
