@@ -48,12 +48,17 @@ sub START {
 }
 
 
-# -- events
+# -- gui events
 
-event new_module_wanted => sub {
+#
+# event: _on_btn_submit()
+#
+# received when user clicked the submit button.
+#
+event _on_btn_submit => sub {
     my $self = shift;
-    my $entry = $self->_w( "ent_module" );
-    say $entry->get;
+    my $module = $self->_w( "ent_module" )->get;
+    $K->post( controller => new_module_wanted => $module );
 };
 
 
@@ -95,9 +100,9 @@ sub _build_gui {
     my $entry = $ftop->Entry()->pack( left, xfillx );
     $self->_set_w( ent_module => $entry );
     $ftop->Button( -text => 'submit',
-        -command => $s->postback( 'new_module_wanted' ),
+        -command => $s->postback( '_on_btn_submit' ),
     )->pack( left );
-    $mw->bind( '<Return>', $s->postback( 'new_module_wanted' ) );
+    $mw->bind( '<Return>', $s->postback( '_on_btn_submit' ) );
 
     #
     $mw->Label( -text=>'Legend', -bg=>'black', -fg=>'white' )->pack( top, fillx );
