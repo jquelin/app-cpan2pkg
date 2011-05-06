@@ -10,6 +10,7 @@ use MooseX::Has::Sugar;
 use MooseX::POE;
 use MooseX::SemiAffordanceAccessor;
 use POE;
+use POE::Wheel::Run;
 use Readonly;
 
 Readonly my $K => $poe_kernel;
@@ -19,6 +20,13 @@ Readonly my $K => $poe_kernel;
 
 has module => ( ro, required, isa=>'App::CPAN2Pkg::Module' );
 
+# -- private attributes
+
+# the wheel used to run an external command. a given worker will only
+# run one wheel at a time, so we don't need to multiplex them.
+has _wheel => ( rw, isa=>'POE::Wheel', clearer=>'_clear_wheel' );
+
+
 # -- initialization
 
 sub START {
@@ -26,6 +34,60 @@ sub START {
     $K->alias_set( $self->module->name );
 }
 
+
+# -- public methods
+
+=method run_command
+
+    $worker->run_command( $command );
+
+Run a C<$command> in another process, and takes care of everything.
+Since it uses L<POE::Wheel::Run> underneath, it understands various
+stuff such as running a code reference. Note: commands will be launched
+under a C<C> locale.
+
+=cut
+
+sub run_command {
+    my ($self, $cmd) = @_;
+
+    $ENV{LC_ALL} = 'C';
+    my $child = POE::Wheel::Run->new(
+        Program     => $cmd,
+        Conduit     => "pty",
+        StdoutEvent => "_child_stdout",
+        StderrEvent => "_child_stderr",
+        CloseEvent  => "_child_close",
+    );
+
+    $K->sig_child( $child->PID, "_child_signal" );
+    $self->_set_wheel( $child );
+    #print( "Child pid ", $child->PID, " started as wheel ", $child->ID, ".\n" );
+}
+
+
+# -- private events
+
+event _child_stdout => sub {
+    my ($self, $line, $wid) = @_[OBJECT, ARG0, ARG1];
+    say scalar(localtime) . " - $wid - " . $self->_wheel->PID . " - $line";
+};
+
+event _child_stderr => sub {
+    my ($self, $line, $wid) = @_[OBJECT, ARG0, ARG1];
+    #say "stderr: $line";
+};
+
+event _child_close => sub {
+    my ($self, $wid) = @_[OBJECT, ARG0];
+    #say "child closed all pipes";
+};
+
+event _child_signal => sub {
+    my ($self, $pid, $status) = @_[ARG1, ARG2];
+    $status //=0;
+    #say "child exited with status $status";
+};
 
 #--
 # CONSTRUCTOR
