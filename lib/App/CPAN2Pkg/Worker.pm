@@ -18,7 +18,14 @@ Readonly my $K => $poe_kernel;
 
 # -- public attributes
 
-has module => ( ro, required, isa=>'App::CPAN2Pkg::Module' );
+=attr module
+
+The name of the module to build / install / submit / whatever.
+
+=cut
+
+has module => ( ro, required, isa=>'Str' );
+
 
 # -- private attributes
 
@@ -31,7 +38,7 @@ has _wheel => ( rw, isa=>'POE::Wheel', clearer=>'_clear_wheel' );
 
 sub START {
     my $self = shift;
-    $K->alias_set( $self->module->name );
+    $K->alias_set( $self->module );
 }
 
 
