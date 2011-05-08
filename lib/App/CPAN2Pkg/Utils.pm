@@ -7,9 +7,14 @@ package App::CPAN2Pkg::Utils;
 
 use Exporter::Lite;
 use File::ShareDir::PathClass qw{ dist_dir };
+use FindBin                   qw{ $Bin };
+use Path::Class;
  
 our @EXPORT_OK = qw{ $SHAREDIR };
-our $SHAREDIR  = dist_dir("App-CPAN2Pkg");
+
+my $root = dir($Bin)->parent;
+our $IS_DEVEL  = -e $root->file("dist.ini" );
+our $SHAREDIR  = $IS_DEVEL ? $root->subdir("share") : dist_dir("App-CPAN2Pkg");
 
 1;
 __END__
