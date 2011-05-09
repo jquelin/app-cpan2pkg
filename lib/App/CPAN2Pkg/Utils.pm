@@ -11,12 +11,13 @@ use File::ShareDir::PathClass qw{ dist_dir };
 use FindBin                   qw{ $Bin };
 use Path::Class;
  
-our @EXPORT_OK = qw{ $LINUX_FLAVOUR $SHAREDIR };
+our @EXPORT_OK = qw{ $LINUX_FLAVOUR $SHAREDIR $WORKER_TYPE };
 
 my $root = dir($Bin)->parent;
 our $IS_DEVEL  = -e $root->file("dist.ini" );
 our $SHAREDIR  = $IS_DEVEL ? $root->subdir("share") : dist_dir("App-CPAN2Pkg");
 our $LINUX_FLAVOUR = Devel::Platform::Info::Linux->new->get_info->{oslabel};
+our $WORKER_TYPE   = "App::CPAN2Pkg::Worker::$LINUX_FLAVOUR";
 
 1;
 __END__

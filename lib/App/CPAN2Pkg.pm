@@ -19,7 +19,7 @@ use Readonly;
 
 use App::CPAN2Pkg::Controller;
 use App::CPAN2Pkg::Tk::Main;
-use App::CPAN2Pkg::Utils      qw{ $LINUX_FLAVOUR };
+use App::CPAN2Pkg::Utils      qw{ $LINUX_FLAVOUR $WORKER_TYPE };
 
 use App::CPAN2Pkg::Module;
 use App::CPAN2Pkg::Worker;
@@ -34,7 +34,7 @@ sub run {
     my (undef, @modules) = @_;
 
     # check if the platform is supported
-    eval "require App::CPAN2Pkg::Worker::$LINUX_FLAVOUR";
+    eval "require $WORKER_TYPE";
     die "Platform $LINUX_FLAVOUR is not supported" if $@;
 
     # create the poe sessions
