@@ -107,23 +107,6 @@ sub _build_gui {
     $mw->bind( '<Return>', $s->postback( '_on_btn_submit' ) );
 
     #
-    $mw->Label( -text=>'Legend', -bg=>'black', -fg=>'white' )->pack( top, fillx );
-
-    my $legend = $mw->Frame->pack( top, fillx );
-    my @lab1 = ( 'not started', 'missing dep', 'building', 'installing', 'available', 'error' );
-    my @col1 = qw{ black yellow orange blue green red };
-    my @lab2 = ( 'not started', 'not available', 'importing', 'building', 'available', 'error' );
-    my @col2 = qw{ black yellow purple orange green red };
-    $legend->Label( -text => 'Local' )->grid( -row => 0, -column => 0, -sticky => 'w' );
-    $legend->Label( -text=>'Build System' )->grid( -row=>1, -column=>0, -sticky=>'w' );
-    my $buldir = $SHAREDIR->subdir( 'bullets' );
-    foreach my $i ( 0 .. $#lab1 ) {
-        $legend->Label( -image=>image( $buldir->file($col1[$i] . ".png")) )->grid( -row=>0, -column=>2*$i+1 );
-        $legend->Label( -image=>image( $buldir->file($col2[$i] . ".png")) )->grid( -row=>1, -column=>2*$i+1 );
-        $legend->Label( -text => $lab1[$i] )->grid( -row=>0, -column=>$i*2+2, -sticky => 'w' );
-        $legend->Label( -text => $lab2[$i] )->grid( -row=>1, -column=>$i*2+2, -sticky => 'w' );
-    }
-
     my $f = $mw->Frame->pack( top, xfill2 );
     my $hlist = $f->Scrolled( 'HList',
         -scrollbars => 'osoe',
