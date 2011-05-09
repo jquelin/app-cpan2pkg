@@ -97,7 +97,7 @@ sub _build_gui {
     $self->_set_w('tooltip', $mw->Balloon);
 
     #
-    my $ftop = $mw->Frame->pack( top, fillx );
+    my $ftop = $mw->Frame->pack( top, fillx, pad20 );
     $ftop->Label( -text => 'New module wanted:' )->pack( left );
     my $entry = $ftop->Entry()->pack( left, xfillx );
     $self->_set_w( ent_module => $entry );
