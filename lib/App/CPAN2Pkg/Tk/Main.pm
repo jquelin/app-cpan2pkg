@@ -98,12 +98,12 @@ sub _build_gui {
 
     #
     my $ftop = $mw->Frame->pack( top, fillx, pad20 );
-    $ftop->Label( -text => 'New module wanted:' )->pack( left );
-    my $entry = $ftop->Entry()->pack( left, xfillx );
+    $ftop->Label( -text => 'New module wanted:' )->pack( left, pad2 );
+    my $entry = $ftop->Entry()->pack( left, xfillx, pad2 );
     $self->_set_w( ent_module => $entry );
     $ftop->Button( -text => 'submit',
         -command => $s->postback( '_on_btn_submit' ),
-    )->pack( left );
+    )->pack( left, pad2 );
     $mw->bind( '<Return>', $s->postback( '_on_btn_submit' ) );
 
     #
