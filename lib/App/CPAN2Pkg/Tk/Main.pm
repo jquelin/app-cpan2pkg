@@ -107,13 +107,6 @@ sub _build_gui {
     $mw->bind( '<Return>', $s->postback( '_on_btn_submit' ) );
 
     #
-    # WARNING: we need to create the toolbar object before anything
-    # else. indeed, tk::toolbar loads the embedded icons in classinit,
-    # that is when the first object of the class is created - and not
-    # during compile time.
-#    $self->_build_toolbar;
-#    $self->_build_menubar;
-#    $self->_build_canvas;
     my $f = $mw->Frame->pack( top, xfill2 );
     $self->_build_hlist( $f );
     $self->_build_notebook( $f );
