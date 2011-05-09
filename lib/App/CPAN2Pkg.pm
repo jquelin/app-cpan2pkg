@@ -14,12 +14,12 @@ package App::CPAN2Pkg;
 use POE::Kernel { loop => 'Tk' };
 
 
-use Devel::Platform::Info::Linux;
 use MooseX::Singleton;
 use Readonly;
 
 use App::CPAN2Pkg::Controller;
 use App::CPAN2Pkg::Tk::Main;
+use App::CPAN2Pkg::Utils      qw{ $LINUX_FLAVOUR };
 
 use App::CPAN2Pkg::Module;
 use App::CPAN2Pkg::Worker;
@@ -34,13 +34,11 @@ sub run {
     my (undef, @modules) = @_;
 
     # check if the platform is supported
-    my $os = Devel::Platform::Info::Linux->new->get_info->{oslabel};
-    my $worker = "App::CPAN2Pkg::Worker::$os";
-    eval "require $worker";
-    die "Platform $os is not supported" if $@;
+    eval "require App::CPAN2Pkg::Worker::$LINUX_FLAVOUR";
+    die "Platform $LINUX_FLAVOUR is not supported" if $@;
 
     # create the poe sessions
-    App::CPAN2Pkg::Controller->new( queue=>\@modules, worker=>$worker );
+    App::CPAN2Pkg::Controller->new( queue=>\@modules );
     App::CPAN2Pkg::Tk::Main->new;
 
     # and let's start the fun!

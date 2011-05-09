@@ -20,14 +20,9 @@ Readonly my $K => $poe_kernel;
 
 A list of modules to be build, to be specified during object creation.
 
-=attr worker
-
-The type of worker to use, eg C<App::CPAN2Pkg::Worker::Mageia>.
-
 =cut
 
-has queue  => ( ro, auto_deref, isa =>'ArrayRef[Str]' );
-has worker => ( ro, required, isa=>'Str' );
+has queue       => ( ro, auto_deref, isa =>'ArrayRef[Str]' );
 
 
 
