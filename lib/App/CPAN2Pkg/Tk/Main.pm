@@ -107,17 +107,6 @@ sub _build_gui {
     $mw->bind( '<Return>', $s->postback( '_on_btn_submit' ) );
 
     #
-    my $f = $mw->Frame->pack( top, xfill2 );
-    my $hlist = $f->Scrolled( 'HList',
-        -scrollbars => 'osoe',
-        -width      => 30,
-        -columns    => 3,
-        -header     => 1,
-    )->pack( left, filly );
-    $hlist->header( create => 0, -text => 'local' );
-    $hlist->header( create => 1, -text => 'bs' );
-    $hlist->header( create => 2, -text => 'module' );
-
     # WARNING: we need to create the toolbar object before anything
     # else. indeed, tk::toolbar loads the embedded icons in classinit,
     # that is when the first object of the class is created - and not
@@ -125,12 +114,36 @@ sub _build_gui {
 #    $self->_build_toolbar;
 #    $self->_build_menubar;
 #    $self->_build_canvas;
+    my $f = $mw->Frame->pack( top, xfill2 );
+    $self->_build_hlist( $f );
     $self->_build_notebook( $f );
 
     # center & show the window
     # FIXME: restore last position saved?
     $mw->Popup;
     $self->_w("ent_module")->focus;
+}
+
+
+#
+# $main->_build_hlist( $parent );
+#
+# build the hierarchical list holding all the module status.
+#
+sub _build_hlist {
+    my ($self, $parent) = @_;
+
+    my $hlist = $parent->Scrolled( 'HList',
+        -scrollbars => 'osoe',
+        -width      => 30,
+        -columns    => 3,
+        -header     => 1,
+    )->pack( left, filly );
+    $self->_set_w( hlist => $hlist );
+
+    $hlist->header( create => 0, -text => 'local' );
+    $hlist->header( create => 1, -text => 'bs' );
+    $hlist->header( create => 2, -text => 'module' );
 }
 
 #
