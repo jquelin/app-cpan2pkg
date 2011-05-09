@@ -12,6 +12,8 @@ use MooseX::SemiAffordanceAccessor;
 use Readonly;
 use Tk;
 use Tk::Balloon;
+use Tk::HList;
+use Tk::NoteBook;
 use Tk::PNG;
 use Tk::Sugar;
 
@@ -140,11 +142,47 @@ sub _build_gui {
 #    $self->_build_toolbar;
 #    $self->_build_menubar;
 #    $self->_build_canvas;
+    $self->_build_notebook( $f );
 
     # center & show the window
     # FIXME: restore last position saved?
     $mw->Popup;
     $self->_w("ent_module")->focus;
+}
+
+#
+# $main->_build_notebook( $parent );
+#
+# build the notebook holding one pane per module being built. first tab
+# contains the legend.
+#
+sub _build_notebook {
+    my ($self, $parent) = @_;
+
+    # create the notebook that will hold module details
+    my $nb = $parent->NoteBook->pack( right, xfill2 );
+    $self->_set_w('notebook', $nb);
+
+    # create a first tab with the legend
+    my $legend = $nb->add("Legend", -label=>"Legend");
+
+    #my $legend = $mw->Frame->pack( top, fillx );
+    my @lab1 = ( 'not started', 'missing dep', 'building', 'installing', 'available', 'error' );
+    my @col1 = qw{ black yellow orange blue green red };
+    my @lab2 = ( 'not started', 'not available', 'importing', 'building', 'available', 'error' );
+    my @col2 = qw{ black yellow purple orange green red };
+    $legend->Label( -text => 'Local' )
+      ->grid( -row => 0, -column => 0, -columnspan=>2, -sticky => 'w' );
+    $legend->Label( -text => 'Build System' )
+      ->grid( -row => 0, -column => 2,  -columnspan=>2,-sticky => 'w' );
+    my $buldir = $SHAREDIR->subdir( 'bullets' );
+    foreach my $i ( 0 .. $#lab1 ) {
+        $legend->Label( -image=>image( $buldir->file($col1[$i] . ".png")) )->grid( -row=>$i+1, -column=>0 );
+        $legend->Label( -image=>image( $buldir->file($col2[$i] . ".png")) )->grid( -row=>$i+1, -column=>2 );
+        $legend->Label( -text => $lab1[$i] )->grid( -row=>$i+1, -column=>1, -sticky => 'w' );
+        $legend->Label( -text => $lab2[$i] )->grid( -row=>$i+1, -column=>3, -sticky => 'w' );
+    }
+
 }
 
 no Moose;
