@@ -114,6 +114,7 @@ sub _build_gui {
     # center & show the window
     # FIXME: restore last position saved?
     $mw->Popup;
+    $mw->minsize($mw->width, $mw->height);
     $self->_w("ent_module")->focus;
 }
 
