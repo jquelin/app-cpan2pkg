@@ -33,6 +33,9 @@ has module => ( ro, required, isa=>'Str' );
 # run one wheel at a time, so we don't need to multiplex them.
 has _wheel => ( rw, isa=>'POE::Wheel', clearer=>'_clear_wheel' );
 
+# the event to fire once run_command() has finished.
+has _result_event => ( rw, isa=>'Str', clearer=>'_clear_result_event' );
+
 
 # -- initialization
 
@@ -62,17 +65,19 @@ event is_installed_locally => sub {
 
 =method run_command
 
-    $worker->run_command( $command );
+    $worker->run_command( $command, $event );
 
 Run a C<$command> in another process, and takes care of everything.
 Since it uses L<POE::Wheel::Run> underneath, it understands various
 stuff such as running a code reference. Note: commands will be launched
 under a C<C> locale.
 
+Upon completion, yields back an C<$event> with the result status.
+
 =cut
 
 sub run_command {
-    my ($self, $cmd) = @_;
+    my ($self, $cmd, $event) = @_;
 
     $ENV{LC_ALL} = 'C';
     my $child = POE::Wheel::Run->new(
@@ -85,6 +90,7 @@ sub run_command {
 
     $K->sig_child( $child->PID, "_child_signal" );
     $self->_set_wheel( $child );
+    $self->_set_result_event( $event );
     #print( "Child pid ", $child->PID, " started as wheel ", $child->ID, ".\n" );
 }
 
@@ -107,9 +113,10 @@ event _child_close => sub {
 };
 
 event _child_signal => sub {
-    my ($self, $pid, $status) = @_[ARG1, ARG2];
+    my ($self, $pid, $status) = @_[OBJECT, ARG1, ARG2];
     $status //=0;
-    #say "child exited with status $status";
+    $self->yield( $self->_result_event, $status );
+    $self->_clear_result_event;
 };
 
 #--
