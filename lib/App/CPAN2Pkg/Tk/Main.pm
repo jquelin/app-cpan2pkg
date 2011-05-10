@@ -63,7 +63,7 @@ event log_step => sub {
     my ($self, $module, $step, $comment) = @_[OBJECT, ARG0 .. $#_ ];
     my $rotext = $self->_w( "rotext_$module" );
     $rotext->insert( 'insert', "** $step\n", "step" );
-    $rotext->insert( 'insert', "* $comment\n", "comment" );
+    $rotext->insert( 'insert', "* $comment\n\n", "comment" );
 };
 
 
