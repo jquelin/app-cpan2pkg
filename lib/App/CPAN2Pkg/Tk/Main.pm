@@ -167,8 +167,10 @@ sub _build_notebook {
       ->grid( -row => 0, -column => 2,  -columnspan=>2,-sticky => 'w' );
     my $buldir = $SHAREDIR->subdir( 'bullets' );
     foreach my $i ( 0 .. $#lab1 ) {
-        $legend->Label( -image=>image( $buldir->file($col1[$i] . ".png")) )->grid( -row=>$i+1, -column=>0 );
-        $legend->Label( -image=>image( $buldir->file($col2[$i] . ".png")) )->grid( -row=>$i+1, -column=>2 );
+        $legend->Label( -image => image( $buldir->file( $col1[$i] . ".png" ) ) )
+          ->grid( -row => $i + 1, -column => 0, ipad5 );
+        $legend->Label( -image => image( $buldir->file( $col2[$i] . ".png" ) ) )
+          ->grid( -row => $i + 1, -column => 2, ipad5 );
         $legend->Label( -text => $lab1[$i] )->grid( -row=>$i+1, -column=>1, -sticky => 'w' );
         $legend->Label( -text => $lab2[$i] )->grid( -row=>$i+1, -column=>3, -sticky => 'w' );
     }
