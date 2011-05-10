@@ -72,7 +72,8 @@ event new_module => sub {
 
     # create new pane in the notebook
     my $nb = $self->_w('notebook');
-    my $pane = $nb->add($module, -label=>$module);
+    my $pane = $nb->add( $module, -label=>$module );
+    $nb->raise( $module );
 };
 
 
