@@ -5,6 +5,7 @@ use warnings;
 package App::CPAN2Pkg::Tk::Main;
 # ABSTRACT: main cpan2pkg window
 
+use List::Util qw{ first };
 use Moose;
 use MooseX::Has::Sugar;
 use MooseX::POE;
@@ -48,6 +49,26 @@ sub START {
     $self->_set_session($session);
     $self->_build_gui;
 }
+
+
+# -- public events
+
+event new_module => sub {
+    my ($self, $module) = @_[OBJECT, ARG0];
+    my $hlist = $self->_w('hlist');
+
+    # calculate module position in the list
+    my @children = $hlist->info( 'children' );
+    my $next = first { $hlist->info(data=>$_) gt $module } @children;
+    my @pos = defined $next ? ( -before => $next ) : ( -at => -1 );
+
+    # create module in the list
+    my $bullet = image( $SHAREDIR->file("bullets", "black.png") );
+    my $elem = $hlist->addchild( "", -data=>$module, @pos );
+    $hlist->itemCreate( $elem, 0, -itemtype => 'image', -image=>$bullet );
+    $hlist->itemCreate( $elem, 1, -itemtype => 'image', -image=>$bullet );
+    $hlist->itemCreate( $elem, 2, -itemtype => 'text', -text=>$module );
+};
 
 
 # -- gui events

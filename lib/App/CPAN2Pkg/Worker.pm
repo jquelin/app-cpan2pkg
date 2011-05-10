@@ -39,6 +39,7 @@ has _wheel => ( rw, isa=>'POE::Wheel', clearer=>'_clear_wheel' );
 sub START {
     my $self = shift;
     $K->alias_set( $self->module );
+    $K->post( main => new_module => $self->module );
 }
 
 
