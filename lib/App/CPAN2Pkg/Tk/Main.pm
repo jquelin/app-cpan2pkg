@@ -91,6 +91,14 @@ event _on_btn_submit => sub {
     $entry->delete( 0, 'end' );
 };
 
+event _on_hlist_2click => sub {
+    my $self = shift;
+    my $hlist = $self->_w('hlist');
+    my ($elem) = $hlist->info('selection');
+    my $module = $hlist->info( data => $elem );
+    $self->_w('notebook')->raise($module);
+};
+
 
 # -- gui creation
 
@@ -166,6 +174,8 @@ sub _build_hlist {
     $hlist->header( create => 0, -text => 'local' );
     $hlist->header( create => 1, -text => 'bs' );
     $hlist->header( create => 2, -text => 'module' );
+
+    $hlist->bind( '<Double-1>', $self->_session->postback('_on_hlist_2click') );
 }
 
 #
