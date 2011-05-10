@@ -76,29 +76,30 @@ event log_step => sub {
 
 event new_module => sub {
     my ($self, $module) = @_[OBJECT, ARG0];
-    my $hlist = $self->_w('hlist');
+    my $modname = $module->name;
 
     # calculate module position in the list
+    my $hlist = $self->_w('hlist');
     my @children = $hlist->info( 'children' );
-    my $next = first { $hlist->info(data=>$_) gt $module } @children;
+    my $next = first { $hlist->info(data=>$_) gt $modname } @children;
     my @pos = defined $next ? ( -before => $next ) : ( -at => -1 );
 
     # create module in the list
     my $bullet = image( $SHAREDIR->file("bullets", "black.png") );
-    my $elem = $hlist->addchild( "", -data=>$module, @pos );
+    my $elem = $hlist->addchild( "", -data=>$modname, @pos );
     $hlist->itemCreate( $elem, 0, -itemtype => 'image', -image=>$bullet );
     $hlist->itemCreate( $elem, 1, -itemtype => 'image', -image=>$bullet );
-    $hlist->itemCreate( $elem, 2, -itemtype => 'text', -text=>$module );
+    $hlist->itemCreate( $elem, 2, -itemtype => 'text', -text=>$modname );
     $hlist->see( $elem );
 
     # create new pane in the notebook
     my $nb = $self->_w('notebook');
-    my $pane = $nb->add( $module, -label=>$module );
-    $nb->raise( $module );
+    my $pane = $nb->add( $modname, -label=>$modname );
+    $nb->raise( $modname );
     my $rotext = $pane->Scrolled( 'ROText', -scrollbars => 'e' )->pack( xfill2 );
     $rotext->tag( configure => step  => -font => "FNbig" );
     $rotext->tag( configure => error => -foreground => "steelblue" );
-    $self->_set_w( "rotext_$module", $rotext );
+    $self->_set_w( "rotext_$modname", $rotext );
 };
 
 

@@ -11,6 +11,7 @@ use MooseX::POE;
 use MooseX::SemiAffordanceAccessor;
 use Readonly;
 
+use App::CPAN2Pkg::Module;
 use App::CPAN2Pkg::Utils qw{ $WORKER_TYPE };
 
 Readonly my $K => $poe_kernel;
@@ -45,7 +46,8 @@ sub START {
 # -- events
 
 event new_module_wanted => sub {
-    my ($self, $module) = @_[OBJECT, ARG0];
+    my ($self, $modname) = @_[OBJECT, ARG0];
+    my $module = App::CPAN2Pkg::Module->new( name => $modname );
     $WORKER_TYPE->new( module => $module );
 };
 

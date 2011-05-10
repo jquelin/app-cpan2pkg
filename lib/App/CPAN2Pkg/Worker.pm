@@ -24,7 +24,7 @@ The name of the module to build / install / submit / whatever.
 
 =cut
 
-has module => ( ro, required, isa=>'Str' );
+has module => ( ro, required, isa=>'App::CPAN2Pkg::Module' );
 
 
 # -- private attributes
@@ -41,7 +41,7 @@ has _result_event => ( rw, isa=>'Str', clearer=>'_clear_result_event' );
 
 sub START {
     my $self = shift;
-    $K->alias_set( $self->module );
+    $K->alias_set( $self->module->name );
     $K->post( main => new_module => $self->module );
     $K->yield( 'is_installed_locally' );
 }
@@ -56,7 +56,7 @@ event is_installed_locally => sub {
     my $cmd  = qq{ perl -M$module -E 'say "$module loaded successfully";' };
     my $step    = "Checking if module is installed";
     my $comment = "Running: $cmd";
-    $K->post( main => log_step => $module => $step => $comment );
+    $K->post( main => log_step => $module->name => $step => $comment );
     $self->run_command( $cmd );
 };
 
@@ -99,12 +99,12 @@ sub run_command {
 
 event _child_stdout => sub {
     my ($self, $line, $wid) = @_[OBJECT, ARG0, ARG1];
-    $K->post( main => log_out => $self->module => $line );
+    $K->post( main => log_out => $self->module->name => $line );
 };
 
 event _child_stderr => sub {
     my ($self, $line, $wid) = @_[OBJECT, ARG0, ARG1];
-    $K->post( main => log_err => $self->module => $line );
+    $K->post( main => log_err => $self->module->name => $line );
 };
 
 event _child_close => sub {
