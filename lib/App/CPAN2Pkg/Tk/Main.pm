@@ -59,6 +59,11 @@ event log_out => sub {
     my $rotext = $self->_w( "rotext_$module" );
     $rotext->insert( 'insert', "$line\n" );
 };
+event log_err => sub {
+    my ($self, $module, $line) = @_[OBJECT, ARG0 .. $#_ ];
+    my $rotext = $self->_w( "rotext_$module" );
+    $rotext->insert( 'insert', "$line\n", "error" );
+};
 event log_step => sub {
     my ($self, $module, $step, $comment) = @_[OBJECT, ARG0 .. $#_ ];
     my $rotext = $self->_w( "rotext_$module" );
@@ -91,8 +96,8 @@ event new_module => sub {
     my $pane = $nb->add( $module, -label=>$module );
     $nb->raise( $module );
     my $rotext = $pane->Scrolled( 'ROText', -scrollbars => 'e' )->pack( xfill2 );
-    $rotext->tag( configure => step    => -font => "FNbig" );
-    #$rotext->tag( configure => err  => -fg => "red", -bg => "#a0b7ce" );
+    $rotext->tag( configure => step  => -font => "FNbig" );
+    $rotext->tag( configure => error => -foreground => "steelblue" );
     $self->_set_w( "rotext_$module", $rotext );
 };
 
