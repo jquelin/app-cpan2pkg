@@ -16,6 +16,7 @@ use Tk::Balloon;
 use Tk::HList;
 use Tk::NoteBook;
 use Tk::PNG;
+use Tk::ROText;
 use Tk::Sugar;
 
 with 'Tk::Role::HasWidgets';
@@ -74,6 +75,11 @@ event new_module => sub {
     my $nb = $self->_w('notebook');
     my $pane = $nb->add( $module, -label=>$module );
     $nb->raise( $module );
+    my $rotext = $pane->Scrolled( 'ROText', -scrollbars => 'e' )->pack( xfill2 );
+    $rotext->tag( configure => step    => -font => "FNbig" );
+    $rotext->tag( configure => comment => -font => "FNitalic" );
+    #$rotext->tag( configure => err  => -fg => "red", -bg => "#a0b7ce" );
+    $self->_set_w( "rotext_$module", $rotext );
 };
 
 
@@ -132,6 +138,9 @@ sub _build_gui {
 
     # the tooltip
     $self->_set_w('tooltip', $mw->Balloon);
+
+    $mw->fontCreate( "FNbig",    -size => 14, -weight => "bold" );
+    $mw->fontCreate( "FNitalic", -size => 12, -slant  => "italic" );
 
     #
     my $ftop = $mw->Frame->pack( top, fillx, pad20 );
