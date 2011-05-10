@@ -43,7 +43,7 @@ sub START {
     my $self = shift;
     $K->alias_set( $self->module->name );
     $K->post( main => new_module => $self->module );
-    $K->yield( 'is_installed_locally' );
+    $K->yield( 'is_available_upstream' );
 }
 
 
