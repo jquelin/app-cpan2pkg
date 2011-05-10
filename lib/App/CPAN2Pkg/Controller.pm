@@ -49,9 +49,9 @@ event new_module_wanted => sub {
     $WORKER_TYPE->new( module => $module );
 };
 
+
 no Moose;
 __PACKAGE__->meta->make_immutable;
-
 1;
 __END__
 

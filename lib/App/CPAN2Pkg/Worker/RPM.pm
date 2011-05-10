@@ -9,5 +9,7 @@ use Moose;
 
 extends 'App::CPAN2Pkg::Worker';
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
 1;
 __END__

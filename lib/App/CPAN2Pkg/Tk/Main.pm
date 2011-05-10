@@ -202,7 +202,6 @@ sub _build_notebook {
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
-
 1;
 __END__
 
