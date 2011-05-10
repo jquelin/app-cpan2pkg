@@ -77,7 +77,7 @@ sub run_command {
     $ENV{LC_ALL} = 'C';
     my $child = POE::Wheel::Run->new(
         Program     => $cmd,
-        Conduit     => "pty",
+        Conduit     => "pty-pipe",
         StdoutEvent => "_child_stdout",
         StderrEvent => "_child_stderr",
         CloseEvent  => "_child_close",
@@ -98,7 +98,7 @@ event _child_stdout => sub {
 
 event _child_stderr => sub {
     my ($self, $line, $wid) = @_[OBJECT, ARG0, ARG1];
-    #say "stderr: $line";
+    $K->post( main => log_err => $self->module => $line );
 };
 
 event _child_close => sub {
