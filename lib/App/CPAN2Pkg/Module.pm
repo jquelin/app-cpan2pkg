@@ -14,6 +14,10 @@ use App::CPAN2Pkg::Types;
 
 # -- public attributes
 
+=attr name
+
+The name of the Perl module, eg C<App::CPAN2Pkg>.
+
 =attr upstream_status
 
 The status of the module from the Linux distribution point of view.
