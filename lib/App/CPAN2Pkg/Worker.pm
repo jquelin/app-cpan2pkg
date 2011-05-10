@@ -93,7 +93,7 @@ sub run_command {
 
 event _child_stdout => sub {
     my ($self, $line, $wid) = @_[OBJECT, ARG0, ARG1];
-    say scalar(localtime) . " - $wid - " . $self->_wheel->PID . " - $line";
+    $K->post( main => log_out => $self->module => $line );
 };
 
 event _child_stderr => sub {

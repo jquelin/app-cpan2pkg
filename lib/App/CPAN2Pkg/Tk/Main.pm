@@ -54,6 +54,11 @@ sub START {
 
 # -- public logging events
 
+event log_out => sub {
+    my ($self, $module, $line) = @_[OBJECT, ARG0 .. $#_ ];
+    my $rotext = $self->_w( "rotext_$module" );
+    $rotext->insert( 'insert', "$line\n" );
+};
 event log_step => sub {
     my ($self, $module, $step, $comment) = @_[OBJECT, ARG0 .. $#_ ];
     my $rotext = $self->_w( "rotext_$module" );
