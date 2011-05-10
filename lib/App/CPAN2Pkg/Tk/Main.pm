@@ -80,8 +80,10 @@ event new_module => sub {
 #
 event _on_btn_submit => sub {
     my $self = shift;
-    my $module = $self->_w( "ent_module" )->get;
+    my $entry = $self->_w( "ent_module" );
+    my $module = $entry->get;
     $K->post( controller => new_module_wanted => $module );
+    $entry->delete( 0, 'end' );
 };
 
 
