@@ -40,7 +40,22 @@ sub START {
     my $self = shift;
     $K->alias_set( $self->module );
     $K->post( main => new_module => $self->module );
+    $K->yield( 'is_installed_locally' );
 }
+
+
+# -- public events
+
+event is_installed_locally => sub {
+    my $self   = shift;
+    my $module = $self->module;
+
+    my $cmd  = qq{ perl -M$module -E 'say "$module loaded successfully";' };
+    my $step    = "Checking if module is installed";
+    my $comment = "Running: $cmd";
+    $K->post( main => log_step => $module => $step => $comment );
+    $self->run_command( $cmd );
+};
 
 
 # -- public methods
@@ -139,19 +154,6 @@ sub spawn {
     );
     return $session->ID;
 }
-
-
-# -- poe inline states
-
-sub _start {
-    my ($k, $module) = @_[KERNEL, HEAP];
-
-    $k->alias_set($module);
-    $k->alias_set($module->name);
-    $k->post('ui',  'module_spawned', $module);
-    $k->post('app', 'module_spawned', $module);
-}
-
 
 
 no Moose;
