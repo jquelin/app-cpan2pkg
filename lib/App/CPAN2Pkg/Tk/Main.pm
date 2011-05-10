@@ -69,6 +69,10 @@ event new_module => sub {
     $hlist->itemCreate( $elem, 1, -itemtype => 'image', -image=>$bullet );
     $hlist->itemCreate( $elem, 2, -itemtype => 'text', -text=>$module );
     $hlist->see( $elem );
+
+    # create new pane in the notebook
+    my $nb = $self->_w('notebook');
+    my $pane = $nb->add($module, -label=>$module);
 };
 
 
