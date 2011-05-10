@@ -63,7 +63,7 @@ event log_step => sub {
     my ($self, $module, $step, $comment) = @_[OBJECT, ARG0 .. $#_ ];
     my $rotext = $self->_w( "rotext_$module" );
     $rotext->insert( 'insert', "** $step\n", "step" );
-    $rotext->insert( 'insert', "* $comment\n\n", "comment" );
+    $rotext->insert( 'insert', "* $comment\n\n" );
 };
 
 
@@ -92,7 +92,6 @@ event new_module => sub {
     $nb->raise( $module );
     my $rotext = $pane->Scrolled( 'ROText', -scrollbars => 'e' )->pack( xfill2 );
     $rotext->tag( configure => step    => -font => "FNbig" );
-    $rotext->tag( configure => comment => -font => "FNitalic" );
     #$rotext->tag( configure => err  => -fg => "red", -bg => "#a0b7ce" );
     $self->_set_w( "rotext_$module", $rotext );
 };
@@ -154,8 +153,8 @@ sub _build_gui {
     # the tooltip
     $self->_set_w('tooltip', $mw->Balloon);
 
-    $mw->fontCreate( "FNbig",    -size => 14, -weight => "bold" );
-    $mw->fontCreate( "FNitalic", -size => 12, -slant  => "italic" );
+    # font used in progression text
+    $mw->fontCreate( "FNbig", -weight => "bold" );
 
     #
     my $ftop = $mw->Frame->pack( top, fillx, pad20 );
