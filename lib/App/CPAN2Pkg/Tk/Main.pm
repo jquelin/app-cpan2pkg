@@ -68,6 +68,7 @@ event new_module => sub {
     $hlist->itemCreate( $elem, 0, -itemtype => 'image', -image=>$bullet );
     $hlist->itemCreate( $elem, 1, -itemtype => 'image', -image=>$bullet );
     $hlist->itemCreate( $elem, 2, -itemtype => 'text', -text=>$module );
+    $hlist->see( $elem );
 };
 
 
