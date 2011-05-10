@@ -9,11 +9,19 @@ use Moose;
 use MooseX::Has::Sugar;
 use MooseX::SemiAffordanceAccessor;
 
+use App::CPAN2Pkg::Types;
+
 
 # -- public attributes
 
-has name => ( ro, required, isa=>'Str' );
+=attr upstream_status
 
+The status of the module from the Linux distribution point of view.
+
+=cut
+
+has name => ( ro, required, isa=>'Str' );
+has upstream_status => ( rw, isa=>"UpstreamStatus", default=>"not available");
 
 # --
 
