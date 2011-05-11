@@ -75,20 +75,6 @@ my $rpm_locked = '';   # only one rpm transaction at a time
 #  - wait for kenobi build
 #
 
-
-sub new {
-    my ($pkg, %params) = @_;
-    my $self = {
-        _blocking => {},
-        _missing  => {},
-        %params,
-    };
-    my $class = ref($pkg) || $pkg;
-    bless $self, $class;
-    return $self;
-}
-
-
 #--
 # SUBS
 
