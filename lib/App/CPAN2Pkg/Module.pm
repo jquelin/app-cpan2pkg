@@ -18,6 +18,10 @@ use App::CPAN2Pkg::Types;
 
 The name of the Perl module, eg C<App::CPAN2Pkg>.
 
+=attr local_status
+
+The status of the module on the local system.
+
 =attr upstream_status
 
 The status of the module from the Linux distribution point of view.
@@ -25,7 +29,8 @@ The status of the module from the Linux distribution point of view.
 =cut
 
 has name => ( ro, required, isa=>'Str' );
-has upstream_status => ( rw, isa=>"UpstreamStatus", default=>"not available");
+has local_status    => ( rw, isa=>"LocalStatus",    default=>"not started" );
+has upstream_status => ( rw, isa=>"UpstreamStatus", default=>"not started" );
 
 # --
 
