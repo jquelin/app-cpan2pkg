@@ -64,6 +64,11 @@ event log_err => sub {
     my $rotext = $self->_w( "rotext_$module" );
     $rotext->insert( 'insert', "$line\n", "error" );
 };
+event log_result => sub {
+    my ($self, $module, $result) = @_[OBJECT, ARG0 .. $#_ ];
+    my $rotext = $self->_w( "rotext_$module" );
+    $rotext->insert( 'insert', "\n==> $result\n\n\n", "result" );
+};
 event log_step => sub {
     my ($self, $module, $step, $comment) = @_[OBJECT, ARG0 .. $#_ ];
     my $rotext = $self->_w( "rotext_$module" );
