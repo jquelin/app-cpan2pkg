@@ -273,32 +273,6 @@ sub install_from_local {
     $self->_wheel($wheel);
 }
 
-sub is_in_dist {
-    my ($k, $self) = @_[KERNEL, OBJECT];
-
-    # preparing command
-    my $name = $self->name;
-    my $cmd  = "urpmq --whatprovides 'perl($name)'";
-    $self->_log_new_step('Checking if packaged upstream', "Running command: $cmd" );
-
-    # running command
-    $self->_output('');
-    $ENV{LC_ALL} = 'C';
-    my $wheel = POE::Wheel::Run->new(
-        Program      => $cmd,
-        #CloseEvent   => '_is_in_dist', # FIXME: cf rt#42757
-        StdoutEvent  => '_stdout',
-        StderrEvent  => '_stderr',
-        Conduit      => 'pty-pipe', # urpmq wants a pty
-        StdoutFilter => POE::Filter::Line->new,
-        StderrFilter => POE::Filter::Line->new,
-    );
-    $k->sig( CHLD => '_is_in_dist' );
-
-    # need to store the wheel, otherwise the process goes woo!
-    $self->_wheel($wheel);
-}
-
 
 sub is_installed {
     my ($k, $self) = @_[KERNEL, OBJECT];
