@@ -33,6 +33,14 @@ sub _build_rpmlock {
 }
 
 
+# -- methods
+
+override _result_install_from_upstream => sub {
+    my $self = shift;
+    $self->rpmlock->release;
+    super();
+};
+
 no Moose;
 __PACKAGE__->meta->make_immutable;
 1;

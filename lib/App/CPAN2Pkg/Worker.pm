@@ -49,6 +49,22 @@ sub START {
 
 # -- logic
 
+event _result_install_from_upstream => sub {
+    my ($self, $status) = @_[OBJECT, ARG0];
+    my $module  = $self->module;
+    my $modname = $module->name;
+
+    if ( $status == 0 ) {
+        $module->set_local_status( 'available' );
+        $K->post( main => log_result => $modname => "$modname is available locally." );
+    } else {
+        # error while installing
+        $module->set_local_status( 'error' );
+        $K->post( main => log_result => $modname => "$modname is not available locally." );
+    }
+    $K->post( main => module_state => $module );
+};
+
 event _result_is_available_upstream => sub {
     my ($self, $status) = @_[OBJECT, ARG0];
     my $module  = $self->module;
