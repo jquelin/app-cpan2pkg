@@ -133,8 +133,9 @@ event new_module => sub {
     my $pane = $nb->add( $modname, -label=>$modname );
     $nb->raise( $modname );
     my $rotext = $pane->Scrolled( 'ROText', -scrollbars => 'e' )->pack( top, xfill2 );
-    $rotext->tag( configure => step  => -font => "FNbig" );
-    $rotext->tag( configure => error => -foreground => "steelblue" );
+    $rotext->tag( configure => step   => -font => "FNbig" );
+    $rotext->tag( configure => error  => -foreground => "firebrick" );
+    $rotext->tag( configure => result => -foreground => "steelblue" );
     $self->_set_w( "rotext_$modname", $rotext );
 
     # close button
