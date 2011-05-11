@@ -75,7 +75,29 @@ event log_step => sub {
     $rotext->insert( 'insert', "** $step\n", "step" );
     $rotext->insert( 'insert', "* $comment\n\n" );
 };
+event module_state => sub {
+    my ($self, $module) = @_[OBJECT, ARG0 .. $#_ ];
+    my $modname = $module->name;
 
+    # get bullet color
+    my %upstream_status = (
+        "not started"   => "black",
+        "not available" => "yellow",
+        importing       => "purple",
+        building        => "orange",
+        available       => "green",
+        error           => "red",
+    );
+    my $color = $upstream_status{ $module->upstream_status };
+
+    # update upstream color
+    my $hlist = $self->_w( "hlist" );
+    my @children = $hlist->info( 'children' );
+    my $elem     = first { $hlist->info(data=>$_) eq $modname } @children;
+    my $bullet   = image( $SHAREDIR->file("bullets", "$color.png") );
+    $hlist->itemConfigure( $elem, 1, -image=>$bullet );
+
+};
 
 # -- public events
 
