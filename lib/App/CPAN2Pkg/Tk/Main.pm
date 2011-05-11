@@ -79,23 +79,29 @@ event module_state => sub {
     my ($self, $module) = @_[OBJECT, ARG0 .. $#_ ];
     my $modname = $module->name;
 
+    # find relevant line in hlist
+    my $hlist = $self->_w( "hlist" );
+    my @children = $hlist->info( 'children' );
+    my $elem     = first { $hlist->info(data=>$_) eq $modname } @children;
+
     # get bullet color
-    my %upstream_status = (
+    my %color = (
         "not started"   => "black",
         "not available" => "yellow",
         importing       => "purple",
         building        => "orange",
+        installing      => "blue",
         available       => "green",
         error           => "red",
     );
-    my $color = $upstream_status{ $module->upstream_status };
+    my $colorl = $color{ $module->local_status };
+    my $coloru = $color{ $module->upstream_status };
 
-    # update upstream color
-    my $hlist = $self->_w( "hlist" );
-    my @children = $hlist->info( 'children' );
-    my $elem     = first { $hlist->info(data=>$_) eq $modname } @children;
-    my $bullet   = image( $SHAREDIR->file("bullets", "$color.png") );
-    $hlist->itemConfigure( $elem, 1, -image=>$bullet );
+    # update bullets
+    my $bulletl  = image( $SHAREDIR->file("bullets", "$colorl.png") );
+    my $bulletu  = image( $SHAREDIR->file("bullets", "$coloru.png") );
+    $hlist->itemConfigure( $elem, 0, -image=>$bulletl );
+    $hlist->itemConfigure( $elem, 1, -image=>$bulletu );
 };
 
 # -- public events
