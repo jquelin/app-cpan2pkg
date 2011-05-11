@@ -285,19 +285,6 @@ sub upstream_status {
 }
 
 
-# -- poe inline states
-
-sub _start {
-    my ($k, $opts) = @_[KERNEL, ARG0];
-    $k->alias_set('app');
-
-    # start packaging some modules
-    my $modules = $opts->{modules};
-    foreach my $name ( @$modules ) {
-        my $module = App::CPAN2Pkg::Module->new( name => $name );
-        $k->yield('package', $module);
-    }
-}
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
