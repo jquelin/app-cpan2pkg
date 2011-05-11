@@ -22,7 +22,7 @@ event is_available_upstream => sub {
     my $step    = "Checking if module is packaged upstream";
     my $comment = "Running: $cmd";
     $K->post( main => log_step => $modname => $step => $comment );
-    $self->run_command( $cmd => "_is_available_upstream_result" );
+    $self->run_command( $cmd => "_result_is_available_upstream" );
 };
 
 

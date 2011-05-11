@@ -47,6 +47,26 @@ sub START {
 }
 
 
+# -- logic
+
+event _result_is_available_upstream => sub {
+    my ($self, $status) = @_[OBJECT, ARG0];
+    my $module  = $self->module;
+    my $modname = $module->name;
+
+    if ( $status == 0 ) {
+        $module->set_upstream_status( 'available' );
+        $K->post( main => log_result => $modname => "$modname is packaged upstream." );
+    } else {
+        $module->set_upstream_status( 'not available' );
+        $K->post( main => log_result => $modname => "$modname is not packaged upstream." );
+    }
+
+    $K->post( main => module_state => $module );
+    $self->yield( "is_installed_locally" );
+};
+
+
 # -- public events
 
 event is_installed_locally => sub {
@@ -57,7 +77,7 @@ event is_installed_locally => sub {
     my $step    = "Checking if module is installed";
     my $comment = "Running: $cmd";
     $K->post( main => log_step => $module->name => $step => $comment );
-    $self->run_command( $cmd );
+    $self->run_command( $cmd => "foo" );
 };
 
 
