@@ -66,6 +66,21 @@ event _result_is_available_upstream => sub {
     $self->yield( "is_installed_locally" );
 };
 
+event _result_is_installed_locally => sub {
+    my ($self, $status) = @_[OBJECT, ARG0];
+    my $module  = $self->module;
+    my $modname = $module->name;
+
+    if ( $status == 0 ) {
+        $module->set_local_status( 'available' );
+        $K->post( main => log_result => $modname => "$modname is available locally." );
+    } else {
+        $module->set_local_status( 'not available' );
+        $K->post( main => log_result => $modname => "$modname is not available locally." );
+    }
+
+    $K->post( main => module_state => $module );
+};
 
 # -- public events
 
@@ -73,11 +88,11 @@ event is_installed_locally => sub {
     my $self   = shift;
     my $module = $self->module;
 
-    my $cmd  = qq{ perl -M$module -E 'say "$module loaded successfully";' };
+    my $cmd     = qq{ perl -M$module -E 'say "$module loaded successfully";' };
     my $step    = "Checking if module is installed";
     my $comment = "Running: $cmd";
     $K->post( main => log_step => $module->name => $step => $comment );
-    $self->run_command( $cmd => "foo" );
+    $self->run_command( $cmd => "_result_is_installed_locally" );
 };
 
 
