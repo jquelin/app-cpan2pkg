@@ -70,6 +70,13 @@ event _result_is_installed_locally => sub {
     $module->set_local_status( $local );
     $K->post( main => log_result => $modname => "$modname is $local locally." );
     $K->post( main => module_state => $module );
+
+    return if $status == 0;
+
+    if ( $module->upstream_status eq 'available' ) {
+        # need to install the module from upstream
+        $self->yield( "install_from_upstream" );
+    }
 };
 
 # -- public events
