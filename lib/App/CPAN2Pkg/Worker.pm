@@ -54,14 +54,9 @@ event _result_is_available_upstream => sub {
     my $module  = $self->module;
     my $modname = $module->name;
 
-    if ( $status == 0 ) {
-        $module->set_upstream_status( 'available' );
-        $K->post( main => log_result => $modname => "$modname is packaged upstream." );
-    } else {
-        $module->set_upstream_status( 'not available' );
-        $K->post( main => log_result => $modname => "$modname is not packaged upstream." );
-    }
-
+    my $upstream = $status == 0 ? 'available' : 'not available';
+    $module->set_upstream_status( $upstream );
+    $K->post( main => log_result => $modname => "$modname is $upstream upstream." );
     $K->post( main => module_state => $module );
     $self->yield( "is_installed_locally" );
 };
@@ -71,14 +66,9 @@ event _result_is_installed_locally => sub {
     my $module  = $self->module;
     my $modname = $module->name;
 
-    if ( $status == 0 ) {
-        $module->set_local_status( 'available' );
-        $K->post( main => log_result => $modname => "$modname is available locally." );
-    } else {
-        $module->set_local_status( 'not available' );
-        $K->post( main => log_result => $modname => "$modname is not available locally." );
-    }
-
+    my $local = $status == 0 ? 'available' : 'not available';
+    $module->set_local_status( $local );
+    $K->post( main => log_result => $modname => "$modname is $local locally." );
     $K->post( main => module_state => $module );
 };
 
