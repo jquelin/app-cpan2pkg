@@ -102,6 +102,10 @@ event module_state => sub {
     my $bulletu  = image( $SHAREDIR->file("bullets", "$coloru.png") );
     $hlist->itemConfigure( $elem, 0, -image=>$bulletl );
     $hlist->itemConfigure( $elem, 1, -image=>$bulletu );
+
+    $self->_w( "btn_close_$modname" )->configure( enabled )
+        if $module->local_status    eq 'available'
+        && $module->upstream_status eq 'available';
 };
 
 # -- public events
@@ -128,14 +132,33 @@ event new_module => sub {
     my $nb = $self->_w('notebook');
     my $pane = $nb->add( $modname, -label=>$modname );
     $nb->raise( $modname );
-    my $rotext = $pane->Scrolled( 'ROText', -scrollbars => 'e' )->pack( xfill2 );
+    my $rotext = $pane->Scrolled( 'ROText', -scrollbars => 'e' )->pack( top, xfill2 );
     $rotext->tag( configure => step  => -font => "FNbig" );
     $rotext->tag( configure => error => -foreground => "steelblue" );
     $self->_set_w( "rotext_$modname", $rotext );
+
+    # close button
+    my $b = $pane->Button(
+        -text    => "Clean finished module",
+        -command => $self->_session->postback( "_on_btn_clean", $modname ),
+        disabled,
+    )->pack( top, fillx );
+    $self->_set_w( "btn_close_$modname", $b );
 };
 
 
 # -- gui events
+
+event _on_btn_clean => sub {
+    my ($self, $args) = @_[OBJECT, ARG0];
+    my ($modname) = @$args;
+    $self->_w('notebook')->delete( $modname );
+
+    my $hlist = $self->_w( 'hlist' );
+    my @children = $hlist->info( 'children' );
+    my $elem     = first { $hlist->info(data=>$_) eq $modname } @children;
+    $hlist->delete( entry => $elem );
+};
 
 #
 # event: _on_btn_submit()
