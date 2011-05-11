@@ -67,18 +67,17 @@ event log_err => sub {
 event log_comment => sub {
     my ($self, $module, $line) = @_[OBJECT, ARG0 .. $#_ ];
     my $rotext = $self->_w( "rotext_$module" );
-    $rotext->insert( 'insert', "$line\n", "comment" );
+    $rotext->insert( 'insert', "* $line\n\n", "comment" );
 };
 event log_result => sub {
     my ($self, $module, $result) = @_[OBJECT, ARG0 .. $#_ ];
     my $rotext = $self->_w( "rotext_$module" );
-    $rotext->insert( 'insert', "\n==> $result\n\n\n", "result" );
+    $rotext->insert( 'insert', "\n* $result\n\n\n", "result" );
 };
 event log_step => sub {
-    my ($self, $module, $step, $comment) = @_[OBJECT, ARG0 .. $#_ ];
+    my ($self, $module, $step) = @_[OBJECT, ARG0 .. $#_ ];
     my $rotext = $self->_w( "rotext_$module" );
-    $rotext->insert( 'insert', "** $step\n", "step" );
-    $rotext->insert( 'insert', "* $comment\n\n" );
+    $rotext->insert( 'insert', "** $step\n\n", "step" );
 };
 event module_state => sub {
     my ($self, $module) = @_[OBJECT, ARG0 .. $#_ ];

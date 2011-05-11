@@ -101,10 +101,8 @@ event is_installed_locally => sub {
     my $self    = shift;
     my $modname = $self->module->name;
 
-    my $cmd     = qq{ perl -M$modname -E 'say "$modname loaded successfully";' };
-    my $step    = "Checking if module is installed";
-    my $comment = "Running: $cmd";
-    $K->post( main => log_step => $modname => $step => $comment );
+    my $cmd = qq{ perl -M$modname -E 'say "$modname loaded successfully";' };
+    $K->post( main => log_step => $modname => "Checking if module is installed" );
     $self->run_command( $cmd => "_result_is_installed_locally" );
 };
 
@@ -127,6 +125,7 @@ Upon completion, yields back an C<$event> with the result status.
 sub run_command {
     my ($self, $cmd, $event) = @_;
 
+    $K->post( main => log_comment => $self->module->name => "Running: $cmd" );
     $ENV{LC_ALL} = 'C';
     my $child = POE::Wheel::Run->new(
         Program     => $cmd,

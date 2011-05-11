@@ -18,10 +18,8 @@ event is_available_upstream => sub {
     my $self = shift;
     my $modname = $self->module->name;
 
-    my $cmd  = "urpmq --whatprovides 'perl($modname)'";
-    my $step    = "Checking if module is packaged upstream";
-    my $comment = "Running: $cmd";
-    $K->post( main => log_step => $modname => $step => $comment );
+    my $cmd = "urpmq --whatprovides 'perl($modname)'";
+    $K->post( main => log_step => $modname => "Checking if module is packaged upstream");
     $self->run_command( $cmd => "_result_is_available_upstream" );
 };
 
@@ -46,10 +44,8 @@ event install_from_upstream => sub {
     $rpmlock->get( $modname );
 
     # preparing & run command
-    my $cmd     = "sudo urpmi --auto 'perl($modname)'";
-    my $step    = "Installing from upstream";
-    my $comment = "Running: $cmd";
-    $K->post( main => log_step => $modname => $step => $comment );
+    my $cmd = "sudo urpmi --auto 'perl($modname)'";
+    $K->post( main => log_step => $modname => "Installing from upstream" );
     $self->run_command( $cmd => "_result_install_from_upstream" );
 };
 
