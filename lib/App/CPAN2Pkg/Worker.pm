@@ -85,13 +85,13 @@ event _result_is_installed_locally => sub {
 # -- public events
 
 event is_installed_locally => sub {
-    my $self   = shift;
-    my $module = $self->module;
+    my $self    = shift;
+    my $modname = $self->module->name;
 
-    my $cmd     = qq{ perl -M$module -E 'say "$module loaded successfully";' };
+    my $cmd     = qq{ perl -M$modname -E 'say "$modname loaded successfully";' };
     my $step    = "Checking if module is installed";
     my $comment = "Running: $cmd";
-    $K->post( main => log_step => $module->name => $step => $comment );
+    $K->post( main => log_step => $modname => $step => $comment );
     $self->run_command( $cmd => "_result_is_installed_locally" );
 };
 
