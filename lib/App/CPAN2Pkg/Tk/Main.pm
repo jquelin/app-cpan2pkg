@@ -96,7 +96,6 @@ event module_state => sub {
     my $elem     = first { $hlist->info(data=>$_) eq $modname } @children;
     my $bullet   = image( $SHAREDIR->file("bullets", "$color.png") );
     $hlist->itemConfigure( $elem, 1, -image=>$bullet );
-
 };
 
 # -- public events
@@ -252,7 +251,7 @@ sub _build_notebook {
     my $legend = $nb->add("Legend", -label=>"Legend");
 
     #my $legend = $mw->Frame->pack( top, fillx );
-    my @lab1 = ( 'not started', 'missing dep', 'building', 'installing', 'available', 'error' );
+    my @lab1 = ( 'not started', 'not available', 'building', 'installing', 'available', 'error' );
     my @col1 = qw{ black yellow orange blue green red };
     my @lab2 = ( 'not started', 'not available', 'importing', 'building', 'available', 'error' );
     my @col2 = qw{ black yellow purple orange green red };
