@@ -30,16 +30,18 @@ override is_available_upstream => sub {
         $K->yield( get_rpm_lock => "_install_from_upstream_with_rpm_lock" );
     };
 
-    event install_from_upstream_with_rpm_lock => sub {
+    #
+    # _install_from_upstream_with_rpm_lock( )
+    #
+    # really install module from distribution, now that we have a lock
+    # on rpm operations.
+    #
+    event _install_from_upstream_with_rpm_lock => sub {
         my $self = shift;
-        my $module  = $self->module;
-        my $modname = $module->name;
-
-        # preparing & run command
+        my $modname = $self->module->name;
         my $cmd = "sudo urpmi --auto 'perl($modname)'";
         $self->run_command( $cmd => "_install_from_upstream_result" );
     };
-
 }
 
 
