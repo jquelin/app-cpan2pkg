@@ -14,7 +14,8 @@ extends 'App::CPAN2Pkg::Worker::RPM';
 
 Readonly my $K => $poe_kernel;
 
-# --
+
+# -- cpan2pkg logic implementation
 
 {   # is_available_upstream
     override is_available_upstream => sub {
@@ -52,3 +53,9 @@ no Moose;
 __PACKAGE__->meta->make_immutable;
 1;
 __END__
+
+=head1 DESCRIPTION
+
+This class implements Mageia specificities that a general worker doesn't
+know how to handle. It inherits from L<App::CPAN2Pkg::Worker::RPM>.
+
