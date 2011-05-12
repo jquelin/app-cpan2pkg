@@ -6,6 +6,7 @@ package App::CPAN2Pkg::Worker::RPM;
 # ABSTRACT: worker specialized in rpm distributions
 
 use Moose;
+use MooseX::ClassAttribute;
 use MooseX::Has::Sugar;
 
 use App::CPAN2Pkg::Lock;
@@ -22,15 +23,8 @@ installation at a time. Note that this object is common to all workers.
 
 =cut
 
-has rpmlock => ( ro, isa=>'App::CPAN2Pkg::Lock', lazy_build );
+class_has rpmlock => ( ro, isa=>'App::CPAN2Pkg::Lock', default=>sub{ App::CPAN2Pkg::Lock->new } );
 
-
-# -- initialization
-
-sub _build_rpmlock {
-    state $lock = App::CPAN2Pkg::Lock->new;
-    return $lock;
-}
 
 
 # -- methods
