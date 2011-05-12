@@ -6,6 +6,7 @@ package App::CPAN2Pkg::Worker;
 # ABSTRACT: poe session to drive a module packaging
 
 use Moose;
+use MooseX::ClassAttribute;
 use MooseX::Has::Sugar;
 use MooseX::POE;
 use MooseX::SemiAffordanceAccessor;
@@ -13,7 +14,28 @@ use POE;
 use POE::Wheel::Run;
 use Readonly;
 
+use App::CPAN2Pkg::Lock;
+
 Readonly my $K => $poe_kernel;
+
+
+# -- class attributes
+
+=attr cpanplus_init
+
+A boolean to state whether CPANPLUS has been initialized with new index.
+This attribute is common to all workers.
+
+=attr cpanplus_lock
+
+A lock (L<App::CPAN2Pkg::Lock> object) to prevent more than one cpanplus
+initialization at a time. Note that this object is common to all
+workers.
+
+=cut
+
+class_has cpanplus_init => ( rw, isa=>'Bool', default=>0 );
+class_has cpanplus_lock => ( ro, isa=>'App::CPAN2Pkg::Lock', default=>sub{ App::CPAN2Pkg::Lock->new } );
 
 
 # -- public attributes
