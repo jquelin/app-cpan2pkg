@@ -150,9 +150,9 @@ event _result_is_installed_locally => sub {
 
     cpanplus_initialize( $event )
 
-Run CPANPLUS initialization (reload index, etc). Fire C<$event> if this has already
-been done. Wait 5 seconds before retrying if initialization is currently
-ongoing.
+Run CPANPLUS initialization (reload index, etc). Fire C<$event> when
+finished, or if this has already been done. Wait 10 seconds before
+retrying if initialization is currently ongoing.
 
 =cut
 
@@ -180,7 +180,7 @@ ongoing.
             my $owner   = $lock->owner;
             my $comment = "CPANPLUS currently being initialized... (cf $owner)";
             $K->post( main => log_comment => $modname => $comment );
-            $K->delay( cpanplus_initialize => 5 );
+            $K->delay( _cpanplus_initialize_lock => 10 );
             return;
         }
 
