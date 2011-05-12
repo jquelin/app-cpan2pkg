@@ -8,18 +8,22 @@ package App::CPAN2Pkg::Worker::RPM;
 use Moose;
 use MooseX::ClassAttribute;
 use MooseX::Has::Sugar;
+use MooseX::POE;
+use Readonly;
 
 use App::CPAN2Pkg::Lock;
 
 extends 'App::CPAN2Pkg::Worker';
 
+Readonly my $K => $poe_kernel;
+
 
 # -- attributes
 
-=attr rpmlock
+=classattr rpmlock
 
 A lock (L<App::CPAN2Pkg::Lock> object) to prevent more than one rpm
-installation at a time. Note that this object is common to all workers.
+installation at a time.
 
 =cut
 
@@ -34,6 +38,38 @@ override _result_install_from_upstream => sub {
     $self->rpmlock->release;
     super();
 };
+
+# -- events
+
+=event get_rpm_lock
+
+    get_rpm_lock( $event )
+
+Try to get a hold on RPM lock. Fire C<$event> if lock was grabbed
+successfully, otherwise wait 5 seconds before trying again.
+
+=cut
+
+event get_rpm_lock => sub {
+    my ($self, $event) = @_[OBJECT, ARG0];
+    my $module  = $self->module;
+    my $modname = $module->name;
+    my $rpmlock = $self->rpmlock;
+
+    # check whether there's another rpm transaction
+    if ( ! $rpmlock->is_available ) {
+        my $owner   = $rpmlock->owner;
+        my $comment = "waiting for rpm lock... (owned by $owner)";
+        $K->post( main => log_comment => $modname => $comment );
+        $K->delay( get_rpm_lock => 5, $event );
+        return;
+    }
+
+    # rpm lock available, grab it
+    $rpmlock->get( $modname );
+    $self->yield( $event );
+};
+
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
