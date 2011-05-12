@@ -7,8 +7,7 @@ package App::CPAN2Pkg::Types;
 
 use Moose::Util::TypeConstraints;
 
-enum LocalStatus    => ( "not started", "not available", qw{ building  installing available error } );
-enum UpstreamStatus => ( "not started", "not available", qw{ importing building   available error } );
+enum Status => ( "not started", "not available", qw{ importing building installing available error } );
 
 1;
 __END__

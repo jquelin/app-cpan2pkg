@@ -111,7 +111,7 @@ Check if module is available in the distribution repositories.
         my $modname = $module->name;
 
         my $upstream = $status == 0 ? 'available' : 'not available';
-        $module->set_upstream_status( $upstream );
+        $module->upstream->set_status( $upstream );
         $K->post( main => log_result => $modname => "$modname is $upstream upstream." );
         $K->post( main => module_state => $module );
         $self->yield( "is_installed_locally" );
@@ -148,13 +148,13 @@ Check if the module is installed locally.
         my $modname = $module->name;
 
         my $local = $status == 0 ? 'available' : 'not available';
-        $module->set_local_status( $local );
+        $module->local->set_status( $local );
         $K->post( main => log_result => $modname => "$modname is $local locally." );
         $K->post( main => module_state => $module );
 
-        if ( $module->upstream_status eq "available" ) {
+        if ( $module->upstream->status eq "available" ) {
             # nothing to do if available locally & upstream
-            return if $module->local_status eq "available";
+            return if $module->local->status eq "available";
 
             # need to install the module from upstream
             $self->yield( "install_from_upstream" );
@@ -181,7 +181,7 @@ Install module from distribution repository.
         my $modname = $module->name;
 
         # change module state
-        $module->set_local_status( 'installing' );
+        $module->local->set_status( 'installing' );
         $K->post( main => module_state => $module );
         $K->post( main => log_step => $modname => "Installing from upstream" );
     };
@@ -198,11 +198,11 @@ Install module from distribution repository.
         my $modname = $module->name;
 
         if ( $status == 0 ) {
-            $module->set_local_status( 'available' );
+            $module->local->set_status( 'available' );
             $K->post( main => log_result => $modname => "$modname is available locally." );
         } else {
             # error while installing
-            $module->set_local_status( 'error' );
+            $module->local->set_status( 'error' );
             $K->post( main => log_result => $modname => "$modname is not available locally." );
         }
         $K->post( main => module_state => $module );
@@ -286,7 +286,7 @@ retrying if initialization is currently ongoing.
             $self->yield( $self->_next_event );
         } else {
             # cpanplus error, bail out for this module
-            $module->set_local_status( "error" );
+            $module->local->set_status( "error" );
             $K->post( main => module_state => $module );
             $K->post( main => log_result => $modname => "CPANPLUS could not reload index, aborting" );
         }

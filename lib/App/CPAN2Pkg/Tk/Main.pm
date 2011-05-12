@@ -101,8 +101,8 @@ event module_state => sub {
         available       => "green",
         error           => "red",
     );
-    my $colorl = $color{ $module->local_status };
-    my $coloru = $color{ $module->upstream_status };
+    my $colorl = $color{ $module->local->status };
+    my $coloru = $color{ $module->upstream->status };
 
     # update bullets
     my $bulletl  = image( $SHAREDIR->file("bullets", "$colorl.png") );
@@ -111,8 +111,8 @@ event module_state => sub {
     $hlist->itemConfigure( $elem, 1, -image=>$bulletu );
 
     $self->_w( "btn_close_$modname" )->configure( enabled )
-        if $module->local_status    eq 'available'
-        && $module->upstream_status eq 'available';
+        if $module->local->status    eq 'available'
+        && $module->upstream->status eq 'available';
 };
 
 # -- public events

@@ -9,6 +9,7 @@ use Moose;
 use MooseX::Has::Sugar;
 use MooseX::SemiAffordanceAccessor;
 
+use App::CPAN2Pkg::Repository;
 use App::CPAN2Pkg::Types;
 
 
@@ -18,19 +19,19 @@ use App::CPAN2Pkg::Types;
 
 The name of the Perl module, eg C<App::CPAN2Pkg>.
 
-=attr local_status
+=attr local
 
-The status of the module on the local system.
+The L<App::CPAN2Pkg::Repository> for the local system.
 
-=attr upstream_status
+=attr upstream
 
-The status of the module from the Linux distribution point of view.
+The L<App::CPAN2Pkg::Repository> for the upstream Linux distribution.
 
 =cut
 
 has name => ( ro, required, isa=>'Str' );
-has local_status    => ( rw, isa=>"LocalStatus",    default=>"not started" );
-has upstream_status => ( rw, isa=>"UpstreamStatus", default=>"not started" );
+has local    => ( ro, isa=>"App::CPAN2Pkg::Repository", default=>sub{ App::CPAN2Pkg::Repository->new } );
+has upstream => ( ro, isa=>"App::CPAN2Pkg::Repository", default=>sub{ App::CPAN2Pkg::Repository->new } );
 
 # --
 
