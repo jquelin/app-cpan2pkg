@@ -93,6 +93,32 @@ sub START {
 
 # -- logic
 
+{
+
+=event is_available_upstream
+
+    is_available_upstream( )
+
+Check if module is available in the distribution repositories.
+
+=cut
+
+    event is_available_upstream => sub { };
+
+    event _result_is_available_upstream => sub {
+        my ($self, $status) = @_[OBJECT, ARG0];
+        my $module  = $self->module;
+        my $modname = $module->name;
+
+        my $upstream = $status == 0 ? 'available' : 'not available';
+        $module->set_upstream_status( $upstream );
+        $K->post( main => log_result => $modname => "$modname is $upstream upstream." );
+        $K->post( main => module_state => $module );
+        $self->yield( "is_installed_locally" );
+    };
+}
+
+
 event _result_install_from_upstream => sub {
     my ($self, $status) = @_[OBJECT, ARG0];
     my $module  = $self->module;
@@ -107,18 +133,6 @@ event _result_install_from_upstream => sub {
         $K->post( main => log_result => $modname => "$modname is not available locally." );
     }
     $K->post( main => module_state => $module );
-};
-
-event _result_is_available_upstream => sub {
-    my ($self, $status) = @_[OBJECT, ARG0];
-    my $module  = $self->module;
-    my $modname = $module->name;
-
-    my $upstream = $status == 0 ? 'available' : 'not available';
-    $module->set_upstream_status( $upstream );
-    $K->post( main => log_result => $modname => "$modname is $upstream upstream." );
-    $K->post( main => module_state => $module );
-    $self->yield( "is_installed_locally" );
 };
 
 event _result_is_installed_locally => sub {

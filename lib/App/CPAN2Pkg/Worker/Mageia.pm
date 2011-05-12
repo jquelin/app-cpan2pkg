@@ -15,7 +15,7 @@ extends 'App::CPAN2Pkg::Worker::RPM';
 Readonly my $K => $poe_kernel;
 
 
-event is_available_upstream => sub {
+override is_available_upstream => sub {
     my $self = shift;
     my $modname = $self->module->name;
 
