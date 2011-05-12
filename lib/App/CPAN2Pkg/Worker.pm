@@ -209,8 +209,6 @@ Install module from distribution repository.
     };
 }
 
-# -- public events
-
 {
 
 =event cpanplus_initialize
@@ -411,50 +409,6 @@ command output.
 }
 
 
-#--
-# CONSTRUCTOR
-
-sub spawn {
-    my ($class, $module) = @_;
-
-    my @public = qw{
-        available_on_bs
-        build_upstream
-        cpan2dist
-        find_prereqs
-        import_upstream
-        install_from_dist
-        install_from_local
-        is_in_dist
-        is_installed
-    };
-    my @private = qw{
-        _build_upstream
-        _cpan2dist
-        _find_prereqs
-        _import_upstream
-        _install_from_dist
-        _install_from_local
-        _is_in_dist
-        _stderr
-        _stdout
-    };
-    
-    # spawning the session
-    my $session = POE::Session->create(
-        heap => $module,
-        inline_states => {
-            _start => \&_start,
-            #_stop  => sub { warn "stop " . $_[HEAP]->name . "\n"; },
-        },
-        object_states => [
-            $module => [ @public, @private ],
-        ],
-    );
-    return $session->ID;
-}
-
-
 no Moose;
 __PACKAGE__->meta->make_immutable;
 1;
@@ -463,23 +417,10 @@ __END__
 =head1 DESCRIPTION
 
 C<App::CPAN2Pkg::Worker> implements a POE session driving the whole
-packaging process of a given module.
+packaging process of a given module. It has different subclasses, used
+to match the diversity of Linux distributions.
 
-It is spawned by C<App::CPAN2Pkg> and uses a C<App::CPAN2Pkg::Module>
-object to implement the logic related to the module availability in the
-distribution.
+It is spawned by C<App::CPAN2Pkg::Controller> and uses a
+C<App::CPAN2Pkg::Module> object to track module information.
 
-
-
-=head1 PUBLIC PACKAGE METHODS
-
-=head2 my $id = App::CPAN2Pkg::Module->spawn( $module )
-
-This method will create a POE session responsible for packaging &
-installing the wanted C<$module> (an C<App::CPAN2Pkg::Module> object).
-
-It will return the POE id of the session newly created.
-
-
-=cut
 
