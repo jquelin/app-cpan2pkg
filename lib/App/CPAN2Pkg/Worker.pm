@@ -91,7 +91,7 @@ sub START {
 }
 
 
-# -- logic
+# -- cpan2pkg logic implementation
 
 {
 
@@ -115,6 +115,53 @@ Check if module is available in the distribution repositories.
         $K->post( main => log_result => $modname => "$modname is $upstream upstream." );
         $K->post( main => module_state => $module );
         $self->yield( "is_installed_locally" );
+    };
+}
+
+{
+
+=event is_installed_locally
+
+    is_installed_locally( )
+
+Check if the module is installed locally.
+
+=cut
+
+    event is_installed_locally => sub {
+        my $self    = shift;
+        my $modname = $self->module->name;
+
+        my $cmd = qq{ perl -M$modname -E 'say "$modname loaded successfully";' };
+        $K->post( main => log_step => $modname => "Checking if module is installed" );
+        $self->run_command( $cmd => "_is_installed_locally_result" );
+    };
+
+    #
+    # _is_installed_locally_result( $status )
+    #
+    # result of the command to check if the module is available locally.
+    #
+    event _result_is_installed_locally => sub {
+        my ($self, $status) = @_[OBJECT, ARG0];
+        my $module  = $self->module;
+        my $modname = $module->name;
+
+        my $local = $status == 0 ? 'available' : 'not available';
+        $module->set_local_status( $local );
+        $K->post( main => log_result => $modname => "$modname is $local locally." );
+        $K->post( main => module_state => $module );
+
+        if ( $module->upstream_status eq "available" ) {
+            # nothing to do if available locally & upstream
+            return if $module->local_status eq "available";
+
+            # need to install the module from upstream
+            $self->yield( "install_from_upstream" );
+
+        } else {
+            $self->yield( "cpanplus_find_prereqs" );
+        }
     };
 }
 
@@ -160,30 +207,7 @@ Install module from distribution repository.
         }
         $K->post( main => module_state => $module );
     };
-
 }
-
-event _result_is_installed_locally => sub {
-    my ($self, $status) = @_[OBJECT, ARG0];
-    my $module  = $self->module;
-    my $modname = $module->name;
-
-    my $local = $status == 0 ? 'available' : 'not available';
-    $module->set_local_status( $local );
-    $K->post( main => log_result => $modname => "$modname is $local locally." );
-    $K->post( main => module_state => $module );
-
-    if ( $module->upstream_status eq "available" ) {
-        # nothing to do if available locally & upstream
-        return if $module->local_status eq "available";
-
-        # need to install the module from upstream
-        $self->yield( "install_from_upstream" );
-
-    } else {
-        $self->yield( "cpanplus_find_prereqs" );
-    }
-};
 
 # -- public events
 
@@ -270,15 +294,6 @@ retrying if initialization is currently ongoing.
         }
     };
 }
-
-event is_installed_locally => sub {
-    my $self    = shift;
-    my $modname = $self->module->name;
-
-    my $cmd = qq{ perl -M$modname -E 'say "$modname loaded successfully";' };
-    $K->post( main => log_step => $modname => "Checking if module is installed" );
-    $self->run_command( $cmd => "_result_is_installed_locally" );
-};
 
 {
 
