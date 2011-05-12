@@ -77,3 +77,9 @@ no Moose;
 __PACKAGE__->meta->make_immutable;
 1;
 __END__
+
+=head1 DESCRIPTION
+
+This class implements a worker specific to RPM-based distributions. It
+inherits from L<App::CPAN2Pkg::Worker>.
+
