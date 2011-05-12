@@ -33,6 +33,23 @@ has name => ( ro, required, isa=>'Str' );
 has local    => ( ro, isa=>"App::CPAN2Pkg::Repository", default=>sub{ App::CPAN2Pkg::Repository->new } );
 has upstream => ( ro, isa=>"App::CPAN2Pkg::Repository", default=>sub{ App::CPAN2Pkg::Repository->new } );
 
+
+# -- public methods
+
+=method add_prereq
+
+    $module->add_prereq( );
+
+Add a prerequesite to the module on both local & upstream repositories.
+
+=cut
+
+sub add_prereq {
+    my ($self, $p) = @_;
+    $self->local->add_prereq($p);
+    $self->upstream->add_prereq($p);
+}
+
 # --
 
 use Class::XSAccessor
