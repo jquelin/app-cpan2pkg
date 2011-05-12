@@ -53,6 +53,18 @@ has module => ( ro, required, isa=>'App::CPAN2Pkg::Module' );
 # run one wheel at a time, so we don't need to multiplex them.
 has _wheel => ( rw, isa=>'POE::Wheel', clearer=>'_clear_wheel' );
 
+# the output of the command
+has _output => (
+    ro,
+    default => "",
+    traits  => ['String'],
+    isa     => 'Str',
+    handles => {
+        _clear_output => 'clear',
+        _add_output   => 'append',
+    },
+);
+
 # the event to fire once run_command() has finished.
 has _result_event => ( rw, isa=>'Str', clearer=>'_clear_result_event' );
 
@@ -222,6 +234,8 @@ event is_installed_locally => sub {
 
 # -- public methods
 
+{
+
 =method run_command
 
     $worker->run_command( $command, $event );
@@ -231,53 +245,55 @@ Since it uses L<POE::Wheel::Run> underneath, it understands various
 stuff such as running a code reference. Note: commands will be launched
 under a C<C> locale.
 
-Upon completion, yields back an C<$event> with the result status.
+Upon completion, yields back an C<$event> with the result status and the
+command output.
 
 =cut
 
-sub run_command {
-    my ($self, $cmd, $event) = @_;
+    sub run_command {
+        my ($self, $cmd, $event) = @_;
 
-    $K->post( main => log_comment => $self->module->name => "Running: $cmd" );
-    $ENV{LC_ALL} = 'C';
-    my $child = POE::Wheel::Run->new(
-        Program     => $cmd,
-        Conduit     => "pty-pipe",
-        StdoutEvent => "_child_stdout",
-        StderrEvent => "_child_stderr",
-        CloseEvent  => "_child_close",
-    );
+        $K->post( main => log_comment => $self->module->name => "Running: $cmd" );
+        $ENV{LC_ALL} = 'C';
+        my $child = POE::Wheel::Run->new(
+            Program     => $cmd,
+            Conduit     => "pty-pipe",
+            StdoutEvent => "_child_stdout",
+            StderrEvent => "_child_stderr",
+            CloseEvent  => "_child_close",
+        );
 
-    $K->sig_child( $child->PID, "_child_signal" );
-    $self->_set_wheel( $child );
-    $self->_set_result_event( $event );
-    #print( "Child pid ", $child->PID, " started as wheel ", $child->ID, ".\n" );
+        $K->sig_child( $child->PID, "_child_signal" );
+        $self->_set_wheel( $child );
+        $self->_clear_output;
+        $self->_set_result_event( $event );
+        #print( "Child pid ", $child->PID, " started as wheel ", $child->ID, ".\n" );
+    }
+
+    event _child_stdout => sub {
+        my ($self, $line, $wid) = @_[OBJECT, ARG0, ARG1];
+        $self->_add_output( "$line\n" );
+        $K->post( main => log_out => $self->module->name => $line );
+    };
+
+    event _child_stderr => sub {
+        my ($self, $line, $wid) = @_[OBJECT, ARG0, ARG1];
+        $K->post( main => log_err => $self->module->name => $line );
+    };
+
+    event _child_close => sub {
+        my ($self, $wid) = @_[OBJECT, ARG0];
+        #say "child closed all pipes";
+    };
+
+    event _child_signal => sub {
+        my ($self, $pid, $status) = @_[OBJECT, ARG1, ARG2];
+        $status //=0;
+        $self->yield( $self->_result_event, $status, $self->_output );
+        $self->_clear_result_event;
+    };
 }
 
-
-# -- private events
-
-event _child_stdout => sub {
-    my ($self, $line, $wid) = @_[OBJECT, ARG0, ARG1];
-    $K->post( main => log_out => $self->module->name => $line );
-};
-
-event _child_stderr => sub {
-    my ($self, $line, $wid) = @_[OBJECT, ARG0, ARG1];
-    $K->post( main => log_err => $self->module->name => $line );
-};
-
-event _child_close => sub {
-    my ($self, $wid) = @_[OBJECT, ARG0];
-    #say "child closed all pipes";
-};
-
-event _child_signal => sub {
-    my ($self, $pid, $status) = @_[OBJECT, ARG1, ARG2];
-    $status //=0;
-    $self->yield( $self->_result_event, $status );
-    $self->_clear_result_event;
-};
 
 #--
 # CONSTRUCTOR
