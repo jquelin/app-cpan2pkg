@@ -142,7 +142,7 @@ Check if the module is installed locally.
     #
     # result of the command to check if the module is available locally.
     #
-    event _result_is_installed_locally => sub {
+    event _is_installed_locally_result => sub {
         my ($self, $status) = @_[OBJECT, ARG0];
         my $module  = $self->module;
         my $modname = $module->name;
