@@ -21,13 +21,6 @@ use App::CPAN2Pkg::Controller;
 use App::CPAN2Pkg::Tk::Main;
 use App::CPAN2Pkg::Utils      qw{ $LINUX_FLAVOUR $WORKER_TYPE };
 
-use App::CPAN2Pkg::Module;
-use App::CPAN2Pkg::Worker;
-use Class::XSAccessor
-    constructor => '_new',
-    accessors   => {
-        _module    => '_module',
-    };
 use POE;
 
 =method run
@@ -52,39 +45,6 @@ sub run {
     # and let's start the fun!
     POE::Kernel->run;
 }
-
-sub spawn {
-    my ($class, $opts) = @_;
-
-    # create the heap object
-    my $obj = App::CPAN2Pkg->_new(
-        _module   => {}, #      {name}=obj store the objects
-    );
-
-    # create the main session
-    my $session = POE::Session->create(
-        inline_states => {
-            # public events
-            available_on_bs      => \&available_on_bs,
-            cpan2dist_status     => \&cpan2dist_status,
-            upstream_status      => \&upstream_status,
-            local_install        => \&local_install,
-            local_status         => \&local_status,
-            module_spawned       => \&module_spawned,
-            package              => \&package,
-            prereqs              => \&prereqs,
-            upstream_import      => \&upstream_import,
-            upstream_install     => \&upstream_install,
-            # poe inline states
-            _start => \&_start,
-            #_stop  => sub { warn "stop app\n"; },
-        },
-        args => $opts,
-        heap => $obj,
-    );
-    return $session->ID;
-}
-
 
 
 #--
@@ -311,34 +271,10 @@ __END__
 
 Don't use this module directly, refer to the C<cpan2pkg> script instead.
 
-C<App::CPAN2Pkg> is the controller for the C<cpan2pkg> application. It
+C<App::CPAN2Pkg> is the main entry point for the C<cpan2pkg> application. It
 implements a POE session, responsible to schedule and advance module
 packagement.
 
-It is spawned by the poe session responsible for the user interface.
-
-
-
-=head1 PUBLIC PACKAGE METHODS
-
-=head2 my $id = App::CPAN2Pkg->spawn( \%params )
-
-This method will create a POE session responsible for coordinating the
-package(s) creation.
-
-It will return the POE id of the session newly created.
-
-You can tune the session by passing some arguments as a hash
-reference, where the hash keys are:
-
-=over 4
-
-=item * modules => \@list_of_modules
-
-A list of modules to start packaging.
-
-
-=back
 
 
 
