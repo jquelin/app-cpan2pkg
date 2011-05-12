@@ -128,7 +128,16 @@ Install module from distribution repository.
 
 =cut
 
-    event install_from_upstream => sub { };
+    event install_from_upstream => sub {
+        my $self = shift;
+        my $module  = $self->module;
+        my $modname = $module->name;
+
+        # change module state
+        $module->set_local_status( 'installing' );
+        $K->post( main => module_state => $module );
+        $K->post( main => log_step => $modname => "Installing from upstream" );
+    };
 
     #
     # _install_from_upstream_result( $status )
