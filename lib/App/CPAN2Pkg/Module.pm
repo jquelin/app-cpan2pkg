@@ -40,7 +40,7 @@ use Class::XSAccessor
         # public
         is_avail_on_bs => 'is_avail_on_bs',
         is_local       => 'is_local',  # if module is available locally
-        name__           => 'name',
+        _name__           => 'name',
         prereqs        => 'prereqs',
         # private
         _blocking  => '_blocking',

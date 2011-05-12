@@ -30,6 +30,14 @@ use Class::XSAccessor
     };
 use POE;
 
+=method run
+
+    App::CPAN2Pkg->run( [ @modules ] );
+
+Start the application, with an initial batch of C<@modules> to build.
+
+=cut
+
 sub run {
     my (undef, @modules) = @_;
 

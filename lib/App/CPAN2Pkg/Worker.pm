@@ -416,6 +416,9 @@ __PACKAGE__->meta->make_immutable;
 1;
 __END__
 
+=for Pod::Coverage
+    START
+
 =head1 DESCRIPTION
 
 C<App::CPAN2Pkg::Worker> implements a POE session driving the whole
