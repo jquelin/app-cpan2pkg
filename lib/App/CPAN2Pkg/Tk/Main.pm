@@ -5,6 +5,7 @@ use warnings;
 package App::CPAN2Pkg::Tk::Main;
 # ABSTRACT: main cpan2pkg window
 
+use DateTime;
 use List::Util qw{ first };
 use Moose;
 use MooseX::Has::Sugar;
@@ -67,17 +68,19 @@ event log_err => sub {
 event log_comment => sub {
     my ($self, $module, $line) = @_[OBJECT, ARG0 .. $#_ ];
     my $rotext = $self->_w( "rotext_$module" );
-    $rotext->insert( 'insert', "* $line\n\n", "comment" );
+    my $timestamp = DateTime->now->hms;
+    $rotext->insert( 'insert', "* $timestamp $line\n", "comment" );
 };
 event log_result => sub {
     my ($self, $module, $result) = @_[OBJECT, ARG0 .. $#_ ];
     my $rotext = $self->_w( "rotext_$module" );
-    $rotext->insert( 'insert', "\n* $result\n\n\n", "result" );
+    my $timestamp = DateTime->now->hms;
+    $rotext->insert( 'insert', "* $timestamp $result\n", "result" );
 };
 event log_step => sub {
     my ($self, $module, $step) = @_[OBJECT, ARG0 .. $#_ ];
     my $rotext = $self->_w( "rotext_$module" );
-    $rotext->insert( 'insert', "** $step\n\n", "step" );
+    $rotext->insert( 'insert', "\n\n** $step\n\n", "step" );
 };
 event module_state => sub {
     my ($self, $module) = @_[OBJECT, ARG0 .. $#_ ];

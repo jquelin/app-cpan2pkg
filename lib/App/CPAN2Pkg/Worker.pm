@@ -253,7 +253,7 @@ retrying if initialization is currently ongoing.
 
         # check if cpanplus needs to be initialized
         if ( $self->cpanplus_init ) {
-            $K->post( main => log_comment => $modname => "CPANPLUS already initialized" );
+            $K->post( main => log_result => $modname => "CPANPLUS already initialized" );
             $self->yield( $self->_next_event );
             return;
         }
@@ -338,6 +338,7 @@ Run CPANPLUS to find the module prereqs.
         my $idx     = firstidx { /^Module\s+Req Ver.*Satisfied/ } @tabbed;
         my @wanted  = @tabbed[ $idx+1 .. $#tabbed ];
         my @prereqs = map { (split /\s+/, $_)[0] } @wanted;
+        chomp( @prereqs );
 
         # store prereqs
         $K->post( main => log_result => $modname => "Prereq found: $_" )
@@ -367,7 +368,7 @@ command output.
     sub run_command {
         my ($self, $cmd, $event) = @_;
 
-        $K->post( main => log_comment => $self->module->name => "Running: $cmd" );
+        $K->post( main => log_comment => $self->module->name => "Running: $cmd\n" );
         $ENV{LC_ALL} = 'C';
         my $child = POE::Wheel::Run->new(
             Program     => $cmd,
@@ -402,6 +403,7 @@ command output.
 
     event _child_signal => sub {
         my ($self, $pid, $status) = @_[OBJECT, ARG1, ARG2];
+        $K->post( main => log_out => $self->module->name => "" );
         $status //=0;
         $self->yield( $self->_result_event, $status, $self->_output );
         $self->_clear_result_event;
