@@ -10,9 +10,10 @@ use MooseX::POE;
 use POE;
 use Readonly;
 
+extends 'App::CPAN2Pkg::Worker::RPM';
+
 Readonly my $K => $poe_kernel;
 
-extends 'App::CPAN2Pkg::Worker::RPM';
 
 event is_available_upstream => sub {
     my $self = shift;
@@ -24,28 +25,25 @@ event is_available_upstream => sub {
 };
 
 event install_from_upstream => sub {
-    my ($self) = shift;
+    my $self = shift;
     my $module  = $self->module;
     my $modname = $module->name;
-    my $rpmlock = $self->rpmlock;
 
     # change module state
     $module->set_local_status( 'installing' );
     $K->post( main => module_state => $module );
+    $K->post( main => log_step => $modname => "Installing from upstream" );
 
-    # check whether there's another rpm transaction
-    if ( ! $rpmlock->is_available ) {
-        my $owner   = $rpmlock->owner;
-        my $comment = "waiting for rpm lock... (owned by $owner)";
-        $K->post( main => log_comment => $modname => $comment );
-        $K->delay( install_from_upstream => 5 );
-        return;
-    }
-    $rpmlock->get( $modname );
+    $self->yield( get_rpm_lock => "install_from_upstream_with_rpm_lock" );
+};
+
+event install_from_upstream_with_rpm_lock => sub {
+    my $self = shift;
+    my $module  = $self->module;
+    my $modname = $module->name;
 
     # preparing & run command
     my $cmd = "sudo urpmi --auto 'perl($modname)'";
-    $K->post( main => log_step => $modname => "Installing from upstream" );
     $self->run_command( $cmd => "_result_install_from_upstream" );
 };
 
