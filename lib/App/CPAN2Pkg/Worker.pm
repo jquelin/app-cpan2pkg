@@ -21,16 +21,14 @@ Readonly my $K => $poe_kernel;
 
 # -- class attributes
 
-=attr cpanplus_init
+=classattr cpanplus_init
 
 A boolean to state whether CPANPLUS has been initialized with new index.
-This attribute is common to all workers.
 
-=attr cpanplus_lock
+=classattr cpanplus_lock
 
 A lock (L<App::CPAN2Pkg::Lock> object) to prevent more than one cpanplus
-initialization at a time. Note that this object is common to all
-workers.
+initialization at a time.
 
 =cut
 
@@ -57,6 +55,11 @@ has _wheel => ( rw, isa=>'POE::Wheel', clearer=>'_clear_wheel' );
 
 # the event to fire once run_command() has finished.
 has _result_event => ( rw, isa=>'Str', clearer=>'_clear_result_event' );
+
+# some events need to be postponed to do other stuff before
+# (initialization, etc). _next_event allows to store the event to be
+# fired afterwards.
+has _next_event => ( rw, isa=>'Str' );
 
 
 # -- initialization
@@ -122,6 +125,90 @@ event _result_is_installed_locally => sub {
 };
 
 # -- public events
+
+{
+
+=event cpanplus_initialize
+
+    cpanplus_initialize( $event )
+
+Run CPANPLUS initialization (reload index, etc). Fire C<$event> if this has already
+been done. Wait 5 seconds before retrying if initialization is currently
+ongoing.
+
+=cut
+
+    event cpanplus_initialize => sub {
+        my ($self, $event) = @_[OBJECT, ARG0];
+        $K->post( main => log_step => $self->module->name => "Initializing CPANPLUS" );
+        $self->_set_next_event( $event );
+        $self->yield( '_cpanplus_initialize_lock' );
+    };
+
+    #
+    # _cpanplus_initialize_lock( )
+    #
+    # try to get a hand on cpanplus lock. once lock has been grabbed,
+    # initialize cpanplus if needed. proceed to $self->_next_event
+    # otherwise.
+    #
+    event _cpanplus_initialize_lock => sub {
+        my $self = shift;
+        my $modname = $self->module->name;
+        my $lock    = $self->cpanplus_lock;
+
+        # check whether there's another cpanplus initialization ongoing
+        if ( ! $lock->is_available ) {
+            my $owner   = $lock->owner;
+            my $comment = "CPANPLUS currently being initialized... (cf $owner)";
+            $K->post( main => log_comment => $modname => $comment );
+            $K->delay( cpanplus_initialize => 5 );
+            return;
+        }
+
+        # cpanplus lock available
+
+        # check if cpanplus needs to be initialized
+        if ( $self->cpanplus_init ) {
+            $K->post( main => log_comment => $modname => "CPANPLUS already initialized" );
+            $self->yield( $self->_next_event );
+            return;
+        }
+
+        # cpanplus not yet initialized
+        $lock->get( $modname );
+        my $cmd = "cpanp x --update_source";
+        $self->run_command( $cmd => "_cpanplus_initialize_result" );
+    };
+
+    #
+    # _cpanplus_initialize_result( $status )
+    #
+    # received when cpanplus initialization is finished. if init went
+    # fine, proceed to $self->_next_event. otherwise, abort processing
+    # and put current module in error.
+    #
+    event _cpanplus_initialize_result => sub {
+        my ($self, $status) = @_[OBJECT, ARG0];
+        my $module   = $self->module;
+        my $modname  = $module->name;
+
+        # release lock
+        $self->cpanplus_lock->release;
+
+        if ( $status == 0 ) {
+            # cpanplus index reloaded, continue operations
+            $self->set_cpanplus_init( 1 );
+            $K->post( main => log_result => $modname => "CPANPLUS has been initialized" );
+            $self->yield( $self->_next_event );
+        } else {
+            # cpanplus error, bail out for this module
+            $module->set_local_status( "error" );
+            $K->post( main => module_state => $module );
+            $K->post( main => log_result => $modname => "CPANPLUS could not reload index, aborting" );
+        }
+    };
+}
 
 event is_installed_locally => sub {
     my $self    = shift;
