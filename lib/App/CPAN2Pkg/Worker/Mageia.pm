@@ -14,15 +14,18 @@ extends 'App::CPAN2Pkg::Worker::RPM';
 
 Readonly my $K => $poe_kernel;
 
+# --
 
-override is_available_upstream => sub {
-    my $self = shift;
-    my $modname = $self->module->name;
+{   # is_available_upstream
+    override is_available_upstream => sub {
+        my $self = shift;
+        my $modname = $self->module->name;
 
-    my $cmd = "urpmq --whatprovides 'perl($modname)'";
-    $K->post( main => log_step => $modname => "Checking if module is packaged upstream");
-    $self->run_command( $cmd => "_result_is_available_upstream" );
-};
+        my $cmd = "urpmq --whatprovides 'perl($modname)'";
+        $K->post( main => log_step => $modname => "Checking if module is packaged upstream");
+        $self->run_command( $cmd => "_result_is_available_upstream" );
+    };
+}
 
 {   # install_from_upstream
     override install_from_upstream => sub {
