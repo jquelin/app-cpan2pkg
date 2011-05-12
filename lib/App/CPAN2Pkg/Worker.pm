@@ -118,22 +118,41 @@ Check if module is available in the distribution repositories.
     };
 }
 
+{
 
-event _result_install_from_upstream => sub {
-    my ($self, $status) = @_[OBJECT, ARG0];
-    my $module  = $self->module;
-    my $modname = $module->name;
+=event install_from_upstream
 
-    if ( $status == 0 ) {
-        $module->set_local_status( 'available' );
-        $K->post( main => log_result => $modname => "$modname is available locally." );
-    } else {
-        # error while installing
-        $module->set_local_status( 'error' );
-        $K->post( main => log_result => $modname => "$modname is not available locally." );
-    }
-    $K->post( main => module_state => $module );
-};
+    install_from_upstream( )
+
+Install module from distribution repository.
+
+=cut
+
+    event install_from_upstream => sub { };
+
+    #
+    # _install_from_upstream_result( $status )
+    #
+    # Result of the command launched to install module from distribution
+    # repository.
+    #
+    event _install_from_upstream_result => sub {
+        my ($self, $status) = @_[OBJECT, ARG0];
+        my $module  = $self->module;
+        my $modname = $module->name;
+
+        if ( $status == 0 ) {
+            $module->set_local_status( 'available' );
+            $K->post( main => log_result => $modname => "$modname is available locally." );
+        } else {
+            # error while installing
+            $module->set_local_status( 'error' );
+            $K->post( main => log_result => $modname => "$modname is not available locally." );
+        }
+        $K->post( main => module_state => $module );
+    };
+
+}
 
 event _result_is_installed_locally => sub {
     my ($self, $status) = @_[OBJECT, ARG0];

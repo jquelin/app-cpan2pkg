@@ -33,7 +33,7 @@ class_has rpmlock => ( ro, isa=>'App::CPAN2Pkg::Lock', default=>sub{ App::CPAN2P
 
 # -- methods
 
-override _result_install_from_upstream => sub {
+override _install_from_upstream_result => sub {
     my $self = shift;
     $self->rpmlock->release;
     super();

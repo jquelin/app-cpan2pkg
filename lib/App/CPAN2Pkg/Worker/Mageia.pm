@@ -24,28 +24,31 @@ override is_available_upstream => sub {
     $self->run_command( $cmd => "_result_is_available_upstream" );
 };
 
-event install_from_upstream => sub {
-    my $self = shift;
-    my $module  = $self->module;
-    my $modname = $module->name;
+{   # install_from_upstream
+    override install_from_upstream => sub {
+        my $self = shift;
+        my $module  = $self->module;
+        my $modname = $module->name;
 
-    # change module state
-    $module->set_local_status( 'installing' );
-    $K->post( main => module_state => $module );
-    $K->post( main => log_step => $modname => "Installing from upstream" );
+        # change module state
+        $module->set_local_status( 'installing' );
+        $K->post( main => module_state => $module );
+        $K->post( main => log_step => $modname => "Installing from upstream" );
 
-    $self->yield( get_rpm_lock => "install_from_upstream_with_rpm_lock" );
-};
+        $self->yield( get_rpm_lock => "install_from_upstream_with_rpm_lock" );
+    };
 
-event install_from_upstream_with_rpm_lock => sub {
-    my $self = shift;
-    my $module  = $self->module;
-    my $modname = $module->name;
+    event install_from_upstream_with_rpm_lock => sub {
+        my $self = shift;
+        my $module  = $self->module;
+        my $modname = $module->name;
 
-    # preparing & run command
-    my $cmd = "sudo urpmi --auto 'perl($modname)'";
-    $self->run_command( $cmd => "_result_install_from_upstream" );
-};
+        # preparing & run command
+        my $cmd = "sudo urpmi --auto 'perl($modname)'";
+        $self->run_command( $cmd => "_install_from_upstream_result" );
+    };
+
+}
 
 
 no Moose;
