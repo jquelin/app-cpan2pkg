@@ -174,30 +174,6 @@ sub import_upstream {
     $self->_wheel($wheel);
 }
 
-sub find_prereqs {
-    my ($k, $self) = @_[KERNEL, OBJECT];
-
-    # preparing command
-    my $name = $self->name;
-    my $cmd = "cpanp /prereqs show $name";
-    $self->_log_new_step('Finding module prereqs', "Running command: $cmd" );
-
-    # running command
-    $self->_output('');
-    $ENV{LC_ALL} = 'C';
-    my $wheel = POE::Wheel::Run->new(
-        Program      => $cmd,
-        CloseEvent   => '_find_prereqs',
-        StdoutEvent  => '_stdout',
-        StderrEvent  => '_stderr',
-        StdoutFilter => POE::Filter::Line->new,
-        StderrFilter => POE::Filter::Line->new,
-    );
-
-    # need to store the wheel, otherwise the process goes woo!
-    $self->_wheel($wheel);
-}
-
 sub install_from_dist {
     my ($k, $self) = @_[KERNEL, OBJECT];
     my $name = $self->name;
@@ -443,54 +419,6 @@ sub _install_from_local {
     $k->post('app', 'local_install', $self, !$exval);
 }
 
-
-sub _is_in_dist {
-    my($k, $self, $pid, $rv) = @_[KERNEL, OBJECT, ARG1, ARG2];
-
-    # since it's a sigchld handler, it also gets called for other
-    # spawned processes. therefore, screen out processes that are
-    # not related to this object.
-    return unless defined $self->_wheel;
-    return unless $self->_wheel->PID == $pid;
-
-    # terminate wheel
-    # FIXME: should be done in CloseEvent
-    $self->_wheel(undef);
-
-    # check if we got a hit
-    # urpmq returns 0 if found, 1 otherwise.
-    my $name  = $self->name;
-    my $exval = $rv >> 8;
-
-    $self->is_avail_on_bs( !$exval );
-    my $status = $exval ? 'not' : 'already';
-    $self->_log_result( "$name is $status packaged upstream." );
-    $k->post('app', 'upstream_status', $self, !$exval);
-}
-
-sub _stderr {
-    my ($k, $self, $line) = @_[KERNEL, OBJECT, ARG0];
-    $k->post('ui', 'append', $self, "stderr: $line\n");
-}
-
-sub _stdout {
-    my ($k, $self, $line) = @_[KERNEL, OBJECT, ARG0];
-    $line .= "\n";
-    $self->_output( $self->_output . $line );
-    $k->post('ui', 'append', $self, "stdout: $line");
-}
-
-
-# -- poe inline states
-
-sub _start {
-    my ($k, $self) = @_[KERNEL, OBJECT];
-
-    $k->alias_set($self);
-    $k->alias_set($self->name);
-    $k->post('ui',  'module_spawned', $self);
-    $k->post('app', 'module_spawned', $self);
-}
 
 
 #--
