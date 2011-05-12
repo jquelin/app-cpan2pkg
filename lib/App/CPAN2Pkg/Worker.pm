@@ -32,7 +32,13 @@ initialization at a time.
 
 =cut
 
-class_has cpanplus_init => ( rw, isa=>'Bool', default=>0 );
+class_has cpanplus_init => (
+    rw,
+    traits  => ['Bool'],
+    isa     => 'Bool',
+    default => 0,
+    handles => { cpanplus_init_done => "set" },
+);
 class_has cpanplus_lock => ( ro, isa=>'App::CPAN2Pkg::Lock', default=>sub{ App::CPAN2Pkg::Lock->new } );
 
 
@@ -210,7 +216,7 @@ ongoing.
 
         if ( $status == 0 ) {
             # cpanplus index reloaded, continue operations
-            $self->set_cpanplus_init( 1 );
+            $self->cpanplus_init_done;
             $K->post( main => log_result => $modname => "CPANPLUS has been initialized" );
             $self->yield( $self->_next_event );
         } else {
