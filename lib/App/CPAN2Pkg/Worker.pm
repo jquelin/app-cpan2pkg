@@ -332,6 +332,10 @@ Run CPANPLUS to find the module prereqs.
         my ($self, $status, $output) = @_[ OBJECT, ARG0 .. $#_ ];
         my $modname = $self->module->name;
 
+        # note that at this point, we still don't know if module exists
+        # on cpan, since cpanplus unfortunately returns 0 even if there
+        # was an error... sigh.
+
         # extract prereqs
         my @lines   = split /\n/, $output;
         my @tabbed  = grep { s/^\s+// } @lines;
@@ -340,9 +344,19 @@ Run CPANPLUS to find the module prereqs.
         my @prereqs = map { (split /\s+/, $_)[0] } @wanted;
         chomp( @prereqs );
 
+        if ( @prereqs == 0 ) {
+            # no prereqs found, build package!
+            $K->post( main => log_result => $modname => "No prereq found." );
+            $self->yield( "cpanplus_create_package" );
+            return;
+        }
+
         # store prereqs
-        $K->post( main => log_result => $modname => "Prereq found: $_" )
-            for @prereqs;
+        foreach my $p ( @prereqs ) {
+            $K->post( main => log_result => $modname => "Prereq found: $p" );
+            $self->module->add_prereq( $p );
+            $K->post( controller => new_module_wanted => $p );
+        }
     };
 }
 
