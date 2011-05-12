@@ -5,6 +5,7 @@ use warnings;
 package App::CPAN2Pkg::Worker;
 # ABSTRACT: poe session to drive a module packaging
 
+use List::MoreUtils qw{ firstidx };
 use Moose;
 use MooseX::ClassAttribute;
 use MooseX::Has::Sugar;
@@ -138,7 +139,7 @@ event _result_is_installed_locally => sub {
         $self->yield( "install_from_upstream" );
 
     } else {
-        $self->yield( "create_package_with_cpanplus" );
+        $self->yield( "cpanplus_find_prereqs" );
     }
 };
 
@@ -236,6 +237,58 @@ event is_installed_locally => sub {
     $K->post( main => log_step => $modname => "Checking if module is installed" );
     $self->run_command( $cmd => "_result_is_installed_locally" );
 };
+
+{
+
+=event cpanplus_find_prereqs
+
+    cpanplus_find_prereqs( )
+
+Run CPANPLUS to find the module prereqs.
+
+=cut
+
+    event cpanplus_find_prereqs => sub {
+        my $self = shift;
+        $self->yield( cpanplus_initialize => "_cpanplus_find_prereqs_init_done" );
+    };
+
+    #
+    # _cpanplus_find_prereqs_init_done( )
+    #
+    # run cpanplus to find module prereqs, now that cpanplus
+    # initialization has been done.
+    #
+    event _cpanplus_find_prereqs_init_done => sub {
+        my $self = shift;
+        my $modname = $self->module->name;
+
+        $K->post( main => log_step => $modname => "Finding module prereqs" );
+        my $cmd = "cpanp /prereqs show $modname";
+        $self->run_command( $cmd => "_cpanplus_find_prereqs_result" );
+    };
+
+    #
+    # _cpanplus_find_prereqs_result( $status, $output )
+    #
+    # extract module prereqs from cpanplus output.
+    #
+    event _cpanplus_find_prereqs_result => sub {
+        my ($self, $status, $output) = @_[ OBJECT, ARG0 .. $#_ ];
+        my $modname = $self->module->name;
+
+        # extract prereqs
+        my @lines   = split /\n/, $output;
+        my @tabbed  = grep { s/^\s+// } @lines;
+        my $idx     = firstidx { /^Module\s+Req Ver.*Satisfied/ } @tabbed;
+        my @wanted  = @tabbed[ $idx+1 .. $#tabbed ];
+        my @prereqs = map { (split /\s+/, $_)[0] } @wanted;
+
+        # store prereqs
+        $K->post( main => log_result => $modname => "Prereq found: $_" )
+            for @prereqs;
+    };
+}
 
 
 # -- public methods
