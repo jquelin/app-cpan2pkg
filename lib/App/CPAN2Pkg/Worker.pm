@@ -420,14 +420,7 @@ unblock the worker from waiting if all the needed modules are present.
         my @prereqs = sort $module->local->prereqs;
         $K->post( main => log_comment => $modname => "Missing prereqs: @prereqs" );
     };
-
-    event _local_prereqs_ready => sub {
-        my $self = shift;
-        my $module  = $self->module;
-        my $modname = $module->name;
-    };
 }
-
 
 
 # -- public methods
