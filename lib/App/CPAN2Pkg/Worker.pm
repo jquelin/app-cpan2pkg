@@ -152,6 +152,10 @@ Check if the module is installed locally.
         $K->post( main => log_result => $modname => "$modname is $local locally." );
         $K->post( main => module_state => $module );
 
+        # inform controller of availability
+        $K->post( controller => module_ready_locally => $modname )
+            if $local eq "available";
+
         if ( $module->upstream->status eq "available" ) {
             # nothing to do if available locally & upstream
             return if $module->local->status eq "available";
@@ -200,6 +204,9 @@ Install module from distribution repository.
         if ( $status == 0 ) {
             $module->local->set_status( 'available' );
             $K->post( main => log_result => $modname => "$modname is available locally." );
+
+            # inform controller of availability
+            $K->post( controller => module_ready_locally => $modname );
         } else {
             # error while installing
             $module->local->set_status( 'error' );
