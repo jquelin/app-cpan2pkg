@@ -68,13 +68,13 @@ event log_err => sub {
 event log_comment => sub {
     my ($self, $module, $line) = @_[OBJECT, ARG0 .. $#_ ];
     my $rotext = $self->_w( "rotext_$module" );
-    my $timestamp = DateTime->now->hms;
+    my $timestamp = DateTime->now(time_zone=>"local")->hms;
     $rotext->insert( 'insert', "* $timestamp $line\n", "comment" );
 };
 event log_result => sub {
     my ($self, $module, $result) = @_[OBJECT, ARG0 .. $#_ ];
     my $rotext = $self->_w( "rotext_$module" );
-    my $timestamp = DateTime->now->hms;
+    my $timestamp = DateTime->now(time_zone=>"local")->hms;
     $rotext->insert( 'insert', "* $timestamp $result\n", "result" );
 };
 event log_step => sub {
