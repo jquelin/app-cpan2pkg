@@ -15,6 +15,11 @@ extends 'App::CPAN2Pkg::Worker::RPM';
 Readonly my $K => $poe_kernel;
 
 
+# -- public methods
+
+override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
+
+
 # -- cpan2pkg logic implementation
 
 {   # check_upstream_availability

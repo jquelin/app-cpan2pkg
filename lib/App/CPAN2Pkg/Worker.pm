@@ -425,6 +425,18 @@ unblock the worker from waiting if all the needed modules are present.
 
 # -- public methods
 
+=method cpan2dist_flavour
+
+    my $backend = $worker->cpan2dist_flavour;
+
+Return the cpanplus backend (C<CPANPLUS::Dist::*>) to be used by the
+worker when running C<cpan2dist>.
+
+=cut
+
+sub cpan2dist_flavour { die "should be overridden in child class!" }
+
+
 {
 
 =method run_command
