@@ -63,6 +63,12 @@ event new_module_wanted => sub {
     $WORKER_TYPE->new( module => $module );
 };
 
+event module_ready_locally => sub {
+    my ($self, $modname) = @_[OBJECT, ARG0];
+    my $app = App::CPAN2Pkg->instance;
+    $K->post( $_ => local_prereqs_available => $modname )
+        for $app->all_modules;
+};
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

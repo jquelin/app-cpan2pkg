@@ -80,6 +80,9 @@ has _result_event => ( rw, isa=>'Str', clearer=>'_clear_result_event' );
 # fired afterwards.
 has _next_event => ( rw, isa=>'Str' );
 
+# current worker state
+has _state => ( rw, isa=>'Str', clearer=>'_clear_state', predicate=>'_has_state' );
+
 
 # -- initialization
 
@@ -389,6 +392,7 @@ unblock the worker from waiting if all the needed modules are present.
 
     event local_prereqs_wait => sub {
         my $self = shift;
+        $self->_set_state( "local_prereqs_wait" );
         my $module  = $self->module;
         my $modname = $module->name;
         my @prereqs = sort $module->local->prereqs;
@@ -402,9 +406,12 @@ unblock the worker from waiting if all the needed modules are present.
         my $modname = $module->name;
         my $local   = $module->local;
 
+        return unless $local->miss_prereq( $newmod );
         $local->rm_prereq( $newmod );
+        return unless $self->_has_state && $self->_state eq "local_prereqs_wait";
 
         if ( $local->can_build ) {
+            $self->_clear_state;
             $K->post( main => log_result => $modname => "All prereqs are available locally" );
             $self->yield( "cpanplus_create_package" );
             return;
