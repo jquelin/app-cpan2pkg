@@ -117,35 +117,35 @@ Check if module is available in the distribution repositories.
         $module->upstream->set_status( $upstream );
         $K->post( main => log_result => $modname => "$modname is $upstream upstream." );
         $K->post( main => module_state => $module );
-        $self->yield( "is_installed_locally" );
+        $self->yield( "check_local_availability" );
     };
 }
 
 {
 
-=event is_installed_locally
+=event check_local_availability
 
-    is_installed_locally( )
+    check_local_availability( )
 
 Check if the module is installed locally.
 
 =cut
 
-    event is_installed_locally => sub {
+    event check_local_availability => sub {
         my $self    = shift;
         my $modname = $self->module->name;
 
         my $cmd = qq{ perl -M$modname -E 'say "$modname loaded successfully";' };
         $K->post( main => log_step => $modname => "Checking if module is installed" );
-        $self->run_command( $cmd => "_is_installed_locally_result" );
+        $self->run_command( $cmd => "_check_local_availability_result" );
     };
 
     #
-    # _is_installed_locally_result( $status )
+    # _check_local_availability_result( $status )
     #
     # result of the command to check if the module is available locally.
     #
-    event _is_installed_locally_result => sub {
+    event _check_local_availability_result => sub {
         my ($self, $status) = @_[OBJECT, ARG0];
         my $module  = $self->module;
         my $modname = $module->name;
