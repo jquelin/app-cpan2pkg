@@ -29,6 +29,7 @@ has _prereqs => (
     handles => {
         _add_prereq => 'set',
         prereqs     => 'keys',
+        rm_prereq   => 'delete',
         can_build   => 'is_empty',
     },
 );
