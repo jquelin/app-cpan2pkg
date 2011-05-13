@@ -9,6 +9,7 @@ use Moose;
 use MooseX::ClassAttribute;
 use MooseX::Has::Sugar;
 use MooseX::POE;
+use Path::Class;
 use Readonly;
 
 use App::CPAN2Pkg::Lock;
@@ -18,7 +19,7 @@ extends 'App::CPAN2Pkg::Worker';
 Readonly my $K => $poe_kernel;
 
 
-# -- attributes
+# -- class attributes
 
 =classattr rpmlock
 
@@ -29,6 +30,21 @@ installation at a time.
 
 class_has rpmlock => ( ro, isa=>'App::CPAN2Pkg::Lock', default=>sub{ App::CPAN2Pkg::Lock->new } );
 
+
+# -- attributes
+
+=attr srpm
+
+Path to the source RPM of the module built with C<cpan2dist>.
+
+=attr rpm
+
+Path to the RPM of the module built with C<cpan2dist>.
+
+=cut
+
+has srpm => ( rw, isa=>'Path::Class::File' );
+has rpm  => ( rw, isa=>'Path::Class::File' );
 
 
 # -- cpan2pkg logic implementation
@@ -60,21 +76,14 @@ class_has rpmlock => ( ro, isa=>'App::CPAN2Pkg::Lock', default=>sub{ App::CPAN2P
             return;
         }
 
-#        my  $status = 1;
-#        my  @result = (
-#                "$name has been successfully built",
-#                "srpm created: $srpm",
-#                "rpm created:  $rpm",
-#            );
-#
-#             storing path to interesting files
-#            $self->_rpm($rpm);
-#            $self->_srpm($srpm);
-#
-#             storing package name
-#            my $pkgname = basename $srpm;
-#            $pkgname =~ s/-\d.*$//;
-#            $self->_pkgname( $pkgname );
+        # logging result
+        $K->post( main => log_result => $modname => "Package built successfully" );
+        $K->post( main => log_result => $modname => "SRPM: $srpm" );
+        $K->post( main => log_result => $modname => "RPM:  $rpm" );
+
+        # storing path to packages
+        $self->set_srpm( file($srpm) );
+        $self->set_rpm ( file($rpm) );
     };
 }
 
