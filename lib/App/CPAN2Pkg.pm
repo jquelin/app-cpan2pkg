@@ -31,6 +31,7 @@ has _modules => (
     isa     => 'HashRef[App::CPAN2Pkg::Module]',
     traits  => ['Hash'],
     handles => {
+        all_modules     => 'keys',
         seen_module     => 'exists',
         register_module => 'set',
         module          => 'get',
@@ -39,6 +40,12 @@ has _modules => (
 
 
 # -- public methods
+
+=method all_modules
+
+    my @modules = $app->all_modules;
+
+Return the list of all modules that have been / are being processed.
 
 =method seen_module
 
