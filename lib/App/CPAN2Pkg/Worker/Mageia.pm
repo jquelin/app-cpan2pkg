@@ -17,14 +17,14 @@ Readonly my $K => $poe_kernel;
 
 # -- cpan2pkg logic implementation
 
-{   # is_available_upstream
-    override is_available_upstream => sub {
+{   # check_upstream_availability
+    override check_upstream_availability => sub {
         my $self = shift;
         my $modname = $self->module->name;
 
         my $cmd = "urpmq --whatprovides 'perl($modname)'";
         $K->post( main => log_step => $modname => "Checking if module is packaged upstream");
-        $self->run_command( $cmd => "_result_is_available_upstream" );
+        $self->run_command( $cmd => "_check_upstream_availability_result" );
     };
 }
 

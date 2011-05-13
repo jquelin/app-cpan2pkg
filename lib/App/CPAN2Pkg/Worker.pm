@@ -90,7 +90,7 @@ sub START {
     my $self = shift;
     $K->alias_set( $self->module->name );
     $K->post( main => new_module => $self->module );
-    $K->yield( 'is_available_upstream' );
+    $K->yield( 'check_upstream_availability' );
 }
 
 
@@ -98,17 +98,17 @@ sub START {
 
 {
 
-=event is_available_upstream
+=event check_upstream_availability
 
-    is_available_upstream( )
+    check_upstream_availability( )
 
 Check if module is available in the distribution repositories.
 
 =cut
 
-    event is_available_upstream => sub { };
+    event check_upstream_availability => sub { };
 
-    event _result_is_available_upstream => sub {
+    event _check_upstream_availability_result => sub {
         my ($self, $status) = @_[OBJECT, ARG0];
         my $module  = $self->module;
         my $modname = $module->name;
