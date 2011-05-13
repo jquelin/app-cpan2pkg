@@ -51,6 +51,10 @@ event new_module_wanted => sub {
 
     my $app = App::CPAN2Pkg->instance;
     if ( $app->seen_module( $modname ) ) {
+        my $module = $app->module( $modname );
+        my $sender = $_[SENDER];
+        $K->post( $sender => local_prereqs_available => $modname )
+            if $module->local->status eq "available";
         return;
     }
 
