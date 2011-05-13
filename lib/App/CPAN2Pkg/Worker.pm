@@ -423,6 +423,54 @@ unblock the worker from waiting if all the needed modules are present.
 }
 
 
+{
+
+=event cpanplus_create_package
+
+    cpanplus_create_package
+
+Try to create a native package for the module using C<cpan2dist>.
+
+=cut
+
+    event cpanplus_create_package => sub {
+        my $self    = shift;
+        my $module  = $self->module;
+        my $modname = $module->name;
+
+        $module->local->set_status( "building" );
+        $K->post( main => module_state => $module );
+        $K->post( main => log_step => $modname => 'Building package' );
+
+        # we don't want to re-build the prereqs, even if we're not at their
+        # most recent version. and cpanplus --nobuildprereqs does not work
+        # as one thinks (it's "don't rebuild prereqs if we're at latest version,
+        # but rebuild anyway if we're not at latest version").
+        # and somehow, the ignore list with regex /(?<!$name)$/ does not work.
+        # so we're stuck with ignore modules one by one - sigh.
+        # 20090606 update: ignore now removes completely the modules from
+        # the prereqs - sigh. so using --ban for now, hoping that it works
+        # this time.
+        my $ignore = '';
+        $ignore .= "--ban '^$_\$' " foreach $module->prereqs;
+
+        # preparing command. note that we do want --force, to be able to extract
+        # the rpm and srpm pathes from the output.
+        my $flavour = $self->cpan2dist_flavour;
+        my $cmd = "cpan2dist $ignore --force --format=$flavour $modname";
+
+        $self->run_command( $cmd => "_cpanplus_create_package_result" );
+    };
+
+    #
+    # _cpanplus_create_package_result( $status, $output )
+    #
+    # check if module was successfully built using cpan2dist.
+    #
+    event _cpanplus_create_package_result => sub { };
+}
+
+
 # -- public methods
 
 =method cpan2dist_flavour

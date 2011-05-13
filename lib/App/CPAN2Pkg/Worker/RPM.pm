@@ -41,6 +41,44 @@ class_has rpmlock => ( ro, isa=>'App::CPAN2Pkg::Lock', default=>sub{ App::CPAN2P
     };
 }
 
+{
+    override _cpanplus_create_package_result => sub {
+        my ($self, $status, $output) = @_[OBJECT, ARG0 .. $#_ ];
+        my $module  = $self->module;
+        my $modname = $module->name;
+
+        # check whether the package has been built correctly.
+        my ($rpm, $srpm);
+        $rpm  = $1 if $output =~ /rpm created successfully: (.*\.rpm)/;
+        $srpm = $1 if $output =~ /srpm available: (.*\.src.rpm)/;
+
+        # detecting error cannot be done on $status - sigh.
+        if ( not ( $rpm && $srpm ) ) {
+            $module->local->set_status( "error" );
+            $K->post( main => module_state => $module );
+            $K->post( main => log_result => $modname => "Error during package creation" );
+            return;
+        }
+
+#        my  $status = 1;
+#        my  @result = (
+#                "$name has been successfully built",
+#                "srpm created: $srpm",
+#                "rpm created:  $rpm",
+#            );
+#
+#             storing path to interesting files
+#            $self->_rpm($rpm);
+#            $self->_srpm($srpm);
+#
+#             storing package name
+#            my $pkgname = basename $srpm;
+#            $pkgname =~ s/-\d.*$//;
+#            $self->_pkgname( $pkgname );
+    };
+}
+
+
 # -- events
 
 =event get_rpm_lock
