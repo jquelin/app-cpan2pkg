@@ -18,35 +18,58 @@ use App::CPAN2Pkg::Types;
 
 The status of the module: available, building, etc.
 
-=attr prereqs
-
-The prerequesites needed before attempting to build the module.
-
 =cut
 
 has status  => ( rw, isa=>"Status", default=>"not started" );
-has prereqs => (
-    ro, auto_deref,
-    traits  => ['Array'],
-    isa     => 'ArrayRef[Str]',
-    default => sub { [] },
+has _prereqs => (
+    ro,
+    traits  => ['Hash'],
+    isa     => 'HashRef[Str]',
+    default => sub { {} },
     handles => {
-        add_prereq => 'push',
+        _add_prereq => 'set',
+        prereqs     => 'keys',
+        can_build   => 'is_empty',
     },
 );
 
 
 # -- public methods
 
+=attr prereqs
+
+    my @prereqs = $repo->prereqs;
+
+The prerequesites needed before attempting to build the module.
+
+=method can_build
+
+    my $bool = $repo->can_build;
+
+Return true if there are no more missing prereqs.
+
+=method rm_prereq
+
+    $repo->rm_prereq( $modname );
+
+Remove C<$modname> as a missing prereq on the repository.
+
+=cut
+
+# methods above provided for free by moose traits.
+
 =method add_prereq
 
-    $status->add_prereq( $foo, $bar );
+    $repo->add_prereq( $modname );
 
 Mark a prereq as missing on the repository.
 
 =cut
 
-# provided by moose traits
+sub add_prereq {
+    my ($self, $modname) = @_;
+    $self->_add_prereq( $modname, $modname );
+}
 
 
 no Moose;
