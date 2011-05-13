@@ -13,8 +13,8 @@ package App::CPAN2Pkg;
 # explicitly is always better.
 use POE::Kernel { loop => 'Tk' };
 
-
 use MooseX::Singleton;
+use MooseX::Has::Sugar;
 use Readonly;
 
 use App::CPAN2Pkg::Controller;
@@ -22,6 +22,48 @@ use App::CPAN2Pkg::Tk::Main;
 use App::CPAN2Pkg::Utils      qw{ $LINUX_FLAVOUR $WORKER_TYPE };
 
 use POE;
+
+# -- private attributes
+
+# keep track of modules being processed.
+has _modules => (
+    ro,
+    isa     => 'HashRef[App::CPAN2Pkg::Module]',
+    traits  => ['Hash'],
+    handles => {
+        seen_module     => 'exists',
+        register_module => 'set',
+        module          => 'get',
+    }
+);
+
+
+# -- public methods
+
+=method seen_module
+
+    my $bool = $app->seen_module( $modname );
+
+Return true if C<$modname> has already been seen. It can be either
+finished processing, or still ongoing.
+
+=method register_module
+
+    $app->register_module( $modname, $module );
+
+Store C<$module> as the L<App::CPAN2Pkg::Module> object tracking
+C<$modname>.
+
+=method
+
+    my $module = $app->module( $modname );
+
+Return the C<$module> object registered for C<$modname>.
+
+=cut
+
+# those methods above are provided by moose traits for free
+
 
 =method run
 
