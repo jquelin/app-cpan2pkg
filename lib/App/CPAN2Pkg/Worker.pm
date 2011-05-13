@@ -451,8 +451,11 @@ Try to create a native package for the module using C<cpan2dist>.
         # 20090606 update: ignore now removes completely the modules from
         # the prereqs - sigh. so using --ban for now, hoping that it works
         # this time.
+        # 20110513 update: --ban is removing completely the modules from
+        # the prereqs (cf 20090606 update). reverting to --ignore, which
+        # seems to work now. sigh.
         my $ignore = '';
-        $ignore .= "--ban '^$_\$' " foreach $module->prereqs;
+        $ignore .= "--ignore '^$_\$' " foreach $module->prereqs;
 
         # preparing command. note that we do want --force, to be able to extract
         # the rpm and srpm pathes from the output.
