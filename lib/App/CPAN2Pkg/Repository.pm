@@ -31,6 +31,7 @@ has _prereqs => (
         prereqs     => 'keys',
         rm_prereq   => 'delete',
         can_build   => 'is_empty',
+        miss_prereq => 'exists',
     },
 );
 
@@ -48,6 +49,12 @@ The prerequesites needed before attempting to build the module.
     my $bool = $repo->can_build;
 
 Return true if there are no more missing prereqs.
+
+=method miss_prereq
+
+    my $bool = $repo->miss_prereq( $modname );
+
+Return true if C<$modname> is missing on the system.
 
 =method rm_prereq
 
