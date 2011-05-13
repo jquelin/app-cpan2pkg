@@ -357,8 +357,63 @@ Run CPANPLUS to find the module prereqs.
             $self->module->add_prereq( $p );
             $K->post( controller => new_module_wanted => $p );
         }
+
+        $self->yield( "local_prereqs_wait" );
     };
 }
+
+{
+
+=event local_prereqs_wait
+
+    local_prereqs_wait( )
+
+Request to wait for local prereqs to be all present before attempting to
+build the module locally.
+
+=event local_prereqs_available
+
+    local_prereqs_available( $modname )
+
+Inform the worker that C<$modname> is now available locally. This may
+unblock the worker from waiting if all the needed modules are present.
+
+=cut
+
+    event local_prereqs_wait => sub {
+        my $self = shift;
+        my $module  = $self->module;
+        my $modname = $module->name;
+        my @prereqs = sort $module->local->prereqs;
+        $K->post( main => log_step => $modname => "Waiting for local prereqs" );
+        $K->post( main => log_comment => $modname => "Missing prereqs: @prereqs" );
+    };
+
+    event local_prereqs_available => sub {
+        my ($self, $newmod) = @_[OBJECT, ARG0];
+        my $module  = $self->module;
+        my $modname = $module->name;
+        my $local   = $module->local;
+
+        $local->rm_prereq( $newmod );
+
+        if ( $local->can_build ) {
+            $K->post( main => log_result => $modname => "All prereqs are available locally" );
+            $self->yield( "cpanplus_create_package" );
+            return;
+        }
+
+        my @prereqs = sort $module->local->prereqs;
+        $K->post( main => log_comment => $modname => "Missing prereqs: @prereqs" );
+    };
+
+    event _local_prereqs_ready => sub {
+        my $self = shift;
+        my $module  = $self->module;
+        my $modname = $module->name;
+    };
+}
+
 
 
 # -- public methods
