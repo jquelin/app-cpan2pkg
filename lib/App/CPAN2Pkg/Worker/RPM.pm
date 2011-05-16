@@ -57,7 +57,7 @@ has rpm  => ( rw, isa=>'Path::Class::File' );
     };
 }
 
-{
+{   # _cpanplus_create_package_result
     override _cpanplus_create_package_result => sub {
         my ($self, $status, $output) = @_[OBJECT, ARG0 .. $#_ ];
         my $module  = $self->module;
@@ -89,7 +89,7 @@ has rpm  => ( rw, isa=>'Path::Class::File' );
     };
 }
 
-{
+{   # local_install_from_package
     override local_install_from_package => sub {
         super();
         $K->yield( get_rpm_lock => "_local_install_from_package_with_rpm_lock" );
