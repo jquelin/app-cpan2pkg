@@ -565,11 +565,67 @@ Import the package in upstream repository.
         $K->post( main => module_state => $module );
         $K->post( main => log_result => $modname => "$modname has been imported" );
 
-        # continue: package is ready to be imported
-        $self->yield( "upstream_import_package" );
+        # now we need to wait for the prereqs to be available upstream
+        $self->yield( "upstream_prereqs_wait" );
     };
 }
 
+{
+
+=event upstream_prereqs_wait
+
+    upstream_prereqs_wait( )
+
+Request to wait for upstream prereqs to be all present before attempting
+to build the module locally.
+
+=event upstream_prereqs_available
+
+    upstream_prereqs_available( $modname )
+
+Inform the worker that C<$modname> is now available upstream. This may
+unblock the worker from waiting if all the needed modules are present.
+
+=cut
+
+    event upstream_prereqs_wait => sub {
+        my $self = shift;
+        my $module  = $self->module;
+        my $modname = $module->name;
+        my @prereqs = sort $module->upstream->prereqs;
+
+        if ( @prereqs == 0 ) {
+            # all prereqs are available, start the build!
+            $self->yield( "upstream_build_package" );
+            return;
+        }
+
+        $self->_set_state( "upstream_prereqs_wait" );
+        $K->post( main => log_step => $modname => "Waiting for upstream prereqs" );
+        $K->post( main => log_comment => $modname => "Missing prereqs: @prereqs" );
+    };
+
+    event upstream_prereqs_available => sub {
+        my ($self, $newmod) = @_[OBJECT, ARG0];
+        my $module  = $self->module;
+        my $modname = $module->name;
+        my $repo    = $module->upstream;
+
+        return unless $repo->miss_prereq( $newmod );
+        $repo->rm_prereq( $newmod );
+        return unless $self->_has_state && $self->_state eq "upstream_prereqs_wait";
+
+        if ( $repo->can_build ) {
+            $self->_clear_state;
+            $K->post( main => log_result => $modname => "All prereqs are available upstream" );
+            $self->yield( "upstream_build_package" );
+            return;
+        }
+
+        my @prereqs = sort $repo->prereqs;
+        $K->post( main => log_comment => $modname => "Missing prereqs: @prereqs" );
+    };
+}
 
 
 

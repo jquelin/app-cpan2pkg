@@ -55,6 +55,8 @@ event new_module_wanted => sub {
         my $sender = $_[SENDER];
         $K->post( $sender => local_prereqs_available => $modname )
             if $module->local->status eq "available";
+        $K->post( $sender => upstream_prereqs_available => $modname )
+            if $module->upstream->status eq "available";
         return;
     }
 
