@@ -53,6 +53,16 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
     };
 }
 
+{ # upstream_import_package
+    override upstream_import_package => sub {
+        super();
+        my $self = shift;
+        my $srpm = $self->srpm;
+        my $cmd = "mgarepo import $srpm";
+        $self->run_command( $cmd => "_upstram_import_package_result" );
+    };
+}
+
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

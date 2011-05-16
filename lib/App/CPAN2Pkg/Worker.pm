@@ -523,6 +523,55 @@ Install the native package generated previously by C<cpan2dist>.
     };
 }
 
+{
+
+=event upstream_import_package
+
+    upstream_import_package( )
+
+Import the package in upstream repository.
+
+=cut
+
+    event upstream_import_package => sub {
+        my $self    = shift;
+        my $module  = $self->module;
+        my $modname = $module->name;
+
+        $module->local->set_status( "importing" );
+        $K->post( main => module_state => $module );
+        $K->post( main => log_step => $modname => 'Importing package' );
+    };
+
+    #
+    # _upstram_import_package_result( $status )
+    #
+    # received when import of the package has been done.
+    #
+    event _upstram_import_package_result => sub {
+        my ($self, $status) = @_[OBJECT, ARG0];
+        my $module  = $self->module;
+        my $modname = $module->name;
+
+        if ( $status != 0 ) {
+            # error while importing package
+            $module->local->set_status( 'error' );
+            $K->post( main => module_state => $module );
+            $K->post( main => log_result => $modname => "$modname could not be imported" );
+            return;
+        }
+
+        $module->local->set_status( 'not available' );
+        $K->post( main => module_state => $module );
+        $K->post( main => log_result => $modname => "$modname has been imported" );
+
+        # continue: package is ready to be imported
+        $self->yield( "upstream_import_package" );
+    };
+}
+
+
+
 
 # -- public methods
 
