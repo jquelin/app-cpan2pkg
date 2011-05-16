@@ -84,6 +84,28 @@ has rpm  => ( rw, isa=>'Path::Class::File' );
         # storing path to packages
         $self->set_srpm( file($srpm) );
         $self->set_rpm ( file($rpm) );
+
+        $self->yield( "local_install_from_package" );
+    };
+}
+
+{
+    override local_install_from_package => sub {
+        super();
+        $K->yield( get_rpm_lock => "_local_install_from_package_with_rpm_lock" );
+    };
+
+    event _local_install_from_package_with_rpm_lock => sub {
+        my $self = shift;
+        my $rpm = $self->rpm;
+        my $cmd = "sudo rpm -Uv $rpm";
+        $self->run_command( $cmd => "_local_install_from_package_result" );
+    };
+
+    override _local_install_from_package_result => sub {
+        my $self = shift;
+        $self->rpmlock->release;
+        super();
     };
 }
 

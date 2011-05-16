@@ -427,7 +427,7 @@ unblock the worker from waiting if all the needed modules are present.
 
 =event cpanplus_create_package
 
-    cpanplus_create_package
+    cpanplus_create_package( )
 
 Try to create a native package for the module using C<cpan2dist>.
 
@@ -471,6 +471,56 @@ Try to create a native package for the module using C<cpan2dist>.
     # check if module was successfully built using cpan2dist.
     #
     event _cpanplus_create_package_result => sub { };
+}
+
+{
+
+=event local_install_from_package
+
+    local_install_from_package( )
+
+Install the native package generated previously by C<cpan2dist>.
+
+=cut
+
+    event local_install_from_package => sub {
+        my $self    = shift;
+        my $module  = $self->module;
+        my $modname = $module->name;
+
+        $module->local->set_status( "installing" );
+        $K->post( main => module_state => $module );
+        $K->post( main => log_step => $modname => 'Installing package' );
+    };
+
+    #
+    # _local_install_from_package_result( $status )
+    #
+    # received after installation of newly generated package is
+    # complete.
+    #
+    event _local_install_from_package_result => sub {
+        my ($self, $status) = @_[OBJECT, ARG0];
+        my $module  = $self->module;
+        my $modname = $module->name;
+
+        if ( $status != 0 ) {
+            # error while installing
+            $module->local->set_status( 'error' );
+            $K->post( main => module_state => $module );
+            $K->post( main => log_result => $modname => "$modname is not available locally." );
+            return;
+        }
+        $module->local->set_status( 'available' );
+        $K->post( main => module_state => $module );
+        $K->post( main => log_result => $modname => "$modname is available locally." );
+
+        # inform controller of availability
+        $K->post( controller => module_ready_locally => $modname );
+
+        # continue: package is ready to be imported
+        $self->yield( "upstream_import_package" );
+    };
 }
 
 
