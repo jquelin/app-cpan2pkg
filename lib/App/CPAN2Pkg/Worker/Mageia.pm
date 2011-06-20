@@ -5,9 +5,12 @@ use warnings;
 package App::CPAN2Pkg::Worker::Mageia;
 # ABSTRACT: worker dedicated to Mageia distribution
 
+use HTML::TreeBuilder;
+use HTTP::Request;
 use Moose;
 use MooseX::POE;
 use POE;
+use POE::Component::Client::HTTP;
 use Readonly;
 
 extends 'App::CPAN2Pkg::Worker::RPM';
@@ -60,6 +63,71 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
         my $srpm = $self->srpm;
         my $cmd = "mgarepo import $srpm";
         $self->run_command( $cmd => "_upstram_import_package_result" );
+    };
+}
+
+{ # upstream_build_package
+    override upstream_build_package => sub {
+        super();
+        my $self = shift;
+        my $pkgname = $self->srpm->basename;
+        $pkgname =~ s/-\d.*$//;
+        my $cmd = "mgarepo submit $pkgname";
+        $self->run_command( $cmd => "_upstram_build_package_result" );
+    };
+
+    override _upstream_build_wait => sub {
+        my $self = shift;
+        my $modname = $self->module->name;
+        POE::Component::Client::HTTP->spawn( Alias => "ua-$modname" );
+        $self->yield( "_upstream_build_wait_request" );
+    };
+
+    event _upstream_build_wait_request => sub {
+        my $self = shift;
+        my $modname = $self->module->name;
+        my $url = "http://pkgsubmit.mageia.org/";
+        my $request = HTTP::Request->new(GET => $url);
+        $K->post( "ua-$modname" => request => _upstream_build_wait_answer => $request );
+    };
+
+    event _upstream_build_wait_answer => sub {
+        my ($self, $requests, $answers) = @_[OBJECT, ARG0, ARG1];
+        my $answer = $answers->[0];
+        my $pkg = $self->srpm->basename;
+        $pkg =~ s/\.src.rpm$//;
+
+        my $tree  = HTML::TreeBuilder->new_from_content( $answer->as_string );
+        my $table = $tree->find_by_tag_name('table');
+        my $link  = $table->look_down(
+            _tag => "a",
+            sub {
+                my ($text) = $_[0]->content_list;
+                $text =~ /$pkg/;
+            }
+        );
+        my (@cells)  = $link->parent->parent->content_list;
+        my ($status) = $cells[6]->content_list;
+
+        my $modname = $self->module->name;
+        my $ua = "ua-$modname";
+        given ( $status ) {
+            when ( "uploaded" ) {
+                # nice, we finally made it!
+                # wait 2 minutes to be sure package has been indexed
+                $K->delay( _upstream_build_package_ready => 120 );
+                $K->post( $ua => "shutdown" );
+            }
+            when ( "failure" ) {
+                my $url = "http://pkgsubmit.mageia.org/" . $status->attr("href");
+                $self->yield( _upstream_build_package_failed => $url );
+                $K->post( $ua => "shutdown" );
+            }
+            default {
+                # no definitive result, wait a bit before checking again
+                $K->delay( _upstream_build_wait_request => 60 );
+            }
+        }
     };
 }
 
