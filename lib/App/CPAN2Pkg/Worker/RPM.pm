@@ -98,7 +98,7 @@ has rpm  => ( rw, isa=>'Path::Class::File' );
     event _local_install_from_package_with_rpm_lock => sub {
         my $self = shift;
         my $rpm = $self->rpm;
-        my $cmd = "sudo rpm -Uv $rpm";
+        my $cmd = "sudo rpm -Uv --force $rpm";
         $self->run_command( $cmd => "_local_install_from_package_result" );
     };
 
