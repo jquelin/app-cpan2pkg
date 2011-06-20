@@ -140,9 +140,9 @@ event module_state => sub {
     $hlist->itemConfigure( $elem, 0, -image=>$bulletl );
     $hlist->itemConfigure( $elem, 1, -image=>$bulletu );
 
-    $self->_w( "btn_close_$modname" )->configure( enabled )
-        if $module->local->status    eq 'available'
-        && $module->upstream->status eq 'available';
+#    $self->_w( "btn_close_$modname" )->configure( enabled )
+#        if $module->local->status    eq 'available'
+#        && $module->upstream->status eq 'available';
 };
 
 # -- public events
@@ -185,26 +185,49 @@ event new_module => sub {
     $self->_set_w( "rotext_$modname", $rotext );
 
     # close button
-    my $b = $pane->Button(
-        -text    => "Clean finished module",
-        -command => $self->_session->postback( "_on_btn_clean", $modname ),
-        disabled,
-    )->pack( top, fillx );
-    $self->_set_w( "btn_close_$modname", $b );
+#    my $b = $pane->Button(
+#        -text    => "Clean finished module",
+#        -command => $self->_session->postback( "_on_btn_clean", $modname ),
+#        disabled,
+#    )->pack( top, fillx );
+#    $self->_set_w( "btn_close_$modname", $b );
 };
 
 
 # -- gui events
 
-event _on_btn_clean => sub {
-    my ($self, $args) = @_[OBJECT, ARG0];
-    my ($modname) = @$args;
-    $self->_w('notebook')->delete( $modname );
+#event _on_btn_clean => sub {
+#    my ($self, $args) = @_[OBJECT, ARG0];
+#    my ($modname) = @$args;
+#    $self->_w('notebook')->delete( $modname );
+#
+#    my $hlist = $self->_w( 'hlist' );
+#    my @children = $hlist->info( 'children' );
+#    my $elem     = first { $hlist->info(data=>$_) eq $modname } @children;
+#    $hlist->delete( entry => $elem );
+#};
 
+event _on_btn_clean_all => sub {
+    my $self = shift;
+    my $nb    = $self->_w( 'notebook' );
     my $hlist = $self->_w( 'hlist' );
-    my @children = $hlist->info( 'children' );
-    my $elem     = first { $hlist->info(data=>$_) eq $modname } @children;
-    $hlist->delete( entry => $elem );
+    my $app   = App::CPAN2Pkg->instance;
+
+    my %pages;
+    @pages{ $nb->info("pages") } = ();
+
+    my @modnames = $app->all_modules;
+    foreach my $modname ( @modnames ) {
+        my $module = $app->module( $modname );
+        next unless exists $pages{ $modname };
+        next if $module->local->status    ne 'available';
+        next if $module->upstream->status ne 'available';
+
+        $nb->delete( $modname );
+        my @children = $hlist->info( 'children' );
+        my $elem     = first { $hlist->info(data=>$_) eq $modname } @children;
+        $hlist->delete( entry => $elem );
+    }
 };
 
 #
@@ -277,6 +300,7 @@ sub _build_gui {
     #
     my $f = $mw->Frame->pack( top, xfill2 );
     $self->_build_hlist( $f );
+    $self->_build_close_btn( $f );
     $self->_build_notebook( $f );
 
     # center & show the window
@@ -286,6 +310,20 @@ sub _build_gui {
     $self->_w("ent_module")->focus;
 }
 
+
+#
+# $main->_build_close_btn( $parent );
+#
+# build the button to close all finished modules.
+#
+sub _build_close_btn {
+    my ($self, $parent) = @_;
+
+    my $b = $parent->Button(
+        -text    => "Clean all finished modules",
+        -command => $self->_session->postback( "_on_btn_clean_all" ),
+    )->pack( bottom, fillx );
+}
 
 #
 # $main->_build_hlist( $parent );
@@ -320,7 +358,7 @@ sub _build_notebook {
     my ($self, $parent) = @_;
 
     # create the notebook that will hold module details
-    my $nb = $parent->NoteBook->pack( right, xfill2 );
+    my $nb = $parent->NoteBook->pack( top, xfill2 );
     $self->_set_w('notebook', $nb);
 
     # create a first tab with the legend
