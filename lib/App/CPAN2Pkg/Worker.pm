@@ -457,10 +457,9 @@ Try to create a native package for the module using C<cpan2dist>.
         my $ignore = '';
         $ignore .= "--ignore '^$_\$' " foreach $module->prereqs;
 
-        # preparing command. note that we do want --force, to be able to extract
-        # the rpm and srpm pathes from the output.
+        # preparing command.
         my $flavour = $self->cpan2dist_flavour;
-        my $cmd = "cpan2dist $ignore --force --format=$flavour $modname";
+        my $cmd = "cpan2dist $ignore --format=$flavour $modname";
 
         $self->run_command( $cmd => "_cpanplus_create_package_result" );
     };
