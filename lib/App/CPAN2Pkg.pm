@@ -85,7 +85,8 @@ sub run {
 
     # check if the platform is supported
     eval "require $WORKER_TYPE";
-    die "Platform $LINUX_FLAVOUR is not supported" if $@;
+    die "Platform $LINUX_FLAVOUR is not supported" if $@ =~ /^Can't locate/;
+    die $@ if $@;
 
     # create the poe sessions
     App::CPAN2Pkg::Controller->new( queue=>\@modules );
