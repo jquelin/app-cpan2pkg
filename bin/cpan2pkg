@@ -17,6 +17,12 @@ exit;
 
 __END__
 
+=head1 SYNOPSIS
+
+    $ cpan2pkg
+    $ cpan2pkg Module::Foo Module::Bar ...
+
+
 =head1 DESCRIPTION
 
 =head2 Purpose of the program
