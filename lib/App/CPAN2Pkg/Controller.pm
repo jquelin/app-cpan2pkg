@@ -46,6 +46,15 @@ sub START {
 
 # -- events
 
+=event new_module_wanted
+
+    new_module_wanted( $modname )
+
+Request C<$modname> to be investigated. It can already exist in this
+run, in which case it won't be propagated any further.
+
+=cut
+
 event new_module_wanted => sub {
     my ($self, $modname) = @_[OBJECT, ARG0];
 
@@ -65,12 +74,33 @@ event new_module_wanted => sub {
     $WORKER_TYPE->new( module => $module );
 };
 
+
+=event module_ready_locally
+
+    module_ready_locally( $modname )
+
+Received when a worker has finished building / installing / fetching a
+module locally, meaning it is available on this very platform.
+
+=cut
+
 event module_ready_locally => sub {
     my ($self, $modname) = @_[OBJECT, ARG0];
     my $app = App::CPAN2Pkg->instance;
     $K->post( $_ => local_prereqs_available => $modname )
         for $app->all_modules;
 };
+
+
+=event module_ready_upstream
+
+    module_ready_upstream( $modname )
+
+Received when a worker has witnessed a module is available upstream,
+either because it existed previously, or because it has been built on
+build system.
+
+=cut
 
 event module_ready_upstream => sub {
     my ($self, $modname) = @_[OBJECT, ARG0];
@@ -87,4 +117,9 @@ __END__
 =for Pod::Coverage
     START
 
+
+=head1 DESCRIPTION
+
+This module implements a POE session responsible for dispatching events
+from and to the interface.
 
