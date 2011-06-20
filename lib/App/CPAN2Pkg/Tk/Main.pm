@@ -103,6 +103,15 @@ C<$module> tab.
     };
 }
 
+=event module_state
+
+    module_state( $module )
+
+Sent from the controller when a module has changed status (either
+local or upstream).
+
+=cut
+
 event module_state => sub {
     my ($self, $module) = @_[OBJECT, ARG0 .. $#_ ];
     my $modname = $module->name;
@@ -137,6 +146,15 @@ event module_state => sub {
 };
 
 # -- public events
+
+=event new_module
+
+    new_module( $module )
+
+Received from the controller when a new module needs to be investigated.
+Said module will be followed by a L<App::CPAN2Pkg::Worker> session.
+
+=cut
 
 event new_module => sub {
     my ($self, $module) = @_[OBJECT, ARG0];
@@ -337,3 +355,9 @@ __END__
 =for Pod::Coverage
     START
 
+
+=head1 DESCRIPTION
+
+This class implements the whole L<Tk> graphical interface. It is a POE
+session driving events and updating the display as workers change
+status.
