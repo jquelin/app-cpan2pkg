@@ -55,33 +55,54 @@ sub START {
 
 # -- public logging events
 
-event log_out => sub {
-    my ($self, $module, $line) = @_[OBJECT, ARG0 .. $#_ ];
-    my $rotext = $self->_w( "rotext_$module" );
-    $rotext->insert( 'end', "$line\n" );
-};
-event log_err => sub {
-    my ($self, $module, $line) = @_[OBJECT, ARG0 .. $#_ ];
-    my $rotext = $self->_w( "rotext_$module" );
-    $rotext->insert( 'end', "$line\n", "error" );
-};
-event log_comment => sub {
-    my ($self, $module, $line) = @_[OBJECT, ARG0 .. $#_ ];
-    my $rotext = $self->_w( "rotext_$module" );
-    my $timestamp = DateTime->now(time_zone=>"local")->hms;
-    $rotext->insert( 'end', "* $timestamp $line\n", "comment" );
-};
-event log_result => sub {
-    my ($self, $module, $result) = @_[OBJECT, ARG0 .. $#_ ];
-    my $rotext = $self->_w( "rotext_$module" );
-    my $timestamp = DateTime->now(time_zone=>"local")->hms;
-    $rotext->insert( 'end', "* $timestamp $result\n", "result" );
-};
-event log_step => sub {
-    my ($self, $module, $step) = @_[OBJECT, ARG0 .. $#_ ];
-    my $rotext = $self->_w( "rotext_$module" );
-    $rotext->insert( 'end', "\n\n** $step\n\n", "step" );
-};
+{
+
+=event log_out
+
+=event log_err
+
+=event log_comment
+
+=event log_result
+
+=event log_step
+
+    log_XXX( $module, $line )
+
+Log a C<$line> of output / stderr / comment / result / step in
+C<$module> tab.
+
+=cut
+
+    event log_out => sub {
+        my ($self, $module, $line) = @_[OBJECT, ARG0 .. $#_ ];
+        my $rotext = $self->_w( "rotext_$module" );
+        $rotext->insert( 'end', "$line\n" );
+    };
+    event log_err => sub {
+        my ($self, $module, $line) = @_[OBJECT, ARG0 .. $#_ ];
+        my $rotext = $self->_w( "rotext_$module" );
+        $rotext->insert( 'end', "$line\n", "error" );
+    };
+    event log_comment => sub {
+        my ($self, $module, $line) = @_[OBJECT, ARG0 .. $#_ ];
+        my $rotext = $self->_w( "rotext_$module" );
+        my $timestamp = DateTime->now(time_zone=>"local")->hms;
+        $rotext->insert( 'end', "* $timestamp $line\n", "comment" );
+    };
+    event log_result => sub {
+        my ($self, $module, $result) = @_[OBJECT, ARG0 .. $#_ ];
+        my $rotext = $self->_w( "rotext_$module" );
+        my $timestamp = DateTime->now(time_zone=>"local")->hms;
+        $rotext->insert( 'end', "* $timestamp $result\n", "result" );
+    };
+    event log_step => sub {
+        my ($self, $module, $step) = @_[OBJECT, ARG0 .. $#_ ];
+        my $rotext = $self->_w( "rotext_$module" );
+        $rotext->insert( 'end', "\n\n** $step\n\n", "step" );
+    };
+}
+
 event module_state => sub {
     my ($self, $module) = @_[OBJECT, ARG0 .. $#_ ];
     my $modname = $module->name;
