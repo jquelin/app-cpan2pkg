@@ -108,14 +108,18 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
         );
         my (@cells)  = $link->parent->parent->content_list;
         my ($status) = $cells[6]->content_list;
+        $status = "unknown" if ref($status);
 
         my $modname = $self->module->name;
         my $ua = "ua-$modname";
         given ( $status ) {
             when ( "uploaded" ) {
                 # nice, we finally made it!
-                # wait 2 minutes to be sure package has been indexed
-                $K->delay( _upstream_build_package_ready => 120 );
+                my $min = 3;
+                $K->post( main => log_comment => $modname =>
+                    "module successfully built, waiting $min minutes to index it" );
+                # wait some time to be sure package has been indexed
+                $K->delay( _upstream_build_package_ready => $min * 60 );
                 $K->post( $ua => "shutdown" );
             }
             when ( "failure" ) {
@@ -125,6 +129,8 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
             }
             default {
                 # no definitive result, wait a bit before checking again
+                $K->post( main => log_comment => $modname =>
+                    "still not ready (current status: $status), waiting 1 more minute" );
                 $K->delay( _upstream_build_wait_request => 60 );
             }
         }
