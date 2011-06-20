@@ -105,8 +105,8 @@ event module_state => sub {
     my $coloru = $color{ $module->upstream->status };
 
     # update bullets
-    my $bulletl  = image( $SHAREDIR->file("bullets", "$colorl.png") );
-    my $bulletu  = image( $SHAREDIR->file("bullets", "$coloru.png") );
+    my $bulletl = image( $SHAREDIR->file("bullets", "$colorl.png") );
+    my $bulletu = image( $SHAREDIR->file("bullets", "$coloru.png") );
     $hlist->itemConfigure( $elem, 0, -image=>$bulletl );
     $hlist->itemConfigure( $elem, 1, -image=>$bulletu );
 

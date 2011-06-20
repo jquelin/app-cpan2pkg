@@ -542,7 +542,7 @@ Import the package in upstream repository.
         my $module  = $self->module;
         my $modname = $module->name;
 
-        $module->local->set_status( "importing" );
+        $module->upstream->set_status( "importing" );
         $K->post( main => module_state => $module );
         $K->post( main => log_step => $modname => 'Importing package' );
     };
@@ -559,13 +559,13 @@ Import the package in upstream repository.
 
         if ( $status != 0 ) {
             # error while importing package
-            $module->local->set_status( 'error' );
+            $module->upstream->set_status( 'error' );
             $K->post( main => module_state => $module );
             $K->post( main => log_result => $modname => "$modname could not be imported" );
             return;
         }
 
-        $module->local->set_status( 'not available' );
+        $module->upstream->set_status( 'not available' );
         $K->post( main => module_state => $module );
         $K->post( main => log_result => $modname => "$modname has been imported" );
 
@@ -646,7 +646,7 @@ Request package to be built on upstream build system.
         my $module  = $self->module;
         my $modname = $module->name;
 
-        $module->local->set_status( "building" );
+        $module->upstream->set_status( "building" );
         $K->post( main => module_state => $module );
         $K->post( main => log_step => $modname => 'Building package upstream' );
     };
@@ -663,7 +663,7 @@ Request package to be built on upstream build system.
 
         if ( $status != 0 ) {
             # error while submitting package
-            $module->local->set_status( 'error' );
+            $module->upstream->set_status( 'error' );
             $K->post( main => module_state => $module );
             $K->post( main => log_result => $modname => "$modname could not be submitted" );
             return;
