@@ -72,6 +72,13 @@ event module_ready_locally => sub {
         for $app->all_modules;
 };
 
+event module_ready_upstream => sub {
+    my ($self, $modname) = @_[OBJECT, ARG0];
+    my $app = App::CPAN2Pkg->instance;
+    $K->post( $_ => upstream_prereqs_available => $modname )
+        for $app->all_modules;
+};
+
 no Moose;
 __PACKAGE__->meta->make_immutable;
 1;

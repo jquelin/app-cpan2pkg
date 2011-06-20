@@ -115,6 +115,11 @@ Check if module is available in the distribution repositories.
 
         my $upstream = $status == 0 ? 'available' : 'not available';
         $module->upstream->set_status( $upstream );
+
+        # inform controller of availability
+        $K->post( controller => module_ready_upstream => $modname )
+            if $upstream eq "available";
+
         $K->post( main => log_result => $modname => "$modname is $upstream upstream." );
         $K->post( main => module_state => $module );
         $self->yield( "check_local_availability" );
