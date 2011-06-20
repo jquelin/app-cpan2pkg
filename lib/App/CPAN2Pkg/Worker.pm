@@ -626,6 +626,81 @@ unblock the worker from waiting if all the needed modules are present.
     };
 }
 
+{
+
+=event upstream_build_package
+
+    upstream_build_package( )
+
+Request package to be built on upstream build system.
+
+=cut
+
+    event upstream_build_package => sub {
+        my $self    = shift;
+        my $module  = $self->module;
+        my $modname = $module->name;
+
+        $module->local->set_status( "building" );
+        $K->post( main => module_state => $module );
+        $K->post( main => log_step => $modname => 'Building package upstream' );
+    };
+
+    #
+    # _upstram_build_package_result( $status )
+    #
+    # received when package submitting has been done.
+    #
+    event _upstram_build_package_result => sub {
+        my ($self, $status) = @_[OBJECT, ARG0];
+        my $module  = $self->module;
+        my $modname = $module->name;
+
+        if ( $status != 0 ) {
+            # error while submitting package
+            $module->local->set_status( 'error' );
+            $K->post( main => module_state => $module );
+            $K->post( main => log_result => $modname => "$modname could not be submitted" );
+            return;
+        }
+
+        # now we need to wait for the build to finish...
+        $K->post( main => log_comment => $modname => "$modname has been submitted" );
+        $self->yield( "_upstream_build_wait" );
+    };
+
+    #
+    # _upstream_build_wait( )
+    #
+    # check on a regular basis whether the build has been finished.
+    #
+    event _upstream_build_wait => sub { };
+
+    event _upstream_build_package_ready => sub {
+        my $self    = shift;
+        my $module  = $self->module;
+        my $modname = $module->name;
+
+        $module->upstream->set_status( "available" );
+        $K->post( main => module_state => $module );
+        $K->post( main => log_result => $modname => 'Package successfully built' );
+
+        # inform controller of availability
+        $K->post( controller => module_ready_upstream => $modname );
+    };
+
+    event _upstream_build_package_failed => sub {
+        my ($self, $details) = @_[OBJECT, ARG0];
+        my $module  = $self->module;
+        my $modname = $module->name;
+
+        $module->upstream->set_status( "error" );
+        $K->post( main => module_state => $module );
+        $K->post( main => log_result => $modname => 'Error while building package' );
+        $K->post( main => log_result => $modname => "details: $details" );
+    };
+}
+
 
 
 # -- public methods
