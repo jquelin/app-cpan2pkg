@@ -8,6 +8,8 @@ package App::CPAN2Pkg::Worker::Mageia;
 use HTML::TreeBuilder;
 use HTTP::Request;
 use Moose;
+use MooseX::ClassAttribute;
+use MooseX::Has::Sugar;
 use MooseX::POE;
 use POE;
 use POE::Component::Client::HTTP;
@@ -16,6 +18,16 @@ use Readonly;
 extends 'App::CPAN2Pkg::Worker::RPM';
 
 Readonly my $K => $poe_kernel;
+
+# -- class attribute
+
+class_has _ua => ( ro, isa=>'Str', builder=>"_build__ua" );
+
+sub _build__ua {
+    my $ua = "mageia-bswait";
+    POE::Component::Client::HTTP->spawn( Alias => $ua );
+    return $ua;
+}
 
 
 # -- public methods
@@ -78,17 +90,14 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
 
     override _upstream_build_wait => sub {
         my $self = shift;
-        my $modname = $self->module->name;
-        POE::Component::Client::HTTP->spawn( Alias => "ua-$modname" );
         $self->yield( "_upstream_build_wait_request" );
     };
 
     event _upstream_build_wait_request => sub {
         my $self = shift;
-        my $modname = $self->module->name;
         my $url = "http://pkgsubmit.mageia.org/";
         my $request = HTTP::Request->new(GET => $url);
-        $K->post( "ua-$modname" => request => _upstream_build_wait_answer => $request );
+        $K->post( $self->_ua => request => _upstream_build_wait_answer => $request );
     };
 
     event _upstream_build_wait_answer => sub {
@@ -108,10 +117,10 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
         );
         my (@cells)  = $link->parent->parent->content_list;
         my ($status) = $cells[6]->content_list;
+        ($status) = $status->content_list if ref($status);
         $status = "unknown" if ref($status);
 
         my $modname = $self->module->name;
-        my $ua = "ua-$modname";
         given ( $status ) {
             when ( "uploaded" ) {
                 # nice, we finally made it!
@@ -120,12 +129,10 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
                     "module successfully built, waiting $min minutes to index it" );
                 # wait some time to be sure package has been indexed
                 $K->delay( _upstream_build_package_ready => $min * 60 );
-                $K->post( $ua => "shutdown" );
             }
             when ( "failure" ) {
                 my $url = "http://pkgsubmit.mageia.org/" . $status->attr("href");
                 $self->yield( _upstream_build_package_failed => $url );
-                $K->post( $ua => "shutdown" );
             }
             default {
                 # no definitive result, wait a bit before checking again
