@@ -78,28 +78,33 @@ C<$module> tab.
         my ($self, $module, $line) = @_[OBJECT, ARG0 .. $#_ ];
         my $rotext = $self->_w( "rotext_$module" );
         $rotext->insert( 'end', "$line\n" );
+        $rotext->yview( 'end' );
     };
     event log_err => sub {
         my ($self, $module, $line) = @_[OBJECT, ARG0 .. $#_ ];
         my $rotext = $self->_w( "rotext_$module" );
         $rotext->insert( 'end', "$line\n", "error" );
+        $rotext->yview( 'end' );
     };
     event log_comment => sub {
         my ($self, $module, $line) = @_[OBJECT, ARG0 .. $#_ ];
         my $rotext = $self->_w( "rotext_$module" );
         my $timestamp = DateTime->now(time_zone=>"local")->hms;
         $rotext->insert( 'end', "* $timestamp $line\n", "comment" );
+        $rotext->yview( 'end' );
     };
     event log_result => sub {
         my ($self, $module, $result) = @_[OBJECT, ARG0 .. $#_ ];
         my $rotext = $self->_w( "rotext_$module" );
         my $timestamp = DateTime->now(time_zone=>"local")->hms;
         $rotext->insert( 'end', "* $timestamp $result\n", "result" );
+        $rotext->yview( 'end' );
     };
     event log_step => sub {
         my ($self, $module, $step) = @_[OBJECT, ARG0 .. $#_ ];
         my $rotext = $self->_w( "rotext_$module" );
         $rotext->insert( 'end', "\n\n** $step\n\n", "step" );
+        $rotext->yview( 'end' );
     };
 }
 
