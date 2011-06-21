@@ -148,6 +148,8 @@ event module_state => sub {
 #    $self->_w( "btn_close_$modname" )->configure( enabled )
 #        if $module->local->status    eq 'available'
 #        && $module->upstream->status eq 'available';
+
+    $hlist->update;
 };
 
 # -- public events
@@ -196,6 +198,8 @@ event new_module => sub {
 #        disabled,
 #    )->pack( top, fillx );
 #    $self->_set_w( "btn_close_$modname", $b );
+
+    $nb->update;
 };
 
 
