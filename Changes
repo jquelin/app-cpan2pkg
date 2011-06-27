@@ -1,7 +1,13 @@
 Revision history for App-CPAN2Pkg
 
 {{$NEXT}}
- - using dist::zilla for release
+
+2.111780  2011-06-27 14:40:26 Europe/Paris
+ - using dist::zilla for release: versioning is 2.YYDDDN (YY=year,
+   DDD=day of year, N=increment in case of multiple releases per day)
+ - using a tk gui instead of a curses one
+ - mageia platform fully supported
+ - platform mandriva no more supported (can be adapted quite easily)
 
 **
 
