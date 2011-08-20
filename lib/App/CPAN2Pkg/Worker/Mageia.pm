@@ -131,7 +131,8 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
                 $K->delay( _upstream_build_package_ready => $min * 60 );
             }
             when ( "failure" ) {
-                my $url = "http://pkgsubmit.mageia.org/" . $status->attr("href");
+                my ($cell) = $cells[6]->content_list;
+                my $url = "http://pkgsubmit.mageia.org/" . $cell->attr("href");
                 $self->yield( _upstream_build_package_failed => $url );
             }
             default {
