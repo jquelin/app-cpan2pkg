@@ -1,6 +1,7 @@
 Revision history for App-CPAN2Pkg
 
 {{$NEXT}}
+ - reflect new page layout of pkgsubmit.mageia.org
 
 2.111781  2011-06-27 17:28:44 Europe/Paris
  - adding missing prereq POE::Loop::Tk, not autodetected

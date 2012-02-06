@@ -8,8 +8,7 @@ package main;
 # ABSTRACT: generating native linux packages from cpan
 
 # for testing purposes
-use FindBin qw{ $Bin };
-use lib "$Bin/../lib";
+use Find::Lib '../lib';
 
 use App::CPAN2Pkg;
 App::CPAN2Pkg->run( @ARGV );
