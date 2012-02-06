@@ -107,7 +107,7 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
         $pkg =~ s/\.src.rpm$//;
 
         my $tree  = HTML::TreeBuilder->new_from_content( $answer->as_string );
-        my $table = $tree->find_by_tag_name('table');
+        my (undef, $table) = $tree->find_by_tag_name('table');
         my $link  = $table->look_down(
             _tag => "a",
             sub {
