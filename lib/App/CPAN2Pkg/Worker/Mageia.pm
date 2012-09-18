@@ -94,31 +94,16 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
 
     event _upstream_build_wait_request => sub {
         my $self = shift;
-        my $url = "http://pkgsubmit.mageia.org/";
-        my $request = HTTP::Request->new(GET => $url);
+        my $pkgname = $self->pkgname;
+        my $url = "http://pkgsubmit.mageia.org/?package=$pkgname&last";
+        my $request = HTTP::Request->new(HEAD => $url);
         $K->post( $self->_ua => request => _upstream_build_wait_answer => $request );
     };
 
     event _upstream_build_wait_answer => sub {
         my ($self, $requests, $answers) = @_[OBJECT, ARG0, ARG1];
         my $answer = $answers->[0];
-        my $pkg = $self->srpm->basename;
-        $pkg =~ s/\.src.rpm$//;
-
-        my $tree  = HTML::TreeBuilder->new_from_content( $answer->as_string );
-        my (undef, $table) = $tree->find_by_tag_name('table');
-        my $link  = $table->look_down(
-            _tag => "a",
-            sub {
-                my ($text) = $_[0]->content_list;
-                $text =~ /$pkg/;
-            }
-        );
-        my (@cells)  = $link->parent->parent->content_list;
-        my ($status) = $cells[6]->content_list;
-        ($status) = $status->content_list if ref($status);
-        $status = "unknown" if ref($status);
-
+        my $status = $answer->header( 'x-bs-package-status' );
         my $modname = $self->module->name;
         given ( $status ) {
             when ( "uploaded" ) {
@@ -130,8 +115,7 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
                 $K->delay( _upstream_build_package_ready => $min * 60 );
             }
             when ( "failure" ) {
-                my ($cell) = $cells[6]->content_list;
-                my $url = "http://pkgsubmit.mageia.org/" . $cell->attr("href");
+                my $url = "http://pkgsubmit.mageia.org/";
                 $self->yield( _upstream_build_package_failed => $url );
             }
             default {
