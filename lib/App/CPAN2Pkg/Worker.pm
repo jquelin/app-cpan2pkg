@@ -548,11 +548,11 @@ Import the package in upstream repository.
     };
 
     #
-    # _upstram_import_package_result( $status )
+    # _upstream_import_package_result( $status )
     #
     # received when import of the package has been done.
     #
-    event _upstram_import_package_result => sub {
+    event _upstream_import_package_result => sub {
         my ($self, $status) = @_[OBJECT, ARG0];
         my $module  = $self->module;
         my $modname = $module->name;
@@ -652,11 +652,11 @@ Request package to be built on upstream build system.
     };
 
     #
-    # _upstram_build_package_result( $status )
+    # _upstream_build_package_result( $status )
     #
     # received when package submitting has been done.
     #
-    event _upstram_build_package_result => sub {
+    event _upstream_build_package_result => sub {
         my ($self, $status) = @_[OBJECT, ARG0];
         my $module  = $self->module;
         my $modname = $module->name;

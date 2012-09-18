@@ -74,7 +74,7 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
         my $self = shift;
         my $srpm = $self->srpm;
         my $cmd = "mgarepo import $srpm";
-        $self->run_command( $cmd => "_upstram_import_package_result" );
+        $self->run_command( $cmd => "_upstream_import_package_result" );
     };
 }
 
@@ -85,7 +85,7 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
         my $pkgname = $self->srpm->basename;
         $pkgname =~ s/-\d.*$//;
         my $cmd = "mgarepo submit $pkgname";
-        $self->run_command( $cmd => "_upstram_build_package_result" );
+        $self->run_command( $cmd => "_upstream_build_package_result" );
     };
 
     override _upstream_build_wait => sub {
