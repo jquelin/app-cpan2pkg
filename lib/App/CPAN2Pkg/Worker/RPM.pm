@@ -41,10 +41,25 @@ Path to the source RPM of the module built with C<cpan2dist>.
 
 Path to the RPM of the module built with C<cpan2dist>.
 
+=has pkgname
+
+The name of the package created.
+
 =cut
 
 has srpm => ( rw, isa=>'Path::Class::File' );
 has rpm  => ( rw, isa=>'Path::Class::File' );
+has pkgname => ( rw, isa=>'Str', lazy_build );
+
+
+# -- initialization
+
+sub _build_pkgname {
+    my $self = shift;
+    my $pkgname = $self->srpm->basename;
+    $pkgname =~ s/-\d.*$//;
+    return $pkgname;
+}
 
 
 # -- cpan2pkg logic implementation

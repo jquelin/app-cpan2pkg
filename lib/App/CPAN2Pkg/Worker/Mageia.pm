@@ -82,8 +82,7 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
     override upstream_build_package => sub {
         super();
         my $self = shift;
-        my $pkgname = $self->srpm->basename;
-        $pkgname =~ s/-\d.*$//;
+        my $pkgname = $self->pkgname;
         my $cmd = "mgarepo submit $pkgname";
         $self->run_command( $cmd => "_upstream_build_package_result" );
     };
