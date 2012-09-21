@@ -18,7 +18,7 @@ use MooseX::Has::Sugar;
 use Readonly;
 
 use App::CPAN2Pkg::Controller;
-use App::CPAN2Pkg::Tk::Main;
+use App::CPAN2Pkg::UI::Tk;
 use App::CPAN2Pkg::Utils      qw{ $LINUX_FLAVOUR $WORKER_TYPE };
 
 use POE;
@@ -90,7 +90,7 @@ sub run {
 
     # create the poe sessions
     App::CPAN2Pkg::Controller->new( queue=>\@modules );
-    App::CPAN2Pkg::Tk::Main->new;
+    App::CPAN2Pkg::UI::Tk->new;
 
     # and let's start the fun!
     POE::Kernel->run;
