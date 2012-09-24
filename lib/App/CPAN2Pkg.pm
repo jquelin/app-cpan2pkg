@@ -5,23 +5,15 @@ use warnings;
 package App::CPAN2Pkg;
 # ABSTRACT: generating native linux packages from cpan
 
-# although it's not strictly needed to load POE::Kernel manually (since
-# MooseX::POE will load it anyway), we're doing it here to make sure poe
-# will use tk event loop. this can also be done by loading module tk
-# before poe, for example if we load app::cpan2pkg::tk::main before
-# moosex::poe... but better be safe than sorry, and doing things
-# explicitly is always better.
-use POE::Kernel { loop => 'Tk' };
-
 use MooseX::Singleton;
 use MooseX::Has::Sugar;
+use POE;
 use Readonly;
 
 use App::CPAN2Pkg::Controller;
+use App::CPAN2Pkg::UI::Text;
 use App::CPAN2Pkg::UI::Tk;
 use App::CPAN2Pkg::Utils      qw{ $LINUX_FLAVOUR $WORKER_TYPE };
-
-use POE;
 
 # -- private attributes
 
@@ -81,7 +73,7 @@ Start the application, with an initial batch of C<@modules> to build.
 =cut
 
 sub run {
-    my (undef, @modules) = @_;
+    my (undef, $opt, @modules) = @_;
 
     # check if the platform is supported
     eval "require $WORKER_TYPE";
@@ -90,7 +82,9 @@ sub run {
 
     # create the poe sessions
     App::CPAN2Pkg::Controller->new( queue=>\@modules );
-    App::CPAN2Pkg::UI::Tk->new;
+    my $ui = $opt->{ui} eq "gui"
+        ? "App::CPAN2Pkg::UI::Tk" : "App::CPAN2Pkg::UI::Text";
+    $ui->new;
 
     # and let's start the fun!
     POE::Kernel->run;

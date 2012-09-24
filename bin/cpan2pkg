@@ -9,17 +9,34 @@ package cpan2pkg;
 
 # for testing purposes
 use Find::Lib '../lib';
+use Getopt::Long::Descriptive;
 
-use App::CPAN2Pkg;
-App::CPAN2Pkg->run( @ARGV );
+my ($opt, $usage) = describe_options(
+    '%c %o <module...>',
+    [ "ui" => hidden => { one_of => [
+        [ "gui|G"  => "graphical interface" ],
+        [ "term|T" => "terminal interface" ],
+    ] } ],
+    [],
+    [ 'help',   "print usage message and exit"                 ],
+);
+print($usage->text), exit if $opt->help;
+$opt->{ui} //= $ENV{DISPLAY} ? "gui" : "term";
+
+# force tk loop for poe if we run the gui
+eval "use Tk" if $opt->{ui} eq "gui";
+
+require App::CPAN2Pkg;
+App::CPAN2Pkg->run( $opt, @ARGV );
 exit;
 
 __END__
 
 =head1 SYNOPSIS
 
-    $ cpan2pkg
+    $ cpan2pkg -G
     $ cpan2pkg Module::Foo Module::Bar ...
+    $ cpan2pkg --help
 
 
 =head1 DESCRIPTION
