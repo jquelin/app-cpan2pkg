@@ -26,7 +26,9 @@ has _modules => (
         all_modules     => 'keys',
         seen_module     => 'exists',
         register_module => 'set',
+        forget_module   => 'delete',
         module          => 'get',
+        nb_modules      => 'count',
     }
 );
 
@@ -38,6 +40,12 @@ has _modules => (
     my @modules = $app->all_modules;
 
 Return the list of all modules that have been / are being processed.
+
+=method nb_modules
+
+    my $nbmods = $app->nb_modules;
+
+Return the number of modules being processed.
 
 =method seen_module
 
@@ -52,6 +60,12 @@ finished processing, or still ongoing.
 
 Store C<$module> as the L<App::CPAN2Pkg::Module> object tracking
 C<$modname>.
+
+=method forget_module
+
+    $app->forget_module( $modname );
+
+Forget C<$modname> and its associated L<App::CPAN2Pkg::Module> object.
 
 =method
 

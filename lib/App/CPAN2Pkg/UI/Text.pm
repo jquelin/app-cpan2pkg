@@ -98,16 +98,32 @@ local or upstream).
 
 event module_state => sub {
     my ($self, $module) = @_[OBJECT, ARG0 .. $#_ ];
-    my $modname = $module->name;
+    my $app       = App::CPAN2Pkg->instance;
+    my $modname   = $module->name;
+    my $timestamp = DateTime->now(time_zone=>"local")->hms;
 
     if ( $module->local->status    eq "error" or
          $module->upstream->status eq "error" ) {
         local $Term::ANSIColor::AUTORESET = 1;
-        my $timestamp = DateTime->now(time_zone=>"local")->hms;
         print RED "$timestamp [$modname] error encountered\n";
         print "$timestamp [$modname] output follows:\n";
         print $self->_outputs->{$modname};
         print RED "$timestamp [$modname] aborting\n";
+        $app->forget_module( $modname );
+    }
+
+    if ( $module->local->status    eq "available" and
+         $module->upstream->status eq "available" ) {
+        local $Term::ANSIColor::AUTORESET = 1;
+        print GREEN "$timestamp [$modname] success\n";
+        $app->forget_module( $modname );
+    }
+
+    {
+        local $Term::ANSIColor::AUTORESET = 1;
+        my $nb = $app->nb_modules;
+        print "$timestamp - $nb modules remaining\n";
+        exit if $nb == 0;
     }
 
     $self->_outputs->{$modname} = "";
