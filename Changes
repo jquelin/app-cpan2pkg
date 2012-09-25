@@ -2,6 +2,9 @@ Revision history for App-CPAN2Pkg
 
 {{$NEXT}}
 
+2.122690  2012-09-25 15:51:35 Europe/Paris
+ - new text interface available
+
 2.122620  2012-09-18 13:44:38 Europe/Paris
  - using official (yet hidden) mageia bs api instead of parsing html
 
