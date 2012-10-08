@@ -108,7 +108,7 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
         given ( $status ) {
             when ( "uploaded" ) {
                 # nice, we finally made it!
-                my $min = 3;
+                my $min = 1;
                 $K->post( main => log_comment => $modname =>
                     "module successfully built, waiting $min minutes to index it" );
                 # wait some time to be sure package has been indexed

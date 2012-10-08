@@ -1,6 +1,9 @@
 Revision history for App-CPAN2Pkg
 
 {{$NEXT}}
+ - mageia: waiting only 1 minute for index (bs now pauses by itself)
+
+**
 
 2.122690  2012-09-25 15:51:35 Europe/Paris
  - new text interface available
