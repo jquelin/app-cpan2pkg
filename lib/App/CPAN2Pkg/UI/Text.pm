@@ -121,8 +121,9 @@ event module_state => sub {
 
     {
         local $Term::ANSIColor::AUTORESET = 1;
-        my $nb = $app->nb_modules;
-        print "$timestamp - $nb modules remaining\n";
+        my $nb   = $app->nb_modules;
+        my @mods = $app->all_modules;
+        print YELLOW "$timestamp cpan2pkg - $nb modules remaining: @mods\n";
         exit if $nb == 0;
     }
 
