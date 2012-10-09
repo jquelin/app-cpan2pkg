@@ -2,6 +2,7 @@ Revision history for App-CPAN2Pkg
 
 {{$NEXT}}
  - tk ui: allow user to mark a module as available
+ - tk ui: prevent empty module creation
 
 3.000     2012-10-09 11:08:45 Europe/Paris
  - moving to dzpba-jquelin 3.x
