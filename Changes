@@ -1,6 +1,7 @@
 Revision history for App-CPAN2Pkg
 
 {{$NEXT}}
+ - moving to dzpba-jquelin 3.x
  - mageia: waiting only 1 minute for index (bs now pauses by itself)
  - mageia: prevent warning when bs ate the submission
  - prereqs: prevent Module::AutoInstall to kick in
