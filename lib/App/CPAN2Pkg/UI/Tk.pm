@@ -346,9 +346,11 @@ sub _build_gui {
 
     #
     my $f = $mw->Frame->pack( top, xfill2 );
-    $self->_build_hlist( $f );
-    $self->_build_close_btn( $f );
-    $self->_build_notebook( $f );
+    my $f1 = $f->Frame->pack( left, filly );
+    my $f2 = $f->Frame->pack( left, xfill2 );
+    $self->_build_hlist( $f1 );
+    $self->_build_close_btn( $f1 );
+    $self->_build_notebook( $f2 );
 
     # center & show the window
     # FIXME: restore last position saved?
@@ -385,7 +387,7 @@ sub _build_hlist {
         -width      => 30,
         -columns    => 3,
         -header     => 1,
-    )->pack( left, filly );
+    )->pack( top, xfilly );
     $self->_set_w( hlist => $hlist );
 
     $hlist->header( create => 0, -text => 'local' );
