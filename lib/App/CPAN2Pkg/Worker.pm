@@ -335,6 +335,7 @@ Run CPANPLUS to find the module prereqs.
 
         $K->post( main => log_step => $modname => "Finding module prereqs" );
         my $cmd = "cpanp /prereqs show $modname";
+        $ENV{PERL_AUTOINSTALL} = "--skipdeps";
         $self->run_command( $cmd => "_cpanplus_find_prereqs_result" );
     };
 

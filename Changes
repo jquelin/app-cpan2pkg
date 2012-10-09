@@ -2,6 +2,7 @@ Revision history for App-CPAN2Pkg
 
 {{$NEXT}}
  - mageia: waiting only 1 minute for index (bs now pauses by itself)
+ - prereqs: prevent Module::AutoInstall to kick in
  - text ui: clearer internal cpan2pkg information
 
 **
