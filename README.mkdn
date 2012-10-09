@@ -4,7 +4,7 @@ App::CPAN2Pkg - generating native linux packages from cpan
 
 # VERSION
 
-version 2.122691
+version 3.001
 
 # SYNOPSIS
 
