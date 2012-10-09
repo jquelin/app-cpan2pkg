@@ -1,0 +1,108 @@
+# NAME
+
+App::CPAN2Pkg - generating native linux packages from cpan
+
+# VERSION
+
+version 2.122691
+
+# SYNOPSIS
+
+    $ cpan2pkg
+    $ cpan2pkg Module::Foo Module::Bar ...
+
+# DESCRIPTION
+
+Don't use this module directly, refer to the `cpan2pkg` script instead.
+
+`App::CPAN2Pkg` is the main entry point for the `cpan2pkg` application. It
+also provides some information about processed modules.
+
+# METHODS
+
+## all\_modules
+
+    my @modules = $app->all_modules;
+
+Return the list of all modules that have been / are being processed.
+
+## nb\_modules
+
+    my $nbmods = $app->nb_modules;
+
+Return the number of modules being processed.
+
+## seen\_module
+
+    my $bool = $app->seen_module( $modname );
+
+Return true if `$modname` has already been seen. It can be either
+finished processing, or still ongoing.
+
+## register\_module
+
+    $app->register_module( $modname, $module );
+
+Store `$module` as the [App::CPAN2Pkg::Module](http://search.cpan.org/perldoc?App::CPAN2Pkg::Module) object tracking
+`$modname`.
+
+## forget\_module
+
+    $app->forget_module( $modname );
+
+Forget `$modname` and its associated [App::CPAN2Pkg::Module](http://search.cpan.org/perldoc?App::CPAN2Pkg::Module) object.
+
+## 
+
+    my $module = $app->module( $modname );
+
+Return the `$module` object registered for `$modname`.
+
+## run
+
+    App::CPAN2Pkg->run( [ @modules ] );
+
+Start the application, with an initial batch of `@modules` to build.
+
+# BUGS
+
+Please report any bugs or feature requests to `app-cpan2pkg at
+rt.cpan.org`, or through the web interface at
+[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-CPAN2Pkg](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-CPAN2Pkg). I will
+be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+# SEE ALSO
+
+You can look for information on this module at:
+
+- Search CPAN
+
+[http://search.cpan.org/dist/App-CPAN2Pkg](http://search.cpan.org/dist/App-CPAN2Pkg)
+
+- See open / report bugs
+
+[http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-CPAN2Pkg](http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-CPAN2Pkg)
+
+- Git repository
+
+[http://github.com/jquelin/app-cpan2pkg](http://github.com/jquelin/app-cpan2pkg)
+
+- AnnoCPAN: Annotated CPAN documentation
+
+[http://annocpan.org/dist/App-CPAN2Pkg](http://annocpan.org/dist/App-CPAN2Pkg)
+
+- CPAN Ratings
+
+[http://cpanratings.perl.org/d/App-CPAN2Pkg](http://cpanratings.perl.org/d/App-CPAN2Pkg)
+
+# AUTHOR
+
+Jerome Quelin <jquelin@gmail.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2009 by Jerome Quelin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
