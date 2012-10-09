@@ -149,6 +149,18 @@ event module_state => sub {
 #        && $module->upstream->status eq 'available';
 
     $hlist->update;
+
+    # allow user to mark a module as available
+    return unless $module->local->status eq "error"
+        or $module->upstream->status eq "error";
+    my $nb = $self->_w('notebook');
+    my $pane   = $nb->page_widget( $modname );
+    my $button = $pane->Button(
+        -text    => 'Mark module as available (locally & upstream)',
+        -command => $self->_session->postback( "_on_btn_mark_available", $module ),
+    )->pack( top, fillx );
+    $self->_set_w( "mark_available_$modname" => $button );
+    $nb->update;
 };
 
 # -- public events
@@ -236,6 +248,32 @@ event _on_btn_clean_all => sub {
         my $elem     = first { $hlist->info(data=>$_) eq $modname } @children;
         $hlist->delete( entry => $elem );
     }
+};
+
+#
+# event: _on_btn_mark_available( $module )
+#
+# received when user clicked the button to mark a module as available.
+#
+event _on_btn_mark_available => sub {
+    my ($self, $args) = @_[ OBJECT, ARG0 ];
+    my $module = $args->[0];
+    my $modname = $module->name;
+
+    # change module status and update interface
+    $module->local->set_status( "available" );
+    $module->upstream->set_status( "available" );
+    $K->yield( log_result => $modname => "Module marked available manually" );
+    $K->yield( module_state => $module );
+
+    # signal controller that module is available
+    $K->post( controller => module_ready_locally  => $modname );
+    $K->post( controller => module_ready_upstream => $modname );
+
+    # remove the button
+    $self->_w( "mark_available_$modname" )->destroy;
+    $self->_del_w( "mark_available_$modname" );
+    $self->_w('notebook')->update;
 };
 
 #
