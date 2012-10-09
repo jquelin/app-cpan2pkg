@@ -103,7 +103,7 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
     event _upstream_build_wait_answer => sub {
         my ($self, $requests, $answers) = @_[OBJECT, ARG0, ARG1];
         my $answer = $answers->[0];
-        my $status = $answer->header( 'x-bs-package-status' );
+        my $status = $answer->header( 'x-bs-package-status' ) // "?";
         my $modname = $self->module->name;
         given ( $status ) {
             when ( "uploaded" ) {
