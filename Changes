@@ -1,6 +1,8 @@
 Revision history for App-CPAN2Pkg
 
 {{$NEXT}}
+
+3.000     2012-10-09 11:08:45 Europe/Paris
  - moving to dzpba-jquelin 3.x
  - mageia: waiting only 1 minute for index (bs now pauses by itself)
  - mageia: prevent warning when bs ate the submission
