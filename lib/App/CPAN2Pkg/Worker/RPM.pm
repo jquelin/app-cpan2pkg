@@ -41,7 +41,7 @@ Path to the source RPM of the module built with C<cpan2dist>.
 
 Path to the RPM of the module built with C<cpan2dist>.
 
-=has pkgname
+=attr pkgname
 
 The name of the package created.
 
