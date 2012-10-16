@@ -1,6 +1,7 @@
 Revision history for App-CPAN2Pkg
 
 {{$NEXT}}
+ - mageia: allow only 2 urpm instances at the same time to prevent fork pikes
 
 3.001     2012-10-09 13:51:44 Europe/Paris
  - tk ui: allow user to mark a module as available

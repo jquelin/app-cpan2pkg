@@ -21,6 +21,19 @@ Readonly my $K => $poe_kernel;
 
 # -- class attribute
 
+class_has _urpm_ok => (
+    rw,
+    traits  => ['Counter'],
+    isa     => 'Int',
+    default => 2,
+    handles => {
+        _urpm_release => "inc",
+        _urpm_grab    => "dec",
+    },
+);
+class_has cpanplus_lock => ( ro, isa=>'App::CPAN2Pkg::Lock', default=>sub{ App::CPAN2Pkg::Lock->new } );
+
+
 class_has _ua => ( ro, isa=>'Str', builder=>"_build__ua" );
 
 sub _build__ua {
@@ -41,10 +54,35 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
     override check_upstream_availability => sub {
         my $self = shift;
         my $modname = $self->module->name;
+        $K->post( main => log_step    => $modname => "Checking if module is packaged upstream");
+        $K->post( main => log_comment => $modname => "waiting for semaphore before running urpm");
+        $K->yield( "_check_upstream_availability_wait4lock" );
+    };
 
+    event _check_upstream_availability_wait4lock => sub {
+        my $self = shift;
+        if ( $self->_urpm_ok ) {
+            $self->_urpm_grab;
+            $K->yield( "_check_upstream_availability_lock_acquired" );
+            return;
+        }
+        $K->delay( _check_upstream_availability_wait4lock => 0.1 );
+    };
+
+    event _check_upstream_availability_lock_acquired => sub {
+        my $self = shift;
+        my $modname = $self->module->name;
+        $K->post( main => log_comment => $modname => "urpm semaphore acquired");
         my $cmd = "urpmq --whatprovides 'perl($modname)'";
-        $K->post( main => log_step => $modname => "Checking if module is packaged upstream");
-        $self->run_command( $cmd => "_check_upstream_availability_result" );
+        $self->run_command( $cmd => "_check_upstream_availability_done" );
+    };
+
+    event _check_upstream_availability_done => sub {
+        my ($self, @args) = @_[OBJECT, ARG0 .. $#_];
+        my $modname = $self->module->name;
+        $self->_urpm_release;
+        $K->post( main => log_comment => $modname => "urpm semaphore released");
+        $K->yield( _check_upstream_availability_result => @args );
     };
 }
 
