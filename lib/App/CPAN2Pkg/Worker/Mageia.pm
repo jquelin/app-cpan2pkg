@@ -143,26 +143,25 @@ override cpan2dist_flavour => sub { "CPANPLUS::Dist::Mageia" };
         my $answer = $answers->[0];
         my $status = $answer->header( 'x-bs-package-status' ) // "?";
         my $modname = $self->module->name;
-        given ( $status ) {
-            when ( "uploaded" ) {
-                # nice, we finally made it!
-                my $min = 1;
-                $K->post( main => log_comment => $modname =>
-                    "module successfully built, waiting $min minutes to index it" );
-                # wait some time to be sure package has been indexed
-                $K->delay( _upstream_build_package_ready => $min * 60 );
-            }
-            when ( "failure" ) {
-                my $url = "http://pkgsubmit.mageia.org/";
-                $self->yield( _upstream_build_package_failed => $url );
-            }
-            default {
-                # no definitive result, wait a bit before checking again
-                $K->post( main => log_comment => $modname =>
-                    "still not ready (current status: $status), waiting 1 more minute" );
-                $K->delay( _upstream_build_wait_request => 60 );
-            }
+        if ($status eq "uploaded") {
+            # nice, we finally made it!
+            my $min = 1;
+            $K->post( main => log_comment => $modname =>
+                "module successfully built, waiting $min minutes to index it" );
+            # wait some time to be sure package has been indexed
+            $K->delay( _upstream_build_package_ready => $min * 60 );
         }
+        elsif ($status eq "failure" ) {
+            my $url = "http://pkgsubmit.mageia.org/";
+            $self->yield( _upstream_build_package_failed => $url );
+        }
+        else {
+            # no definitive result, wait a bit before checking again
+            $K->post( main => log_comment => $modname =>
+                "still not ready (current status: $status), waiting 1 more minute" );
+            $K->delay( _upstream_build_wait_request => 60 );
+        }
+
     };
 }
 

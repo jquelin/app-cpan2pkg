@@ -43,14 +43,14 @@ finished processing, or still ongoing.
 
     $app->register_module( $modname, $module );
 
-Store `$module` as the [App::CPAN2Pkg::Module](http://search.cpan.org/perldoc?App::CPAN2Pkg::Module) object tracking
+Store `$module` as the [App::CPAN2Pkg::Module](https://metacpan.org/pod/App::CPAN2Pkg::Module) object tracking
 `$modname`.
 
 ## forget\_module
 
     $app->forget_module( $modname );
 
-Forget `$modname` and its associated [App::CPAN2Pkg::Module](http://search.cpan.org/perldoc?App::CPAN2Pkg::Module) object.
+Forget `$modname` and its associated [App::CPAN2Pkg::Module](https://metacpan.org/pod/App::CPAN2Pkg::Module) object.
 
 ## 
 
@@ -78,23 +78,23 @@ You can look for information on this module at:
 
 - Search CPAN
 
-[http://search.cpan.org/dist/App-CPAN2Pkg](http://search.cpan.org/dist/App-CPAN2Pkg)
+    [http://search.cpan.org/dist/App-CPAN2Pkg](http://search.cpan.org/dist/App-CPAN2Pkg)
 
 - See open / report bugs
 
-[http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-CPAN2Pkg](http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-CPAN2Pkg)
+    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-CPAN2Pkg](http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-CPAN2Pkg)
 
 - Git repository
 
-[http://github.com/jquelin/app-cpan2pkg](http://github.com/jquelin/app-cpan2pkg)
+    [http://github.com/jquelin/app-cpan2pkg](http://github.com/jquelin/app-cpan2pkg)
 
 - AnnoCPAN: Annotated CPAN documentation
 
-[http://annocpan.org/dist/App-CPAN2Pkg](http://annocpan.org/dist/App-CPAN2Pkg)
+    [http://annocpan.org/dist/App-CPAN2Pkg](http://annocpan.org/dist/App-CPAN2Pkg)
 
 - CPAN Ratings
 
-[http://cpanratings.perl.org/d/App-CPAN2Pkg](http://cpanratings.perl.org/d/App-CPAN2Pkg)
+    [http://cpanratings.perl.org/d/App-CPAN2Pkg](http://cpanratings.perl.org/d/App-CPAN2Pkg)
 
 # AUTHOR
 
