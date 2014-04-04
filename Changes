@@ -2,6 +2,11 @@ Revision history for App-CPAN2Pkg
 
 {{$NEXT}}
 
+3.003     2014-04-04 14:34:35+02:00 Europe/Paris
+ - fix Moose enum warning
+ - make it work with dzil v5
+ - add env var CPAN2PKG_NO_CPANP_X to skip "cpanp x"
+
 3.002     2012-10-29 13:47:56 Europe/Paris
  - mageia: allow only 2 urpm instances at the same time to prevent fork pikes
 
