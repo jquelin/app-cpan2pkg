@@ -71,6 +71,6 @@ then submit module to upstream buildsystem.
 And this, while dealing with dependencies, all the way long, repeating
 steps over and over as needed.
 
-Read L<this blog entry|http://jquelin.blogspot.com/2009/01/cpan-modules-native-linux-
-packages.html> for this module rationale.
+Read L<this blog entry|http://jquelin.blogspot.com/2009/01/cpan-modules-native-linux-packages.html>
+for this module rationale.
 
