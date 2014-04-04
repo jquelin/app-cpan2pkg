@@ -275,11 +275,9 @@ retrying if initialization is currently ongoing.
 
         # cpanplus not yet initialized
         $lock->get( $modname );
-        my $cmd = "cpanp x --update_source";
-
-        if ($ENV{CPAN2PKG_DONT_CPANP_X}) {
-            $cmd = "echo 1";
-        }
+        my $cmd = $ENV{CPAN2PKG_NO_CPANP_X}
+            ? "echo 'CPAN2PKG_NO_CPANP_X: skipping cpanp index recreation'"
+            : "cpanp x --update_source";
 
         $self->run_command( $cmd => "_cpanplus_initialize_result" );
     };
