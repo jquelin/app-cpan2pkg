@@ -2,6 +2,9 @@ Revision history for App-CPAN2Pkg
 
 {{$NEXT}}
 
+3.004     2014-06-12 14:04:24+02:00 Europe/Paris
+ - urls shouldn't have newlines (gh#4)
+
 3.003     2014-04-04 14:34:35+02:00 Europe/Paris
  - fix Moose enum warning
  - make it work with dzil v5
