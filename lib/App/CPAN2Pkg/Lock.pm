@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package App::CPAN2Pkg::Lock;
-# ABSTRACT:
+# ABSTRACT: Simple locking mechanism within cpan2pkg
 
 use Moose;
 use MooseX::Has::Sugar;
